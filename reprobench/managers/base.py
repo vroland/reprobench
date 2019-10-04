@@ -13,6 +13,7 @@ class BaseManager(object):
         self.config = read_config(config, resolve_files=True)
         self.output_dir = kwargs.pop("output_dir")
         self.repeat = kwargs.pop("repeat")
+        self.rbdir = kwargs.pop("rbdir")
 
         context = zmq.Context()
         self.socket = context.socket(zmq.DEALER)
@@ -29,7 +30,7 @@ class BaseManager(object):
         client_results = bootstrap_client(self.config)
         bootstrapped_config = {**self.config, **client_results}
 
-        logger.info("Sending bootstrap event to server")
+        logger.info(f"Sending bootstrap event to server {self.server_address}")
         payload = dict(
             config=bootstrapped_config, output_dir=self.output_dir, repeat=self.repeat
         )

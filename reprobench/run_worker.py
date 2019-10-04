@@ -1,0 +1,3 @@
+import
+
+w = core.w

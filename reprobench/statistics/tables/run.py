@@ -4,11 +4,7 @@ from reprobench.utils import import_class
 
 from .base import PandasExporter
 
-try:
-    import pandas as pd
-except ImportError:
-    pass
-
+import pandas as pd
 
 class RunTable(PandasExporter):
     @classmethod

@@ -1,7 +1,6 @@
 BOOTSTRAP = b"core:bootstrap"
 
 WORKER_JOIN = b"worker:join"
-WORKER_LEAVE = b"worker:leave"
 
 RUN_START = b"run:start"
 RUN_STEP = b"run:step"

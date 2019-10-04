@@ -27,8 +27,9 @@ class CoreObserver(Observer):
     @classmethod
     def get_next_pending_run(cls):
         try:
-            run = Run.select().where(Run.status == Run.PENDING).limit(1).get()
-        except Run.DoesNotExist:
+            run = Run.get_or_none(Run.status == 0)
+        # Attribute error occurs, if no open runs can be found
+        except (Run.DoesNotExist, AttributeError):
             return None
 
         run.status = Run.SUBMITTED

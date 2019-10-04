@@ -6,12 +6,8 @@ from reprobench.core.base import Step, Observer
 from reprobench.core.db import BaseModel, Run, db
 from reprobench.utils import send_event
 
-try:
-    import psutil
-    from cpuinfo import get_cpu_info
-except ImportError:
-    psutil = None
-    get_cpu_info = None
+import psutil
+from cpuinfo import get_cpu_info
 
 
 class Node(BaseModel):

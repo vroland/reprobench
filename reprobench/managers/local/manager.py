@@ -48,7 +48,8 @@ class LocalManager(BaseManager):
 
     @staticmethod
     def spawn_worker(server_address):
-        worker = BenchmarkWorker(server_address)
+        # TODO: This disables tunneling
+        worker = BenchmarkWorker(server_address, None, 4)
         worker.run()
 
     def spawn_workers(self):
