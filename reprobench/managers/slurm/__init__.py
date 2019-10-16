@@ -13,6 +13,12 @@ from .manager import SlurmManager
 @click.option("-r", "--repeat", type=int, default=1)
 @click.argument("command", type=click.Choice(("run", "stop")))
 @click.argument("config", type=click.Path(), default="./benchmark.yml")
+@click.option("--processes", type=int, default=1)
+@click.option("--additional_args", type=str, default="")
+@click.option("--reserve_cores", type=int, default=0)
+@click.option("--reserve_memory", type=int, default=0)
+@click.option("--reserve_time", type=int, default=0)
+@click.option("--reserve_hosts", type=int, default=1)
 @server_info
 @use_tunneling
 @common

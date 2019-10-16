@@ -182,7 +182,7 @@ def bootstrap_tools(config):
         )
         query.execute()
 
-        if "parameters" not in tool:
+        if "parameters" not in tool or tool["parameters"] is None:
             create_parameter_group(tool_name, "default", {})
             continue
 

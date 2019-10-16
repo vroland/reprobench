@@ -1,12 +1,7 @@
 from loguru import logger
 
-try:
-    from psmon import ProcessMonitor
-    from psmon.limiters import CpuTimeLimiter, MaxMemoryLimiter, WallTimeLimiter
-except ImportError:
-    logger.warning(
-        "You may need to install the `psmon` extra to run with this executor."
-    )
+from psmon import ProcessMonitor
+from psmon.limiters import CpuTimeLimiter, MaxMemoryLimiter, WallTimeLimiter
 
 from reprobench.utils import send_event
 
@@ -24,7 +19,7 @@ class PsmonExecutor(Executor):
             config = {}
 
         wall_grace = config.get("wall_grace", 15)
-        self.nonzero_as_rte = config.get("nonzero_rte", True)
+        self.nonzero_as_rte = config.get("nonzero_rte", "true").lower() == "true"
 
         limits = context["run"]["limits"]
         time_limit = float(limits["time"])

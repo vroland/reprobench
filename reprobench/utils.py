@@ -16,14 +16,11 @@ from reprobench.core.exceptions import ExecutableNotFoundError, NotSupportedErro
 from reprobench.core.schema import schema
 from retrying import retry
 from tqdm import tqdm
+from loguru import logger
 
-try:
-    import msgpack
-    from playhouse.apsw_ext import APSWDatabase
-    from reprobench.core.db import db
-except ImportError:
-    APSWDatabase = None
-    db = None
+import msgpack
+from playhouse.apsw_ext import APSWDatabase
+from reprobench.core.db import db
 
 
 def find_executable(executable):

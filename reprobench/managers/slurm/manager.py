@@ -13,15 +13,28 @@ from .utils import to_comma_range
 
 
 class SlurmManager(BaseManager):
+    def __init__(self, config, server_address, tunneling, **kwargs):
+        BaseManager.__init__(self, config, server_address, tunneling, **kwargs)
+        self.additional = kwargs.pop("additional_args")
+        self.cpu_count = kwargs.pop("reserve_cores")
+        self.mem_limit = kwargs.pop("reserve_memory")
+        self.time_limit = kwargs.pop("reserve_time")
+        self.reserve_hosts = kwargs.pop("reserve_hosts")
+
     def prepare(self):
         Path(self.output_dir).mkdir(parents=True, exist_ok=True)
         limits = self.config["limits"]
         time_limit_minutes = int(math.ceil(limits["time"] / 60.0))
 
-        self.cpu_count = limits.get("cores", 1)
-        # @TODO improve this
-        self.time_limit = 2 * time_limit_minutes
-        self.mem_limit = 2 * limits["memory"]
+        if self.cpu_count == 0:
+            self.cpu_count = limits.get("cores", 1)
+
+        if self.time_limit == 0:
+            # @TODO improve this
+            self.time_limit = 2 * time_limit_minutes
+
+        if self.mem_limit == 0:
+            self.mem_limit = 2 * limits["memory"]
 
         if self.tunneling is not None:
             self.server = SSHTunnelForwarder(
@@ -51,21 +64,46 @@ class SlurmManager(BaseManager):
         if self.tunneling is not None:
             address_args = f"-h {self.tunneling['host']} -p {self.tunneling['port']} -K {self.tunneling['key_file']}"
 
-        worker_cmd = f"{sys.exec_prefix}/bin/reprobench worker {address_args} -vv"
+        target_path = f"{sys.exec_prefix}/bin/reprobench"
+        if len(self.rbdir) > 0:
+            target_path = f"{self.rbdir}/reprobench-bin"
+
+        worker_cmd = f"{target_path} worker {address_args} -vv --processes={self.processes}"
+        host_limit = self.pending
+        if self.processes > 1:
+            host_limit = self.reserve_hosts
+
         worker_submit_cmd = [
             "sbatch",
             "--parsable",
-            f"--array=1-{self.pending}",
+            f"--array=1-{host_limit}",
             f"--time={self.time_limit}",
             f"--mem={self.mem_limit}",
             f"--cpus-per-task={self.cpu_count}",
             f"--job-name={self.config['title']}-benchmark-worker",
             f"--output={self.output_dir}/slurm-worker_%a.out",
-            "--wrap",
-            f"srun {worker_cmd}",
         ]
+
+        if self.processes > 1:
+            worker_submit_cmd.append("--exclusive")
+        # Additional args may contain args that are required by the scheduler
+        if len(self.additional) > 0:
+            additional_args = self.additional.split(" ")
+            for i in range(0, len(additional_args), 2):
+                # TODO: This is a hack
+                if i+1 < len(additional_args) and additional_args[i].startswith("-") and not additional_args[i+1].startswith("-"):
+                    worker_submit_cmd.append(f"{additional_args[i]} {additional_args[i+1]}")
+                    i += 1
+                else:
+                    worker_submit_cmd.append(additional_args[i])
+                    if i + 1 < len(additional_args):
+                        worker_submit_cmd.append(additional_args[i+1])
+
+        # Finaly add command
+        worker_submit_cmd.append(f"--wrap=\"srun {worker_cmd}\"")
+
         logger.trace(worker_submit_cmd)
-        self.worker_job = subprocess.check_output(worker_submit_cmd).decode().strip()
+        self.worker_job = subprocess.check_output(" ".join(worker_submit_cmd), shell=True).decode().strip()
         logger.info(f"Worker job array id: {self.worker_job}")
 
     def wait(self):

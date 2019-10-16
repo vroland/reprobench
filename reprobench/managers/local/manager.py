@@ -1,7 +1,7 @@
 import atexit
 import time
 import sys
-from multiprocessing import Pool
+from multiprocessing import Pool, Process
 
 from sshtunnel import SSHTunnelForwarder
 from loguru import logger
@@ -17,6 +17,7 @@ class LocalManager(BaseManager):
         self.num_workers = kwargs.pop("num_workers")
         self.start_time = None
         self.workers = []
+        self.runner_process = None
 
     def exit(self):
         for worker in self.workers:
@@ -47,22 +48,32 @@ class LocalManager(BaseManager):
             logger.info(f"Tunneling established at {self.server_address}")
 
     @staticmethod
-    def spawn_worker(server_address):
-        worker = BenchmarkWorker(server_address)
+    def spawn_worker(server_address, processes=1):
+        # TODO: This disables tunneling
+        worker = BenchmarkWorker(server_address, None, processes)
         worker.run()
 
     def spawn_workers(self):
-        self.pool = Pool(self.num_workers)
-        jobs = (self.server_address for _ in range(self.pending))
-        self.pool_iterator = self.pool.imap_unordered(self.spawn_worker, jobs)
-        self.pool.close()
+        if self.processes == 1:
+            self.pool = Pool(self.num_workers)
+            jobs_address = (self.server_address for _ in range(self.pending))
+            self.pool_iterator = self.pool.imap_unordered(self.spawn_worker, jobs_address)
+            self.pool.close()
+        else:
+            self.runner_process = Process(target=LocalManager.spawn_worker, args=[self.server_address, self.processes])
+            self.runner_process.start()
 
     def wait(self):
-        progress_bar = tqdm(desc="Executing runs", total=self.pending)
-        for _ in self.pool_iterator:
-            progress_bar.update()
-        progress_bar.close()
-        self.pool.join()
+        if self.processes == 1:
+            progress_bar = tqdm(desc="Executing runs", total=self.pending)
+            for _ in self.pool_iterator:
+                progress_bar.update()
+            progress_bar.close()
+            self.pool.join()
+        else:
+            logger.info("Running runner process")
+            self.runner_process.join()
+            logger.info("Done")
 
         if self.tunneling is not None:
             self.server.stop()
