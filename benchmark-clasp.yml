@@ -1,0 +1,50 @@
+title: clasp
+description: Benchmark for different runtimes with and without glibc hack
+
+limits:
+  time: 30 # s
+  memory: 1024 # mb
+
+steps:
+  run:
+    - module: reprobench.core.sysinfo.CollectSystemInfo
+    - module: reprobench.executors.PsmonExecutor
+      config:
+        nonzero_rte: false
+  analysis:
+    - module: reprobench.statistics.tables.RunTable
+      config:
+        joins:
+          - reprobench.executors.db.RunStatistic
+          - reprobench.core.sysinfo.RunNode
+        output: statistics/raw.csv
+#    - module: reprobench.statistics.tables.RunSummaryTable
+#      config:
+#        output: statistics/summary.csv
+#    - module: reprobench.statistics.plots.CactusPlot
+#      config:
+#        measure: wall_time
+#        output: statistics/cactus.ipynb
+
+observers:
+  - module: reprobench.core.sysinfo.SystemInfoObserver
+  - module: reprobench.executors.RunStatisticObserver
+
+tasks:
+  asp-bench:
+    type: url
+    urls:
+      #- http://aspcomp2015.dibris.unige.it/SteinerTree.zip
+      - http://aspcomp2015.dibris.unige.it/GraphColouring.zip
+    path: ./tasks/steiner
+    extract_archives: true
+    patterns: |
+      **/*.asp
+      !**/encoding.asp
+      !**/*.tar.bz2
+
+tools:
+  no-hack:
+    module: clasp-tool.ClaspTool
+  with-hack:
+    module: clasp-tool.ClaspToolLibc
