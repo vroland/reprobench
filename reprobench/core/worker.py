@@ -56,6 +56,8 @@ class BenchmarkWorker:
                 except (BaseSSHTunnelForwarderError, ConnectionResetError) as ee:
                     logger.info(f"Worker spawn failed {ee}")
                     time.sleep(3)
+        else:
+            self.server = None
 
     def killed(self, run_id):
         if self.socket:
@@ -117,6 +119,8 @@ class BenchmarkWorker:
                 # the check, before the join.
                 except RuntimeError:
                     pass
+        if self.server is not None:
+            self.stop_tunneling()
 
     def run_internal(self, target_cpu=-1, ret=None):
         # Pin process, this affects subprocesses as well
@@ -187,7 +191,6 @@ class BenchmarkWorker:
 def cli(**kwargs):
     worker = BenchmarkWorker(**kwargs)
     worker.run()
-
 
 if __name__ == "__main__":
     cli()

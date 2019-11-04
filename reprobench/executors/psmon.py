@@ -60,7 +60,11 @@ class PsmonExecutor(Executor):
         directory=None,
         **kwargs,
     ):
-        out_file = open(out_path, "wb")
+        if out_path is not None:
+            out_file = open(out_path, "wb")
+        else:
+            out_file = sys.stdout
+
         err_file = open(err_path, "wb")
 
         monitor = ProcessMonitor(
