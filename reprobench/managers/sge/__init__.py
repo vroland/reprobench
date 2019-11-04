@@ -12,6 +12,7 @@ from reprobench.console.decorators import server_info, common, use_tunneling
 @click.option("--processes", type=int, default=1)
 @click.argument("command", type=click.Choice(("run", "stop")))
 @click.argument("config", type=click.Path(), default="./benchmark.yml")
+@click.option("--additional_args", type=str, default="")
 @server_info
 @use_tunneling
 @common

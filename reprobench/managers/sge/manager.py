@@ -8,10 +8,15 @@ import subprocess
 import math
 import time
 import os
+import stat
 
 
 class SgeManager(BaseManager):
     """A manager that uses the Sun Grid Engine."""
+
+    def __init__(self, config, server_address, tunneling, **kwargs):
+        BaseManager.__init__(self, config, server_address, tunneling, **kwargs)
+        self.additional = kwargs.pop("additional_args")
 
     def prepare(self):
         Path(self.output_dir).mkdir(parents=True, exist_ok=True)
@@ -22,6 +27,9 @@ class SgeManager(BaseManager):
         # @TODO improve this
         self.time_limit = 2 * time_limit_minutes
         self.mem_limit = 2 * limits["memory"]
+
+        if self.processes > 1:
+            raise Exception("SGE Manager does not support cpu pinning")
 
         if self.tunneling is not None:
             self.server = SSHTunnelForwarder(
@@ -50,8 +58,12 @@ class SgeManager(BaseManager):
         address_args = f"--address={self.server_address}"
         if self.tunneling is not None:
             address_args = f"-h {self.tunneling['host']} -p {self.tunneling['port']} -K {self.tunneling['key_file']}"
+        
+        target_path = f"{sys.exec_prefix}/bin/reprobench"
+        if len(self.rbdir) > 0:
+            target_path = f"{self.rbdir}/reprobench-bin"
 
-        worker_cmd = f"{self.rbdir}/bin/reprobench worker {address_args} -vv"
+        worker_cmd = f"{target_path} worker {address_args} -vv"
 
         # Create submission script
         # TODO: Is it ok to assume /bin/sh?
@@ -59,6 +71,7 @@ class SgeManager(BaseManager):
         sge_script = open('sge.sh', 'w')
         sge_script.writelines(["#!/bin/sh\n", worker_cmd])
         sge_script.close()
+        os.chmod('sge.sh', stat.S_IXOTH | stat.S_IROTH | stat.S_IXGRP | stat.S_IRGRP | stat.S_IRWXU)
 
         worker_submit_cmd = [
             "qsub",
@@ -71,14 +84,28 @@ class SgeManager(BaseManager):
             # Convert to Gigabyte
             f"-l h_vmem={'{0:.2g}G'.format(float(self.mem_limit)/1024)}",
             f"-N {self.config['title']}-benchmark-worker",
-            f"{os.path.join(os.getcwd(), 'sge.sh')}",
         ]
 
         # TODO: Add possibility to get $TMPDIR to executing script...
 
         # If more than one processor, activate multiprocessor environment
         if self.cpu_count > 1:
-            worker_submit_cmd.insert(6, f"-pe smp {self.cpu_count}")
+            worker_submit_cmd.append(6, f"-pe smp {self.cpu_count}")
+
+         # Additional args may contain args that are required by the scheduler
+        if len(self.additional) > 0:
+            additional_args = self.additional.split(" ")
+            for i in range(0, len(additional_args), 2):
+                # TODO: This is a hack
+                if i+1 < len(additional_args) and additional_args[i].startswith("-") and not additional_args[i+1].startswith("-"):
+                    worker_submit_cmd.append(f"{additional_args[i]} {additional_args[i+1]}")
+                    i += 1
+                else:
+                    worker_submit_cmd.append(additional_args[i])
+                    if i + 1 < len(additional_args):
+                        worker_submit_cmd.append(additional_args[i+1])
+
+        worker_submit_cmd.append(f"{os.path.join(os.getcwd(), 'sge.sh')}")
 
         # TODO: P allows to set a project name
         logger.trace(worker_submit_cmd)
