@@ -2,8 +2,8 @@ title: clasp
 description: Benchmark for different runtimes with and without glibc hack
 
 limits:
-  time: 30 # s
-  memory: 1024 # mb
+  time: 3600 # s
+  memory: 4024 # mb
 
 steps:
   run:

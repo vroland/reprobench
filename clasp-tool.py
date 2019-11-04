@@ -8,8 +8,8 @@ from loguru import logger
 class ClaspTool(ExecutableTool):
     name = "Clasp Tool"
     prefix = '-'
-    path = "/home/aschidler/Downloads/clasp_glibc"
-    gringo_path = "/home/aschidler/Downloads/clingo-5.4.0-linux-x86_64/gringo"
+    path = "/home/jfichte/clasp_glibc"
+    gringo_path = "/home/jfichte/clingo-5.4.0-linux-x86_64/gringo"
 
     @classmethod
     def is_ready(cls):
