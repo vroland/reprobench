@@ -8,7 +8,8 @@ limits:
 steps:
   run:
     - module: reprobench.core.sysinfo.CollectSystemInfo
-    - module: reprobench.executors.PsmonExecutor
+#    - module: reprobench.executors.PsmonExecutor
+    - module: reprobench.executors.RunSolverPerfEval
       config:
         nonzero_rte: false
   analysis:
@@ -35,12 +36,17 @@ tasks:
     type: url
     urls:
       - https://www.cs.ubc.ca/~hoos/SATLIB/Benchmarks/SAT/GCP/flat30-60.tar.gz
-    path: ./tasks/coloring
+    path: ./tasks/test
     extract_archives: true
     patterns: |
       **/*.cnf
       !**/*.tar.bz2
-
 tools:
-  tester:
-    module: test-tool.TestTool
+  no-hack:
+    module: clasp-tool.ClaspTool
+  with-hack:
+    module: clasp-tool.ClaspToolLibc
+#
+#tools:
+#  tester:
+#    module: test-tool.TestTool

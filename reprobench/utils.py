@@ -218,7 +218,8 @@ def init_db(db_path):
     Args:
         db_path (str): path to the database
     """
-    database = APSWDatabase(db_path, pragmas=(("journal_mode", "wal"),))
+    database = APSWDatabase(":memory:")
+    # database = APSWDatabase(db_path, pragmas=(("journal_mode", "wal"),))
     db.initialize(database)
 
 
