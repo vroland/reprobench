@@ -28,7 +28,7 @@ class SgeManager(BaseManager):
         self.time_limit = 2 * time_limit_minutes
         self.mem_limit = 2 * limits["memory"]
 
-        if self.processes > 1:
+        if self.multirun_cores > 0:
             raise Exception("SGE Manager does not support cpu pinning")
 
         if self.tunneling is not None:
@@ -58,7 +58,7 @@ class SgeManager(BaseManager):
         address_args = f"--address={self.server_address}"
         if self.tunneling is not None:
             address_args = f"-h {self.tunneling['host']} -p {self.tunneling['port']} -K {self.tunneling['key_file']}"
-        
+
         target_path = f"{sys.exec_prefix}/bin/reprobench"
         if len(self.rbdir) > 0:
             target_path = f"{self.rbdir}/reprobench-bin"

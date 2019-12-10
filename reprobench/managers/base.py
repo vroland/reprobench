@@ -14,7 +14,7 @@ class BaseManager(object):
         self.output_dir = kwargs.pop("output_dir")
         self.repeat = kwargs.pop("repeat")
         self.rbdir = kwargs.pop("rbdir")
-        self.processes = kwargs.pop("processes")
+        self.multirun_cores = kwargs.pop("multirun_cores")
 
         context = zmq.Context()
         self.socket = context.socket(zmq.DEALER)

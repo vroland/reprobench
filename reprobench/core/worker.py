@@ -7,6 +7,7 @@ from pathlib import Path
 import os
 from sys import platform
 import threading
+import subprocess
 
 import click
 import zmq
@@ -27,9 +28,9 @@ REQUEST_TIMEOUT = 15000
 
 
 class BenchmarkWorker:
-    def __init__(self, server_address, tunneling, processes=1):
+    def __init__(self, server_address, tunneling, multirun_cores=0):
         self.server_address = server_address
-        self.processes = processes
+        self.multirun_cores = multirun_cores
         self.isunix = (platform == "linux" or platform == "linux2")
 
         if tunneling is not None:
@@ -51,6 +52,9 @@ class BenchmarkWorker:
                     self.server.start()
                     self.server_address = f"tcp://127.0.0.1:{self.server.local_bind_port}"
                     logger.info(f"Tunneling established at {self.server_address}")
+                    time.sleep(1)  # Let the tunnel establish
+                    self.server.check_tunnels()
+
                     atexit.register(self.stop_tunneling)
                     return
                 except (BaseSSHTunnelForwarderError, ConnectionResetError) as ee:
@@ -70,7 +74,7 @@ class BenchmarkWorker:
     def run(self):
         # Check if socket is connected, or reconnect on demand....
 
-        if self.processes == 1:
+        if self.multirun_cores == 0:
             self.run_internal()
         else:
             # Pin this controlling thread to the first CPU (unix only)
@@ -85,7 +89,7 @@ class BenchmarkWorker:
                 ret = mp.Value("b", True, lock=False)
 
                 while ret.value:
-                    ip = mp.Process(target=self.run_internal, args=[t_cpu, ret])
+                    ip = mp.Process(target=self.run_internal, args=[t_cpu, self.multirun_cores, ret])
                     ip.start()
                     # A timeout here could enforce a runtime limit...
                     ip.join()
@@ -94,22 +98,24 @@ class BenchmarkWorker:
 
             # Ideally the processes should be distributed among NUMA regions. There is a python libary that provides
             # NUMA information. Since it caused errors on Taurus, it is not used here
-            # TODO: This assumes two CPUs with a NUMA region per CPU
-            numcpu = 2
-            t_cpu = []
-            ppcpu = self.processes // numcpu
-            spcpu = mp.cpu_count() // numcpu // ppcpu
-            for c_cpu in range(1, numcpu + 1):
-                for c_proc in range(0, ppcpu):
-                    t_cpu.append(mp.cpu_count() // numcpu * c_cpu - 1 - spcpu * c_proc)
+
+            # Get number of physical CPUs, not cores
+            numcpu = int(subprocess.check_output('cat /proc/cpuinfo | grep "physical id" | sort -u | wc -l', shell=True))
+            cores_per_cpu = mp.cpu_count() // numcpu
+            ppcpu = cores_per_cpu // self.multirun_cores
 
             runner_threads = []
-            for i in range(0, self.processes):
-                t = threading.Thread(target=internal_runner, args=[t_cpu[i]])
-                runner_threads.append(t)
-                t.start()
-                # Wait to avoid parallel connections
-                time.sleep(0.2)
+            for c_cpu in range(0, numcpu):
+                # Start from last core, this avoids overlap with the runner if possible
+                c_idx = (c_cpu + 1) * cores_per_cpu
+
+                for c_proc in range(0, ppcpu):
+                    t = threading.Thread(target=internal_runner, args=[c_idx - self.multirun_cores])
+                    runner_threads.append(t)
+                    t.start()
+                    # Wait to avoid parallel connections
+                    c_idx -= self.multirun_cores
+                    time.sleep(0.2)
 
             for t in runner_threads:
                 try:
@@ -122,12 +128,13 @@ class BenchmarkWorker:
         if self.server is not None:
             self.stop_tunneling()
 
-    def run_internal(self, target_cpu=-1, ret=None):
+    def run_internal(self, target_cpu=-1, num_cores=-1, ret=None):
         # Pin process, this affects subprocesses as well
         if target_cpu > -1 and self.isunix:
             try:
-                os.sched_setaffinity(0, [target_cpu])
-                logger.debug(f"Pinned to CPU {target_cpu}")
+                cpu_list = list(range(target_cpu, target_cpu + num_cores))
+                os.sched_setaffinity(0, cpu_list)
+                logger.debug(f"Pinned to CPU {cpu_list}")
             except OSError as ee:
                 logger.error(f"Failed to set affinity {ee}")
 
@@ -184,7 +191,7 @@ class BenchmarkWorker:
 
 
 @click.command("worker")
-@click.option("--processes", type=int, default=1)
+@click.option("--multirun_cores", type=int, default=1)
 @server_info
 @use_tunneling
 @common
