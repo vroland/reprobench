@@ -109,7 +109,7 @@ class RunSolverPerfEval(Executor):
         perfcmdline = "/usr/bin/perf stat -o %s -e dTLB-load-misses,cycles,stalled-cycles-backend,cache-misses %s" % (
         perflog, solver_cmd)
         runsolver = os.path.expanduser("~/bin/runsolver")
-        run_cmd = f"{runsolver:s} --vsize-limit {self.mem_limit:.0f} -C {self.cpu_limit:.0f} -w {watcher:s} -v {varfile:s} {perfcmdline:s} > {stdout_p:s} 2>> {stderr_p:s}"
+        run_cmd = f"{runsolver:s} --vsize-limit {self.mem_limit:.0f} -W {self.cpu_limit:.0f}  -w {watcher:s} -v {varfile:s} {perfcmdline:s} > {stdout_p:s} 2>> {stderr_p:s}"
 
         logger.debug(run_cmd)
         logger.debug(f"Running {directory}")
@@ -120,6 +120,7 @@ class RunSolverPerfEval(Executor):
             stats['error'] = err
         else:
             stats['error'] = ''
+
         # runsolver parser
         with open(f"{varfile:s}") as f:
             for line in f:
@@ -139,7 +140,11 @@ class RunSolverPerfEval(Executor):
                 for val, reg in runsolver_re.items():
                     m = reg.match(line)
                     if m: stats['runsolver_%s' %val] = m.group("val")
-        stats['return_code'] = stats['runsolver_STATUS']
+        try:
+            stats['return_code'] = stats['runsolver_STATUS']
+        except KeyError:
+            stats['return_code'] = '9'
+
         logger.error(stats)
         stats['cpu_time'] = stats['runsolver_CPUTIME']
         stats['wall_time'] = stats['runsolver_WCTIME']

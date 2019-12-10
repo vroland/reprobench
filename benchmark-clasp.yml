@@ -2,7 +2,7 @@ title: clasp
 description: Benchmark for different runtimes with and without glibc hack
 
 limits:
-  time: 3600 # s
+  time: 5 # s
   memory: 4024 # mb
 
 steps:
@@ -60,6 +60,12 @@ tasks:
 
 tools:
   no-hack:
-    module: clasp-tool.ClaspTool
+    module: clasp-tool.ClaspASPTool
+    parameters:
+      default:
+        encoding: "tasks/steiner/GraphColouring/GraphColouring/encoding.asp"
   with-hack:
-    module: clasp-tool.ClaspToolLibc
+    module: clasp-tool.ClaspASPToolLibc
+    parameters:
+      default:
+        encoding: "tasks/steiner/GraphColouring/GraphColouring/encoding.asp"

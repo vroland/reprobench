@@ -1,28 +1,24 @@
 import os
+import reprobench
 from reprobench.tools.executable import ExecutableTool
 from pathlib import Path
 import subprocess
 from loguru import logger
 
 
-class ClaspTool(ExecutableTool):
+class ClaspASPTool(ExecutableTool):
     name = "Clasp Tool"
     prefix = '-'
-    path = "/home/vagrant/src3/reprobench/dpkg/clingo/clasp"
-    gringo_path = "/home/vagrant/src3/reprobench/dpkg/clingo/gringo"
+    path = "/home/vagrant/src3/reprobench/tools/clasp/clasp_asp.sh"
 
     @classmethod
     def is_ready(cls):
         return Path(cls.path).is_file()
 
     def get_arguments(self):
-        ret = []
-        for key, value in self.parameters.items():
-            if not value.strip() == "":
-                ret.append(f"{self.prefix}{key}={value}")
-            else:
-                ret.append(f"{self.prefix}{key}")
-
+        reprobench_path = os.path.abspath(os.path.join(os.path.dirname(reprobench.__file__),'..'))
+        ret = [ "%s/%s" %(reprobench_path, self.parameters.get("encoding"))]
+        # logger.error(self.task)
         return ret
 
     def get_cmdline(self):
@@ -45,7 +41,7 @@ class ClaspTool(ExecutableTool):
             err_path=self.get_err_path(),
         )
 
-class ClaspToolLibc(ClaspTool):
+class ClaspASPToolLibc(ClaspASPTool):
     def run(self, executor):
         my_env = os.environ.copy()
         my_env["GLIBC_THP_ALWAYS"] = 1
