@@ -1,7 +1,8 @@
 from reprobench.core.base import Step, Observer
-from reprobench.executors.events import STORE_RUNSTATS
+from reprobench.executors.events import STORE_RUNSTATS, STORE_THP_RUNSTATS
 
-from .db import RunStatistic
+from .db import RunStatistic, RunStatisticExtended
+from loguru import logger
 
 
 class RunStatisticObserver(Observer):
@@ -11,6 +12,16 @@ class RunStatisticObserver(Observer):
     def handle_event(cls, event_type, payload, **kwargs):
         if event_type == STORE_RUNSTATS:
             RunStatistic.insert(**payload).on_conflict("replace").execute()
+
+class RunStatisticExtendedObserver(Observer):
+    SUBSCRIBED_EVENTS = (STORE_THP_RUNSTATS,)
+
+    @classmethod
+    def handle_event(cls, event_type, payload, **kwargs):
+        logger.debug("Received the following payload:")
+        logger.debug(payload)
+        if event_type == STORE_THP_RUNSTATS:
+            RunStatisticExtended.insert(**payload).on_conflict("replace").execute()
 
 
 class Executor(Step):

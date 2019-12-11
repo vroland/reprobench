@@ -6,8 +6,8 @@ from loguru import logger
 import reprobench
 from reprobench.utils import send_event
 from .base import Executor
-from .db import RunStatistic
-from .events import STORE_RUNSTATS
+from .db import RunStatistic, RunStatisticExtended
+from .events import STORE_RUNSTATS, STORE_THP_RUNSTATS
 
 runsolver_re = {
     "SEGFAULT": re.compile(r"^\s*Child\s*ended\s*because\s*it\s*received\s*signal\s*11\s*\((?P<val>SIGSEGV)\)\s*"),
@@ -61,8 +61,20 @@ class RunSolverPerfEval(Executor):
                 if m: perf_res[val] = m.group("val")
         return stats
 
+    @classmethod
+    def register(cls, config=None):
+        RunStatisticExtended.create_table()
+
+
     def compile_stats(self, stats):
-        verdict = None
+        try:
+            stats['return_code'] = stats['runsolver_STATUS']
+        except KeyError:
+            stats['return_code'] = '9'
+        stats['cpu_time'] = stats['runsolver_CPUTIME']
+        stats['wall_time'] = stats['runsolver_WCTIME']
+        stats['max_memory'] = stats['runsolver_MAXVM']
+
         if stats["error"] == TimeoutError:
             verdict = RunStatistic.TIMEOUT
         elif stats["error"] == MemoryError:
@@ -71,17 +83,14 @@ class RunSolverPerfEval(Executor):
             verdict = RunStatistic.RUNTIME_ERR
         else:
             verdict = RunStatistic.SUCCESS
-
         del stats["error"]
 
-        return dict(
-            run_id=self.run_id,
-            verdict=verdict,
-            cpu_time=stats["cpu_time"],
-            wall_time=stats["wall_time"],
-            max_memory=stats["max_memory"],
-            return_code=stats["return_code"],
-        )
+        stats['run_id'] = self.run_id
+        stats['verdict'] = verdict
+
+        logger.error(stats)
+
+        return stats
 
     def run(
         self,
@@ -140,15 +149,7 @@ class RunSolverPerfEval(Executor):
                 for val, reg in runsolver_re.items():
                     m = reg.match(line)
                     if m: stats['runsolver_%s' %val] = m.group("val")
-        try:
-            stats['return_code'] = stats['runsolver_STATUS']
-        except KeyError:
-            stats['return_code'] = '9'
-
         logger.error(stats)
-        stats['cpu_time'] = stats['runsolver_CPUTIME']
-        stats['wall_time'] = stats['runsolver_WCTIME']
-        stats['max_memory'] = stats['runsolver_MAXVM']
 
         #perf result parser
         with open(f"{perflog:s}") as f:
@@ -163,4 +164,5 @@ class RunSolverPerfEval(Executor):
         logger.debug(f"Finished {directory}")
 
         payload = self.compile_stats(stats)
-        send_event(self.socket, STORE_RUNSTATS, payload)
+        # send_event(self.socket, STORE_RUNSTATS, payload)
+        send_event(self.socket, STORE_THP_RUNSTATS, payload)

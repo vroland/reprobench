@@ -2,7 +2,7 @@ title: clasp
 description: Benchmark for different runtimes with and without glibc hack
 
 limits:
-  time: 5 # s
+  time: 1 # s
   memory: 4024 # mb
 
 steps:
@@ -30,6 +30,7 @@ steps:
 observers:
   - module: reprobench.core.sysinfo.SystemInfoObserver
   - module: reprobench.executors.RunStatisticObserver
+#  - module: reprobench.executors.RunStatisticExtendedObserver
 
 tasks:
   asp-bench:

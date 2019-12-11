@@ -29,7 +29,8 @@ steps:
 
 observers:
   - module: reprobench.core.sysinfo.SystemInfoObserver
-  - module: reprobench.executors.RunStatisticObserver
+#  - module: reprobench.executors.RunStatisticObserver
+  - module: reprobench.executors.RunStatisticExtendedObserver
 
 tasks:
   asp-bench:
