@@ -6,3 +6,5 @@ logger.add(sys.stderr, level="TRACE")
 s = BenchmarkServer("tcp://*:31313", verbosity=2)
 
 s.run()
+
+

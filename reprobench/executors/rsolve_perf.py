@@ -75,20 +75,20 @@ class RunSolverPerfEval(Executor):
         stats['wall_time'] = stats['runsolver_WCTIME']
         stats['max_memory'] = stats['runsolver_MAXVM']
 
-        if stats["error"] == TimeoutError:
-            verdict = RunStatistic.TIMEOUT
-        elif stats["error"] == MemoryError:
-            verdict = RunStatistic.MEMOUT
-        elif stats["error"] or (self.nonzero_as_rte and stats["return_code"] != 0):
-            verdict = RunStatistic.RUNTIME_ERR
+        if stats["runsolver_TIMEOUT"] == 'true':
+            verdict = RunStatisticExtended.TIMEOUT
+        elif stats["runsolver_MEMOUT"] == 'true':
+            verdict = RunStatisticExtended.MEMOUT
+        elif (stats["error"] and stats["error"] != '') or (self.nonzero_as_rte and self.nonzero_as_rte.lower() == 'true'):
+            verdict = RunStatisticExtended.RUNTIME_ERR
         else:
-            verdict = RunStatistic.SUCCESS
+            verdict = RunStatisticExtended.SUCCESS
         del stats["error"]
 
         stats['run_id'] = self.run_id
         stats['verdict'] = verdict
 
-        logger.error(stats)
+        logger.trace(stats)
 
         return stats
 
@@ -139,6 +139,7 @@ class RunSolverPerfEval(Executor):
                     continue
                 line = line[:-1].split("=")
                 stats['runsolver_%s' %line[0]] = line[1]
+        logger.trace(stats)
 
         # runsolver watcher parser (returncode etc)
         #for line in codecs.open(perflog, errors='ignore', encoding='utf-8'):
@@ -149,7 +150,7 @@ class RunSolverPerfEval(Executor):
                 for val, reg in runsolver_re.items():
                     m = reg.match(line)
                     if m: stats['runsolver_%s' %val] = m.group("val")
-        logger.error(stats)
+        logger.trace(stats)
 
         #perf result parser
         with open(f"{perflog:s}") as f:
@@ -160,7 +161,7 @@ class RunSolverPerfEval(Executor):
                     if m: stats['perf_%s'%val] = m.group("val")
 
 
-        logger.debug(stats)
+        logger.trace(stats)
         logger.debug(f"Finished {directory}")
 
         payload = self.compile_stats(stats)
