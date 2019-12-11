@@ -1,13 +1,14 @@
 import os
+from pathlib import Path
+
+from loguru import logger
+
 import reprobench
 from reprobench.tools.executable import ExecutableTool
-from pathlib import Path
-import subprocess
-from loguru import logger
 
 
 class ClaspASPTool(ExecutableTool):
-    name = "Clasp Tool"
+    name = "Clasp ASP Tool"
     prefix = '-'
     path = "/home/vagrant/src3/reprobench/tools/clasp/clasp_asp.sh"
 
@@ -16,8 +17,8 @@ class ClaspASPTool(ExecutableTool):
         return Path(cls.path).is_file()
 
     def get_arguments(self):
-        reprobench_path = os.path.abspath(os.path.join(os.path.dirname(reprobench.__file__),'..'))
-        ret = [ "%s/%s" %(reprobench_path, self.parameters.get("encoding"))]
+        reprobench_path = os.path.abspath(os.path.join(os.path.dirname(reprobench.__file__), '..'))
+        ret = ["%s/%s" % (reprobench_path, self.parameters.get("encoding"))]
         # logger.error(self.task)
         return ret
 
@@ -36,13 +37,25 @@ class ClaspASPTool(ExecutableTool):
         executor.run(
             self.get_cmdline(),
             directory=self.cwd,
-            input_str = self.task,
+            input_str=self.task,
             out_path=self.get_out_path(),
             err_path=self.get_err_path(),
         )
 
+
 class ClaspASPToolLibc(ClaspASPTool):
+    name = "Clasp THP Tool"
+
     def run(self, executor):
         my_env = os.environ.copy()
         my_env["GLIBC_THP_ALWAYS"] = 1
         self.run_internal(executor, my_env)
+
+
+class ClaspTool(ClaspASPTool):
+    name = "Clasp Tool"
+    prefix = '-'
+    path = "/home/vagrant/src3/reprobench/tools/clasp/clasp_lparse.sh"
+
+    def get_arguments(self):
+        return [f"{self.prefix}{key}={value}" for key, value in self.parameters.items()]
