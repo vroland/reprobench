@@ -37,8 +37,8 @@ tasks:
     type: url
     urls:
       - https://www.cs.uni-potsdam.de/wv/projects/sets/set-industrial-09-12-gauss.tar.xz
-#    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/SAT_gauss/
-    path: ./tasks/thp/sat/
+    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/SAT_gauss/
+#    path: ./tasks/thp/sat/
     extract_archives: true
     patterns: |
       **/*
@@ -51,8 +51,8 @@ tasks:
     type: url
     urls:
       - http://satcompetition.org/2014/files/sc14-app.tar
-#    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/SAT_2014app/
-    path: ./tasks/thp/sat/
+    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/SAT_2014app/
+#    path: ./tasks/thp/sat/
     extract_archives: true
     patterns: |
       **/*
@@ -60,7 +60,7 @@ tasks:
       !**/*.tar.xz
       !**/*.tar.gz
       !**/*.tgz
-
+      !**/.*
 
 
 tools:
