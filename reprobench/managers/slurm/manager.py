@@ -68,9 +68,9 @@ class SlurmManager(BaseManager):
         if len(self.rbdir) > 0:
             target_path = f"{self.rbdir}/reprobench-bin"
 
-        worker_cmd = f"{target_path} worker {address_args} -vv --processes={self.processes}"
+        worker_cmd = f"{target_path} worker {address_args} -vv --multirun_cores={self.multirun_cores}"
         host_limit = self.pending
-        if self.processes > 1:
+        if self.multirun_cores > 0:
             host_limit = self.reserve_hosts
 
         worker_submit_cmd = [
@@ -84,8 +84,9 @@ class SlurmManager(BaseManager):
             f"--output={self.output_dir}/slurm-worker_%a.out",
         ]
 
-        if self.processes > 1:
+        if self.multirun_cores > 0:
             worker_submit_cmd.append("--exclusive")
+
         # Additional args may contain args that are required by the scheduler
         if len(self.additional) > 0:
             additional_args = self.additional.split(" ")

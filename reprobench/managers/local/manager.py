@@ -48,23 +48,23 @@ class LocalManager(BaseManager):
             logger.info(f"Tunneling established at {self.server_address}")
 
     @staticmethod
-    def spawn_worker(server_address, processes=1):
+    def spawn_worker(server_address, multirun_cores=0):
         # TODO: This disables tunneling
-        worker = BenchmarkWorker(server_address, None, processes)
+        worker = BenchmarkWorker(server_address, None, multirun_cores=multirun_cores)
         worker.run()
 
     def spawn_workers(self):
-        if self.processes == 1:
+        if self.multirun_cores == 0:
             self.pool = Pool(self.num_workers)
             jobs_address = (self.server_address for _ in range(self.pending))
             self.pool_iterator = self.pool.imap_unordered(self.spawn_worker, jobs_address)
             self.pool.close()
         else:
-            self.runner_process = Process(target=LocalManager.spawn_worker, args=[self.server_address, self.processes])
+            self.runner_process = Process(target=LocalManager.spawn_worker, args=[self.server_address, self.multirun_cores])
             self.runner_process.start()
 
     def wait(self):
-        if self.processes == 1:
+        if self.multirun_cores == 0:
             progress_bar = tqdm(desc="Executing runs", total=self.pending)
             for _ in self.pool_iterator:
                 progress_bar.update()
