@@ -4,6 +4,7 @@ limits_schema = Map(
     {
         "time": Int(),
         Optional("memory", default=8192): Int(),
+        Optional("scheduler_memory", default=8192): Int(),
         Optional("output"): Int(),
         Optional("cores"): Int(),
     }

@@ -34,7 +34,11 @@ class SlurmManager(BaseManager):
             self.time_limit = 2 * time_limit_minutes
 
         if self.mem_limit == 0:
-            self.mem_limit = 2 * limits["memory"]
+            if 'scheduler_memory' in limits:
+                self.mem_limit = limits["scheduler_memory"]
+            else:
+                self.mem_limit = 2 * limits["memory"]
+
 
         if self.tunneling is not None:
             self.server = SSHTunnelForwarder(
@@ -86,6 +90,9 @@ class SlurmManager(BaseManager):
 
         if self.multirun_cores > 0:
             worker_submit_cmd.append("--exclusive")
+
+        logger.error(worker_submit_cmd)
+        exit(1)
 
         # Additional args may contain args that are required by the scheduler
         if len(self.additional) > 0:

@@ -4,6 +4,7 @@ description: Benchmark for different runtimes with and without glibc hack
 limits:
   time: 900 # s
   memory: 4024 # mb
+  scheduler_memory: 65536 #mb
 
 steps:
   run:
@@ -34,9 +35,9 @@ observers:
 
 tasks:
   sat_gauss_bench:
-    type: url
-    urls:
-      - https://www.cs.uni-potsdam.de/wv/projects/sets/set-industrial-09-12-gauss.tar.xz
+    type: file
+#    urls:
+#      - https://www.cs.uni-potsdam.de/wv/projects/sets/set-industrial-09-12-gauss.tar.xz
     path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/SAT_gauss/
 #    path: ./tasks/thp/sat/
     extract_archives: true
@@ -48,9 +49,9 @@ tasks:
       !**/*.tgz
 
   sat2014_app_bench:
-    type: url
-    urls:
-      - http://satcompetition.org/2014/files/sc14-app.tar
+    type: file
+#    urls:
+#      - http://satcompetition.org/2014/files/sc14-app.tar
     path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/SAT_2014app/
 #    path: ./tasks/thp/sat/
     extract_archives: true
