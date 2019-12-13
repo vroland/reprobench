@@ -38,6 +38,11 @@ if [ -z $filename ] ; then
   exit 1
 fi
 
+if [ ! -f $filename ] ; then
+  echo "Filename does not exist. Exiting..."
+  exit 1
+fi
+
 if [ $thp == 1 ] ; then
   env="GLIBC_THP_ALWAYS=1"
 fi
