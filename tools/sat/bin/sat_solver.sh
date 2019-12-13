@@ -5,7 +5,7 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 # Initialize our own variables:
 verbose=0
-
+thp=0
 while getopts "h?vts:f:" opt; do
     case "$opt" in
     h|\?)
@@ -33,15 +33,16 @@ if [ -z $solver ] ; then
 fi
 solver_cmd="./$solver"_glibc $@
 
-if [ ! -z $thp ] ; then
+if [ -z $filename ] ; then
   echo "No filename given. Exiting..."
   exit 1
 fi
 
-if [ -n $thp ] ; then
-  export GLIBC_THP_ALWAYS=1
-  echo "Using THP option in libc"
+if [ $thp == 1 ] ; then
+  env="GLIBC_THP_ALWAYS=1"
 fi
+
+echo $env
 
 type=$(file -b --mime-type $filename)
 echo $type
@@ -58,8 +59,7 @@ fi
 
 
 cd "$(dirname "$0")"
-echo "$cmd | $solver_cmd"
-echo GLIBC_THP_ALWAYS=$GLIBC_THP_ALWAYS
+echo "$cmd | env $env $solver_cmd"
 $cmd | $solver_cmd &
 PID=$!
 wait $PID

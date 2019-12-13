@@ -37,7 +37,7 @@ class SlurmManager(BaseManager):
             if 'scheduler_memory' in limits:
                 self.mem_limit = limits["scheduler_memory"]
             else:
-                self.mem_limit = 2 * limits["memory"]
+                self.mem_limit = 0
 
 
         if self.tunneling is not None:
@@ -92,7 +92,6 @@ class SlurmManager(BaseManager):
             worker_submit_cmd.append("--exclusive")
 
         logger.error(worker_submit_cmd)
-        exit(1)
 
         # Additional args may contain args that are required by the scheduler
         if len(self.additional) > 0:

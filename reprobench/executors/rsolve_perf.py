@@ -2,6 +2,7 @@ import os
 from subprocess import Popen, PIPE
 import re
 from loguru import logger
+import json
 
 import reprobench
 from reprobench.utils import send_event
@@ -66,7 +67,8 @@ class RunSolverPerfEval(Executor):
         RunStatisticExtended.create_table()
 
 
-    def compile_stats(self, stats):
+    @staticmethod
+    def compile_stats(stats, run_id, nonzero_as_rte):
         try:
             stats['return_code'] = stats['runsolver_STATUS']
         except KeyError:
@@ -79,17 +81,18 @@ class RunSolverPerfEval(Executor):
             verdict = RunStatisticExtended.TIMEOUT
         elif stats["runsolver_MEMOUT"] == 'true':
             verdict = RunStatisticExtended.MEMOUT
-        elif (stats["error"] and stats["error"] != '') or (self.nonzero_as_rte and self.nonzero_as_rte.lower() == 'true'):
+        elif ("error" in stats and stats["error"] != '') or \
+            (nonzero_as_rte and nonzero_as_rte.lower() == 'true'):
             verdict = RunStatisticExtended.RUNTIME_ERR
+            del stats["error"]
         else:
             verdict = RunStatisticExtended.SUCCESS
-        del stats["error"]
 
-        stats['run_id'] = self.run_id
+
+        stats['run_id'] = run_id
         stats['verdict'] = verdict
 
         logger.trace(stats)
-
         return stats
 
     def run(
@@ -101,15 +104,10 @@ class RunSolverPerfEval(Executor):
         directory=None,
         **kwargs,
     ):
-        stats = {}
 
         #TODO: fix out_path
         outdir = os.path.abspath(os.path.join(self.reprobench_path,os.path.dirname(out_path)))
-        stdout_p = '%s/stdout.txt' % (outdir)
-        stderr_p = '%s/stderr.txt' % (outdir)
-        watcher = '%s/watcher.txt' % (outdir)
-        varfile = '%s/varfile.txt' % (outdir)
-        perflog = '%s/perflog.txt' % (outdir)
+        payload_p, perflog, stderr_p, stdout_p, varfile, watcher, runparameters_p = self.log_paths(outdir)
 
         logger.debug(perflog)
 
@@ -120,50 +118,77 @@ class RunSolverPerfEval(Executor):
         runsolver = os.path.expanduser("~/bin/runsolver")
         run_cmd = f"{runsolver:s} --vsize-limit {self.mem_limit:.0f} -W {self.cpu_limit:.0f}  -w {watcher:s} -v {varfile:s} {perfcmdline:s} > {stdout_p:s} 2>> {stderr_p:s}"
 
+        logger.trace('Logging run parameters to %s' %runparameters_p)
+        with open(runparameters_p, 'w') as runparameters_f:
+            run_details = {'run_id': self.run_id}
+            runparameters_f.write(json.dumps(run_details))
+
         logger.debug(run_cmd)
         logger.debug(f"Running {directory}")
         p_solver = Popen(run_cmd, stdout=PIPE, stderr=PIPE, shell=True, close_fds=True, cwd=outdir)
         output, err = p_solver.communicate()
+
+        stats = {}
         if err != b'':
             logger.error(err)
             stats['error'] = err
         else:
             stats['error'] = ''
 
+        stats = self.parse_logs(perflog, varfile, watcher, stats)
+
+        logger.trace(stats)
+        logger.debug(f"Finished {directory}")
+
+        payload = self.compile_stats(stats, self.run_id, self.nonzero_as_rte)
+
+        logger.error(payload)
+        with open(payload_p, 'w') as payload_f:
+            payload_f.write(json.dumps(payload))
+
+        # send_event(self.socket, STORE_RUNSTATS, payload)
+        send_event(self.socket, STORE_THP_RUNSTATS, payload)
+
+    @staticmethod
+    def log_paths(outdir):
+        stdout_p = '%s/stdout.txt' % (outdir)
+        stderr_p = '%s/stderr.txt' % (outdir)
+        watcher = '%s/watcher.txt' % (outdir)
+        varfile = '%s/varfile.txt' % (outdir)
+        perflog = '%s/perflog.txt' % (outdir)
+        payload_p = '%s/result.json' % (outdir)
+        runparameters_p = '%s/run.json' % (outdir)
+        return payload_p, perflog, stderr_p, stdout_p, varfile, watcher, runparameters_p
+
+    @staticmethod
+    def parse_logs(perflog, varfile, watcher, stats=None):
+        if stats is None:
+            stats={}
         # runsolver parser
         with open(f"{varfile:s}") as f:
             for line in f:
-                #TODO: debuglevel
+                # TODO: debuglevel
                 # logger.debug(line)
                 if line.startswith('#') or len(line) == 0:
                     continue
                 line = line[:-1].split("=")
-                stats['runsolver_%s' %line[0]] = line[1]
+                stats['runsolver_%s' % line[0]] = line[1]
         logger.trace(stats)
-
         # runsolver watcher parser (returncode etc)
-        #for line in codecs.open(perflog, errors='ignore', encoding='utf-8'):
+        # for line in codecs.open(perflog, errors='ignore', encoding='utf-8'):
         with open(f"{watcher:s}") as f:
             for line in f.readlines():
-                #TODO: debuglevel
+                # TODO: debuglevel
                 # logger.debug(line)
                 for val, reg in runsolver_re.items():
                     m = reg.match(line)
-                    if m: stats['runsolver_%s' %val] = m.group("val")
+                    if m: stats['runsolver_%s' % val] = m.group("val")
         logger.trace(stats)
-
-        #perf result parser
+        # perf result parser
         with open(f"{perflog:s}") as f:
             for line in f.readlines():
                 # logger.debug(line)
                 for val, reg in perf_re.items():
                     m = reg.match(line)
-                    if m: stats['perf_%s'%val] = m.group("val")
-
-
-        logger.trace(stats)
-        logger.debug(f"Finished {directory}")
-
-        payload = self.compile_stats(stats)
-        # send_event(self.socket, STORE_RUNSTATS, payload)
-        send_event(self.socket, STORE_THP_RUNSTATS, payload)
+                    if m: stats['perf_%s' % val] = m.group("val")
+        return stats
