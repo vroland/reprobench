@@ -4,7 +4,7 @@ description: Benchmark for different runtimes with and without glibc hack
 limits:
   time: 5 # s
   memory: 4024 # mb
-#  scheduler_memory: 62000 #mb
+  scheduler_memory: 62000 #mb
 
 steps:
   run:
@@ -48,21 +48,22 @@ tasks:
       !**/*.tar.gz
       !**/*.tgz
 
-  sat2014_app_bench:
-    type: file
-#    urls:
-#      - http://satcompetition.org/2014/files/sc14-app.tar
-    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/SAT_2014app/
-#    path: ./tasks/thp/sat/
-    extract_archives: true
-    patterns: |
-      **/*
-      !**/*.tar.bz2
-      !**/*.tar.xz
-      !**/*.tar.gz
-      !**/*.tgz
-      !**/.*
-
+#  sat2014_app_bench:
+#    type: file
+##    urls:
+##      - http://satcompetition.org/2014/files/sc14-app.tar
+#    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/SAT_2014app/
+##    path: ./tasks/thp/sat/
+#    extract_archives: true
+#    patterns: |
+#      **/*
+#      !**/*.tar.bz2
+#      !**/*.tar.xz
+#      !**/*.tar.gz
+#      !**/*.tgz
+#      !**/*.tar
+#      !**/.*
+#
 
 tools:
   glibc:
@@ -71,8 +72,8 @@ tools:
       default:
         s:
           - minisat
-          - mergesat
-          - plingeling
+#          - mergesat
+#          - plingeling
   glibc_thp:
     module: tools.sat.satExecutor.SATTool
     parameters:
@@ -82,6 +83,6 @@ tools:
         #s = solver
         s:
           - minisat
-          - mergesat
-          - plingeling
+#          - mergesat
+#          - plingeling
 

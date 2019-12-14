@@ -5,8 +5,18 @@ import glob
 import os
 from reprobench.executors import RunSolverPerfEval
 from loguru import logger
+import yaml
 
-config = './benchmark_thp_sat.yml'
+mconfig = None
+with open('./meta_config.yml') as config_f:
+    try:
+        mconfig=yaml.safe_load(config_f)
+    except yaml.YAMLError as exc:
+        print(exc)
+        exit(1)
+
+
+config = mconfig['config']
 config = read_config(config, resolve_files=True)
 
 # TODO: consider tasks only

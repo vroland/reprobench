@@ -84,10 +84,11 @@ class RunSolverPerfEval(Executor):
         elif ("error" in stats and stats["error"] != '') or \
             (nonzero_as_rte and nonzero_as_rte.lower() == 'true'):
             verdict = RunStatisticExtended.RUNTIME_ERR
-            del stats["error"]
         else:
             verdict = RunStatisticExtended.SUCCESS
 
+        if 'error' in stats:
+            del stats["error"]
 
         stats['run_id'] = run_id
         stats['verdict'] = verdict

@@ -1,3 +1,5 @@
+from loguru import logger
+
 from reprobench.utils import recv_event
 
 try:
@@ -11,15 +13,19 @@ class Observer:
 
     @classmethod
     def observe(cls, context, backend_address, reply):
+        logger.debug(cls)
         observe_args = (context, backend_address, reply)
         socket = context.socket(zmq.SUB)
         socket.connect(backend_address)
 
+        logger.trace('Subscribed events...')
+        logger.trace(cls.SUBSCRIBED_EVENTS)
         for event in cls.SUBSCRIBED_EVENTS:
             socket.setsockopt(zmq.SUBSCRIBE, event)
 
         while True:
             event_type, payload, address = recv_event(socket)
+            logger.trace((address, event_type, payload))
             cls.handle_event(
                 event_type,
                 payload,

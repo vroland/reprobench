@@ -1,4 +1,5 @@
 from functools import lru_cache
+from loguru import logger
 
 from peewee import fn
 
@@ -73,6 +74,7 @@ class CoreObserver(Observer):
         reply = kwargs.pop("reply")
         address = kwargs.pop("address")
         observe_args = kwargs.pop("observe_args")
+        logger.trace(event_type)
 
         if event_type == BOOTSTRAP:
             bootstrap(observe_args=observe_args, **payload)

@@ -1,10 +1,20 @@
 from reprobench.managers.slurm.manager import SlurmManager
 from loguru import logger
 import sys
+import yaml
+
+mconfig = None
+with open('./meta_config.yml') as config_f:
+    try:
+        mconfig=yaml.safe_load(config_f)
+    except yaml.YAMLError as exc:
+        print(exc)
+        exit(1)
+
 
 logger.add(sys.stderr, level="TRACE")
-m = SlurmManager( num_workers=1, server_address="tcp://localhost:31313", output_dir="output",
-                 config="./benchmark_thp_sat.yml", tunneling=None, repeat=1, rbdir="/home/jfichte/reprobench"
+m = SlurmManager( num_workers=1, server_address=mconfig['server_url'], output_dir=mconfig['output'],
+                 config=mconfig['config'], tunneling=None, repeat=1, rbdir="/home/jfichte/reprobench"
 , reserve_cores=0, reserve_memory=0, additional_args="--partition=haswell64 -A p_gpusat", reserve_time=0, reserve_hosts=1, multirun_cores=1
 #, reserve_cores=24, reserve_memory=0, additional_args="--partition=haswell64 -A p_gpusat", reserve_time=3600, reserve_hosts=1, processes=12
                   )

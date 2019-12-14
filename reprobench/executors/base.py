@@ -10,6 +10,8 @@ class RunStatisticObserver(Observer):
 
     @classmethod
     def handle_event(cls, event_type, payload, **kwargs):
+        logger.debug("Received the following payload:")
+        logger.debug(payload)
         if event_type == STORE_RUNSTATS:
             RunStatistic.insert(**payload).on_conflict("replace").execute()
 

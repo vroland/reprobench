@@ -31,6 +31,7 @@ dependencies:
   - xz=5.2.4=h14c3975_4
   - zlib=1.2.11=h7b6447c_3
   - pandas
+  - pyyaml
   - pip:
     - ansimarkup==1.4.0
     - apsw==3.9.2.post1
