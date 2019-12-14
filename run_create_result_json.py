@@ -45,8 +45,8 @@ for folder in folders:
         #TODO: next safe payload somehow
         #make sure that run_id is saved somewhere
         payload = RunSolverPerfEval.compile_stats(stats=stats,run_id=1, nonzero_as_rte=nonzero_rte)
-
         logger.error(payload)
+
 
         print(payload_p)
         exit(1)

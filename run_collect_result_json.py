@@ -2,15 +2,16 @@
 import glob
 import json
 import os
-import zmq
 
+import pandas as pd
 import yaml
+import zmq
 from loguru import logger
 
 from reprobench.core.bootstrap.client import bootstrap_tools
-from reprobench.utils import read_config, send_event, encode_message
+from reprobench.executors import RunSolverPerfEval
 from reprobench.executors.events import STORE_THP_RUNSTATS
-from reprobench.core.events import RUN_START
+from reprobench.utils import read_config, encode_message
 
 mconfig = None
 with open('./meta_config.yml') as config_f:
@@ -23,6 +24,11 @@ with open('./meta_config.yml') as config_f:
 config = mconfig['config']
 config = read_config(config, resolve_files=True)
 
+for module in config['steps']['run']:
+    if module['module'] != 'reprobench.executors.RunSolverPerfEval':
+        continue
+    nonzero_rte = module['config']['nonzero_rte']
+
 # TODO: make parameter
 
 
@@ -31,7 +37,7 @@ folders = []
 for tool in tconfig:
     folders.append(os.path.abspath("./%s/%s" % (mconfig['output'], tool)))
 
-send_events = True
+send_events = False
 conn = None
 socket = None
 if send_events:
@@ -40,21 +46,31 @@ if send_events:
     socket.connect(mconfig['server_url'])
 
 # hack the server and send bootstrap & sysinfo messages
-#send_event(socket, RUN_START, 'payload')
-#send_event(socket, BOOTSTRAP, 'payload')
+# send_event(socket, RUN_START, 'payload')
+# send_event(socket, BOOTSTRAP, 'payload')
 #
 # send_event(socket, RUN_START, 'payload')
 
+df = None
 
 for folder in folders:
-    for file in glob.glob('%s/**/perflog.txt' % folder, recursive=True):
+    for file in glob.glob('%s/**/result.json' % folder, recursive=True):
         my_folder = os.path.dirname(file)
         result_p = "%s/result.json" % my_folder
-        print(result_p)
         with open(result_p, 'r') as result_f:
             result = json.load(result_f)
-        logger.info(result)
-
+            stats = RunSolverPerfEval.compile_stats(stats=result, run_id=result['run_id'], nonzero_as_rte=nonzero_rte)
+            if df is None:
+                df = pd.DataFrame(columns=result.keys())
+            cols = df.columns
+            try:
+                df.loc[len(df)] = stats
+            except ValueError as e:
+                missing = set(cols) - set(stats.keys())
+                for e in missing:
+                    stats[e]='NaN'
+                df.loc[len(df)] = stats
+        # logger.info(result)
         if send_events:
             logger.error('Send Event...')
             # send_event(socket = socket, event_type=STORE_THP_RUNSTATS, payload=result)
@@ -62,5 +78,5 @@ for folder in folders:
             socket.send_multipart([STORE_THP_RUNSTATS, encode_message(result)])
             logger.error('Done...')
 
-        # exit(1)
-        # safe stats
+
+df.to_csv('output_%s.csv' %config['title'])

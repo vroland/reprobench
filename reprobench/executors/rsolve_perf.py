@@ -89,6 +89,8 @@ class RunSolverPerfEval(Executor):
 
         if 'error' in stats:
             del stats["error"]
+        if 'runsolver_STATUS' not in stats:
+            stats['runsolver_STATUS'] = 1
 
         stats['run_id'] = run_id
         stats['verdict'] = verdict
