@@ -17,6 +17,7 @@ class BenchmarkServer(object):
 
     def __init__(self, frontend_address, **kwargs):
         self.frontend_address = frontend_address
+        self.observers = []
 
     def receive_event(self):
         address, event_type, payload = self.frontend.recv_multipart()
@@ -26,27 +27,25 @@ class BenchmarkServer(object):
     def loop(self):
         while True:
             address, event_type, payload = self.receive_event()
-            self.backend.send_multipart([event_type, payload, address])
+            payload = decode_message(payload)
+            for observer in self.observers:
+                observer.handle_event(event_type, payload,
+                                      address=address,
+                                      context=self.context,
+                                      reply=self.frontend,
+                                      server=self)
 
     def run(self):
         self.context = zmq.Context()
         self.frontend = self.context.socket(zmq.ROUTER)
         self.frontend.bind(self.frontend_address)
-        self.backend = self.context.socket(zmq.PUB)
-        self.backend.bind(self.BACKEND_ADDRESS)
 
-        core_observer_greenlet = gevent.spawn(
-            CoreObserver.observe,
-            self.context,
-            backend_address=self.BACKEND_ADDRESS,
-            reply=self.frontend,
-        )
+        CoreObserver.observe(self)
         logger.info(f"Listening on {self.frontend_address}...")
 
         serverlet = gevent.spawn(self.loop)
         logger.info(f"Ready to receive events...")
         serverlet.join()
-        core_observer_greenlet.kill()
 
 
 @click.command(name="server")

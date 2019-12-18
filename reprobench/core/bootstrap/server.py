@@ -70,7 +70,7 @@ def bootstrap_steps(config):
         query.execute()
 
 
-def bootstrap_observers(config, observe_args):
+def bootstrap_observers(config, server):
     count = Observer.select().count()
     new_observers = config["observers"][count:]
     if len(new_observers) > 0:
@@ -87,7 +87,7 @@ def bootstrap_observers(config, observe_args):
 
         for observer in new_observers:
             observer_class = import_class(observer["module"])
-            gevent.spawn(observer_class.observe, *observe_args)
+            observer_class.observe(server)
 
 
 def register_steps(config):
@@ -222,12 +222,12 @@ def bootstrap_runs(config, output_dir, repeat=1):
                 query.execute()
 
 
-def bootstrap(config=None, output_dir=None, repeat=1, observe_args=None):
+def bootstrap(config=None, output_dir=None, repeat=1, server=None):
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     bootstrap_db(output_dir)
     bootstrap_limits(config)
     bootstrap_steps(config)
-    bootstrap_observers(config, observe_args)
+    bootstrap_observers(config, server)
     register_steps(config)
     bootstrap_tasks(config)
     bootstrap_tools(config)
