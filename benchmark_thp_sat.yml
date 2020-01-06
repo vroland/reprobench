@@ -1,4 +1,4 @@
-title: clasp
+title: sat_solvers
 description: Benchmark for different runtimes with and without glibc hack
 
 limits:

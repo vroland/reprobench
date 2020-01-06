@@ -1,9 +1,10 @@
-title: clasp
+title: asp_solvers
 description: Benchmark for different runtimes with and without glibc hack
 
 limits:
   time: 5 # s
   memory: 4024 # mb
+  scheduler_memory: 62000 #mb
 
 steps:
   run:
@@ -31,24 +32,31 @@ observers:
   - module: reprobench.executors.RunStatisticExtendedObserver
 
 tasks:
-  asp-bench:
+  asp_bench:
     type: url
     urls:
       - https://www.cs.uni-potsdam.de/wv/projects/sets/set-asp-gauss.tar.xz
-#    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark
-    path: ./tasks/thp/ASP/
+    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/ASP_gauss/
+#    path: ./tasks/thp/ASP/
     extract_archives: true
     patterns: |
       **/*
       !**/*.tar.bz2
       !**/*.tar.xz
-
+      !**/*.tar.gz
+      !**/*.tgz
 
 tools:
   glibc:
     module: tools.asp.clasp.claspExecutor.ClaspTool
+    parameters:
+      default:
+        s:
+          - clasp
   glibc_thp:
     module: tools.asp.clasp.claspExecutor.ClaspTool
     parameters:
       default:
         t: 1
+        s:
+          - clasp
