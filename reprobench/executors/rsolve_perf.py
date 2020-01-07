@@ -77,12 +77,14 @@ class RunSolverPerfEval(Executor):
         stats['wall_time'] = stats['runsolver_WCTIME']
         stats['max_memory'] = stats['runsolver_MAXVM']
 
+        logger.error(stats)
+
         if stats["runsolver_TIMEOUT"] == 'true':
             verdict = RunStatisticExtended.TIMEOUT
         elif stats["runsolver_MEMOUT"] == 'true':
             verdict = RunStatisticExtended.MEMOUT
         elif ("error" in stats and stats["error"] != '') or \
-            (nonzero_as_rte and nonzero_as_rte.lower() == 'true'):
+            (nonzero_as_rte and nonzero_as_rte.lower() == 'true' and int(stats['return_code']) != 0):
             verdict = RunStatisticExtended.RUNTIME_ERR
         else:
             verdict = RunStatisticExtended.SUCCESS
