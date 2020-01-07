@@ -40,12 +40,25 @@ if [ ! -z $thp ] ; then
   export GLIBC_THP_ALWAYS=1
   echo "Using THP option in libc"
 fi
-cmd="./"$solver"_glibc $@ $filename"
+
+if [ "$solver" == "aigbmc" ] ; then
+  cmd="./"$solver"_glibc $@ -m -n 100 $filename"
+elif [ "$solver" == "cbmc" ] ; then
+  #crappy path fix for the tool calls
+  #TODO: needs to be fixed somehow
+  #TODO: think of a better way to handle those cases with the benchmark tool
+  fdir=$(dirname $filename)
+  params=$(cat $filename | sed "s|\$BENCHDIR/|"$fdir"/|g")
+  cmd="./"$solver"_glibc $@ $params"
+else
+  echo 'Default parameters for solver undefined'
+  exit 1
+fi
 echo $cmd
 
 cd "$(dirname "$0")"
 bash -c 'echo GLIBC_THP_ALWAYS=$GLIBC_THP_ALWAYS'
-bash -c "$cmd" &
+bash -c "$cmd"  &
 PID=$!
 wait $PID
 exit $?

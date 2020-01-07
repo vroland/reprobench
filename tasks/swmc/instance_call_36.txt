@@ -1,0 +1,1 @@
+$BENCHDIR/llbmc-bench-1.1/llbmc-bench/eureka/array_init.c -I $BENCHDIR/llbmc-bench-1.1/llbmc-bench/include/cbmc  --bounds-check --div-by-zero-check --pointer-check --pointer-check --signed-overflow-check --unsigned-overflow-check --pointer-overflow-check --float-overflow-check
