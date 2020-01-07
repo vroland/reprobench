@@ -1,4 +1,5 @@
 #config: "./benchmark_thp_sat.yml"
-config: "./benchmark_thp_asp.yml"
+#config: "./benchmark_thp_asp.yml"
+config: "./benchmark_thp_bmc_sw.yml"
 output: "output"
 server_url: "tcp://127.0.0.1:31313"

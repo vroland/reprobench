@@ -42,14 +42,12 @@ tasks:
     path: ./tasks/swmc/
     extract_archives: true
     patterns: |
-      **/instance_call_1.txt
-      **/instance_call_4.txt
+      **/instance_call_*.txt
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz`
       !**/*.tgz
       !**/*.tar
-#      **/instance_call_*.txt
 
 tools:
   glibc:
