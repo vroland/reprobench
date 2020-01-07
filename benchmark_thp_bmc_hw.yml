@@ -38,27 +38,11 @@ tasks:
     type: url
     urls:
       - http://fmv.jku.at/hwmcc17/hwmcc17-single-benchmarks.tar.xz
-#      - http://llbmc.org/files/downloads/llbmc-bench-1.1.tgz
-    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/BMC/
+    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/HWBMC/
     #    path: ./tasks/thp/bmc/
     extract_archives: true
     patterns: |
       **/*
-      !**/*.tar.bz2
-      !**/*.tar.xz
-      !**/*.tar.gz
-      !**/*.tgz
-      !**/*.tar
-
-  hwmcc_bench:
-    type: url
-    urls:
-      - http://llbmc.org/files/downloads/llbmc-bench-1.1.tgz
-#    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/BMC/
-        path: ./tasks/swmc/
-    extract_archives: true
-    patterns: |
-      **/instance_call_*.txt
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
@@ -72,7 +56,6 @@ tools:
       default:
         s:
           - aigbmc
-          - cbmc
   glibc_thp:
     module: tools.bmc.bmcExecutor.BMCTool
     parameters:
@@ -82,5 +65,4 @@ tools:
         #s = solver
         s:
           - aigbmc
-          - cbmc
 

@@ -39,7 +39,7 @@ tasks:
     type: url
     urls:
       - http://llbmc.org/files/downloads/llbmc-bench-1.1.tgz
-    path: ./tasks/swmc/
+    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/SWBMC/
     extract_archives: true
     patterns: |
       **/instance_call_*.txt
