@@ -42,7 +42,7 @@ tasks:
     path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/SWBMC/
     extract_archives: true
     patterns: |
-      **/instance_call_*.txt
+      **/instance_call_*.txts
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz`
