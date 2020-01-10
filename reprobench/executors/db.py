@@ -66,6 +66,7 @@ class RunStatisticExtended(BaseModel):
     runsolver_STATUS = IntegerField(null=True)
     perf_tlb_miss = FloatField(null=True)
     perf_cycles = FloatField(null=True)
+    perf_cache_misses = FloatField(null=True)
     perf_stall_cycles = FloatField(null=True)
     perf_elapsed = FloatField(null=True)
     perf_cpu_migrations = FloatField(null=True)
