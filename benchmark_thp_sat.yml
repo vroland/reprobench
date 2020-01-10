@@ -3,12 +3,15 @@ description: Benchmark for different runtimes with and without glibc hack
 
 limits:
   time: 5 # s
-  memory: 4024 # mb
-  scheduler_memory: 62000 #mb
+  memory: 8048 # mb
+  scheduler_memory: 32768 #mb
 
 steps:
   run:
     - module: reprobench.core.sysinfo.CollectSystemInfo
+    - module: reprobench.core.setup.SetupKernel
+      config:
+        transparent_hugepage: madvise
     - module: reprobench.executors.RunSolverPerfEval
 #    - module: reprobench.executors.PsmonExecutor
       config:
@@ -42,11 +45,12 @@ tasks:
 #    path: ./tasks/thp/sat/
     extract_archives: true
     patterns: |
-      **/*
+      **/q_query_3_L100_coli.sat.cnf
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
       !**/*.tgz
+#      **/*
 
 #  sat2014_app_bench:
 #    type: file
