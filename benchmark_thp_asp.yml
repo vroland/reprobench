@@ -9,6 +9,9 @@ limits:
 steps:
   run:
     - module: reprobench.core.sysinfo.CollectSystemInfo
+    - module: reprobench.core.setup.SetupKernel
+      config:
+        transparent_hugepage: madvise
     - module: reprobench.executors.RunSolverPerfEval
       config:
         nonzero_rte: False
@@ -40,11 +43,12 @@ tasks:
 #    path: ./tasks/thp/ASP/
     extract_archives: true
     patterns: |
-      **/*
+      **/rand_200_1800_1154991214_9.gph
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
       !**/*.tgz
+#      **/*
 
 tools:
   glibc:
