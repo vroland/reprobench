@@ -21,6 +21,9 @@ shift $((OPTIND-1))
 
 trap 'kill -TERM $PID' TERM
 
+echo /sys/kernel/mm/transparent_hugepage/enabled
+cat /sys/kernel/mm/transparent_hugepage/enabled
+
 cmd="./gringo "$@" | ./clasp"
 echo $cmd
 

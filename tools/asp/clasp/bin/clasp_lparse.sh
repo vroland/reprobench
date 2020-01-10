@@ -23,6 +23,9 @@ shift $((OPTIND-1))
 
 trap 'kill -TERM $PID' TERM
 
+echo /sys/kernel/mm/transparent_hugepage/enabled
+cat /sys/kernel/mm/transparent_hugepage/enabled
+
 if [ ! -z $thp ] ; then
   export GLIBC_THP_ALWAYS=1
   echo "Using THP option in libc"

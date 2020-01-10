@@ -26,6 +26,9 @@ shift $((OPTIND-1))
 
 trap 'kill -TERM $PID' TERM
 
+echo /sys/kernel/mm/transparent_hugepage/enabled
+cat /sys/kernel/mm/transparent_hugepage/enabled
+
 if [ -z $solver ] ; then
   echo "No Solver given. Exiting..."
   exit 1
