@@ -27,6 +27,8 @@ shift $((OPTIND-1))
 
 trap 'kill -TERM $PID' TERM
 
+cat /etc/hostname
+
 echo /sys/kernel/mm/transparent_hugepage/enabled
 cat /sys/kernel/mm/transparent_hugepage/enabled
 
