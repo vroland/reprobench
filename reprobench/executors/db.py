@@ -74,6 +74,10 @@ class RunStatisticExtended(BaseModel):
     perf_context_switches = FloatField(null=True)
     return_code = IntegerField(null=True)
 
+    #think about removing; but duplicate data helps here to work faster...
+    platform = CharField(null=True)
+    hostname = CharField(null=True)
+
     cpu_time = FloatField(help_text="CPU Time (s)", null=True)
     wall_time = FloatField(help_text="Wall Clock Time (s)", null=True)
     max_memory = FloatField(help_text="Max Memory Usage (KiB)", null=True)

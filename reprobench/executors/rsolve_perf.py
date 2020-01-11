@@ -1,3 +1,5 @@
+#TODO: replace platform by standardlib
+import platform
 import os
 from subprocess import Popen, PIPE
 import re
@@ -76,6 +78,8 @@ class RunSolverPerfEval(Executor):
         stats['cpu_time'] = stats['runsolver_CPUTIME']
         stats['wall_time'] = stats['runsolver_WCTIME']
         stats['max_memory'] = stats['runsolver_MAXVM']
+        stats['platform'] = platform.platform(aliased=True)
+        stats['hostname'] = platform.node()
 
         logger.error(stats)
 
@@ -150,6 +154,7 @@ class RunSolverPerfEval(Executor):
         logger.error(payload)
         with open(payload_p, 'w') as payload_f:
             payload_f.write(json.dumps(payload))
+
 
         # send_event(self.socket, STORE_RUNSTATS, payload)
         send_event(self.socket, STORE_THP_RUNSTATS, payload)
