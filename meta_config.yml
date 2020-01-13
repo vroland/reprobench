@@ -6,3 +6,5 @@ config: "./benchmark_thp_asp.yml"
 output: "output"
 reserve_hosts: 1
 server_url: "tcp://127.0.0.1:31313"
+email: "johannes.fichte@tu-dresden.de"
+
