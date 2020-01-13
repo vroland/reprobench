@@ -20,6 +20,7 @@ class SlurmManager(BaseManager):
         self.mem_limit = kwargs.pop("reserve_memory")
         self.time_limit = kwargs.pop("reserve_time")
         self.reserve_hosts = kwargs.pop("reserve_hosts")
+        self.email = kwargs.pop("email")
 
     def prepare(self):
         Path(self.output_dir).mkdir(parents=True, exist_ok=True)
@@ -86,6 +87,8 @@ class SlurmManager(BaseManager):
             f"--cpus-per-task={self.cpu_count}",
             f"--job-name={self.config['title']}-benchmark-worker",
             f"--output={self.output_dir}/slurm-worker_%a.out",
+            f"--mail-user={self.email}",
+            f"--mail-type = end"
         ]
 
         if self.multirun_cores > 0:

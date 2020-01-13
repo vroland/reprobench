@@ -15,7 +15,7 @@ with open('./meta_config.yml') as config_f:
 logger.add(sys.stderr, level="TRACE")
 m = SlurmManager( num_workers=1, server_address=mconfig['server_url'], output_dir=mconfig['output'],
                  config=mconfig['config'], tunneling=None, repeat=1, rbdir="/home/jfichte/reprobench"
-, reserve_cores=0, reserve_memory=0, additional_args="--partition=haswell64 -A p_mcc2020 --exclusive", reserve_time=0, reserve_hosts=mconfig['reserve_hosts'], multirun_cores=4
+, reserve_cores=0, reserve_memory=0, additional_args="--partition=haswell64 -A p_mcc2020 --exclusive", reserve_time=0, reserve_hosts=mconfig['reserve_hosts'], multirun_cores=4, email=mconfig['email']
 #, reserve_cores=24, reserve_memory=0, additional_args="--partition=haswell64 -A p_gpusat", reserve_time=3600, reserve_hosts=1, processes=12
                   )
 
