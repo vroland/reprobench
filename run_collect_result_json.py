@@ -53,6 +53,9 @@ if send_events:
 
 df = None
 
+#TODO: handling of multiple keys
+keys = ['runsolver_WCTIME', 'runsolver_CPUTIME', 'runsolver_USERTIME', 'runsolver_SYSTEMTIME', 'runsolver_CPUUSAGE', 'runsolver_MAXVM', 'runsolver_TIMEOUT', 'runsolver_MEMOUT', 'runsolver_STATUS', 'perf_tlb_miss', 'perf_cycles', 'perf_cache_misses', 'perf_elapsed', 'return_code', 'cpu_time', 'wall_time', 'max_memory', 'platform', 'hostname', 'run_id', 'verdict']
+
 for folder in folders:
     for file in glob.glob('%s/**/result.json' % folder, recursive=True):
         my_folder = os.path.dirname(file)
@@ -61,7 +64,10 @@ for folder in folders:
             result = json.load(result_f)
             stats = RunSolverPerfEval.compile_stats(stats=result, run_id=result['run_id'], nonzero_as_rte=nonzero_rte)
             if df is None:
+                # TODO: handling of missing keys and default from file
                 df = pd.DataFrame(columns=result.keys())
+                # df = pd.DataFrame(columns=keys)
+            print(result.keys())
             cols = df.columns
             try:
                 df.loc[len(df)] = stats
