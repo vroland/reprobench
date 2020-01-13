@@ -88,7 +88,7 @@ class SlurmManager(BaseManager):
             f"--job-name={self.config['title']}-benchmark-worker",
             f"--output={self.output_dir}/slurm-worker_%a.out",
             f"--mail-user={self.email}",
-            f"--mail-type = end"
+            f"--mail-type=end"
         ]
 
         if self.multirun_cores > 0:
