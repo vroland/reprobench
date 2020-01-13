@@ -1,5 +1,5 @@
-#config: "./benchmark_thp_sat.yml"
-config: "./benchmark_thp_asp.yml"
+config: "./benchmark_thp_sat.yml"
+#config: "./benchmark_thp_asp.yml"
 #config: "./benchmark_thp_bmc_sw.yml"
 #config: "./benchmark_thp_bmc_hw.yml"
 #config: "./benchmark_thp_maxsat.yml"
@@ -7,4 +7,6 @@ output: "output"
 reserve_hosts: 1
 server_url: "tcp://127.0.0.1:31313"
 email: "johannes.fichte@tu-dresden.de"
+reserve_time: "4:00:00"
+
 

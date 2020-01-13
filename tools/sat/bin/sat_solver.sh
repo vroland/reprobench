@@ -75,7 +75,8 @@ else
 fi
 
 cd "$(dirname "$0")"
-echo "$cmd | env $env $solver_cmd"
+echo "$cmd | env $env $solv
+er_cmd"
 $cmd | $solver_cmd &
 PID=$!
 wait $PID
