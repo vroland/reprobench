@@ -71,6 +71,8 @@ class RunSolverPerfEval(Executor):
 
     @staticmethod
     def compile_stats(stats, run_id, nonzero_as_rte):
+        perf_keys = ['perf_tlb_miss', 'perf_cycles', 'perf_cache_misses', 'perf_elapsed']
+
         try:
             stats['return_code'] = stats['runsolver_STATUS']
         except KeyError:
@@ -78,8 +80,6 @@ class RunSolverPerfEval(Executor):
         stats['cpu_time'] = stats['runsolver_CPUTIME']
         stats['wall_time'] = stats['runsolver_WCTIME']
         stats['max_memory'] = stats['runsolver_MAXVM']
-        stats['platform'] = platform.platform(aliased=True)
-        stats['hostname'] = platform.node()
 
         logger.error(stats)
 
@@ -97,6 +97,10 @@ class RunSolverPerfEval(Executor):
             del stats["error"]
         if 'runsolver_STATUS' not in stats:
             stats['runsolver_STATUS'] = 1
+
+        for key in perf_keys:
+            if not key in stats:
+                stats[key] = 'NA'
 
         stats['run_id'] = run_id
         stats['verdict'] = verdict
@@ -148,6 +152,9 @@ class RunSolverPerfEval(Executor):
 
         logger.trace(stats)
         logger.debug(f"Finished {directory}")
+
+        stats['platform'] = platform.platform(aliased=True)
+        stats['hostname'] = platform.node()
 
         payload = self.compile_stats(stats, self.run_id, self.nonzero_as_rte)
 
