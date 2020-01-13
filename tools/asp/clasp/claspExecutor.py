@@ -39,7 +39,7 @@ class ClaspASPTool(ExecutableTool):
         executor.run(
             self.get_cmdline(),
             directory=self.cwd,
-            input_str=self.task,
+            input_str="-f %s" %self.task,
             out_path=self.get_out_path(),
             err_path=self.get_err_path(),
         )

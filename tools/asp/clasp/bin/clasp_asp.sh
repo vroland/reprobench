@@ -6,7 +6,7 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 # Initialize our own variables:
 verbose=0
 
-while getopts "h?vtf:l:" opt; do
+while getopts "h?vtf:e:" opt; do
     case "$opt" in
     h|\?)
         show_help
@@ -18,7 +18,7 @@ while getopts "h?vtf:l:" opt; do
         ;;
     f)  filename=$OPTARG
         ;;
-    l)  lp=$OPTARG
+    l)  encoding=$OPTARG
         ;;
     esac
 done
@@ -48,13 +48,13 @@ if [ ! -f $filename ] ; then
   exit 1
 fi
 
-if [ -z $lp ] ; then
-  echo "No logic program (-l) given. Exiting..."
+if [ -z $encoding ] ; then
+  echo "No encoding (-e) given. Exiting..."
   exit 1
 fi
 
-if [ ! -f $lp ] ; then
-  echo "Logic program does not exist. Exiting..."
+if [ ! -f $encoding ] ; then
+  echo "Encoding does not exist. Exiting..."
   exit 1
 fi
 
@@ -76,7 +76,7 @@ solver_cmd="./clasp_glibc" $@
 
 cd "$(dirname "$0")"
 echo "$cmd | env $env $solver_cmd"
-$cmd | ./gringo - $lp | $solver_cmd &
+$cmd | ./gringo - $encoding | $solver_cmd &
 
 PID=$!
 wait $PID
