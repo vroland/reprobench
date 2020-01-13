@@ -100,7 +100,7 @@ class RunSolverPerfEval(Executor):
 
         for key in perf_keys:
             if not key in stats:
-                stats[key] = 'NA'
+                stats[key] = '-1'
 
         stats['run_id'] = run_id
         stats['verdict'] = verdict
