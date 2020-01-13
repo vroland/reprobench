@@ -45,12 +45,11 @@ tasks:
 #    path: ./tasks/thp/sat/
     extract_archives: true
     patterns: |
-      **/q_query_3_L100_coli.sat.cnf
+      **/*
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
       !**/*.tgz
-#      **/*
 
 #  sat2014_app_bench:
 #    type: file

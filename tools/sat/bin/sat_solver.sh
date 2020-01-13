@@ -37,7 +37,6 @@ if [ -z $solver ] ; then
   echo "No Solver given. Exiting..."
   exit 1
 fi
-solver_cmd="./$solver"_glibc $@
 
 if [ -z $filename ] ; then
   echo "No filename given. Exiting..."
@@ -68,6 +67,12 @@ else
   cmd="zcat -f $filename"
 fi
 
+if [ "$solver" == "plingeling" ] ; then
+  solver_cmd="./"$solver"_glibc -t 1 -g 8 $@"
+#elif [ "$solver" == "mergesat" ] ; then
+else
+  solver_cmd="./$solver"_glibc $@
+fi
 
 cd "$(dirname "$0")"
 echo "$cmd | env $env $solver_cmd"
