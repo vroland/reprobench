@@ -6,7 +6,7 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 # Initialize our own variables:
 verbose=0
 
-while getopts "h?vt:s:" opt; do
+while getopts "h?vt:s:f:" opt; do
     case "$opt" in
     h|\?)
         show_help
@@ -15,6 +15,8 @@ while getopts "h?vt:s:" opt; do
     v)  verbose=1
         ;;
     t)  thp=1
+        ;;
+    f)  filename=$OPTARG
         ;;
     esac
 done
@@ -32,11 +34,25 @@ if [ ! -z $thp ] ; then
   export GLIBC_THP_ALWAYS=1
   echo "Using THP option in libc"
 fi
-cmd="./clasp_glibc $@"
-echo $cmd
+
+type=$(file -b --mime-type $filename)
+echo $type
+
+if [ $type == "application/x-lzma" ] ; then
+  cmd="lzcat $filename"
+elif [ $type == "application/x-bzip2" ] ; then
+  cmd="bzcat $filename"
+elif [ $type == "application/x-xz" ] ; then
+  cmd="xzcat $filename"
+else
+  cmd="zcat -f $filename"
+fi
+
+solver_cmd="./clasp_glibc" $@
 
 cd "$(dirname "$0")"
-bash -c "$cmd" &
+echo "$cmd | env $env $solver_cmd"
+$cmd | $solver_cmd &
 PID=$!
 wait $PID
 exit $?
