@@ -5,7 +5,7 @@ pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
-df = pd.read_csv('output_sat_solvers_2020_01_11.csv')
+df = pd.read_csv('output_sat_solvers.csv')
 # print(df)
 
 
@@ -25,7 +25,15 @@ print(glibc_thp['instance'].count())
 x=df.groupby(['group','solver']).size() #.agg(['count']) #.agg('wall_time')
 print(x.reset_index(name='counts'))
 # print(x.describe())
-exit(1)
+# exit(1)
+
+df.loc[df.verdict=='TLE', 'wall_time'] = 900
+df.loc[df.verdict=='RTE', 'wall_time'] = 900
+
+df.loc[df.verdict=='TLE', 'perf_cache_misses'] = np.nan
+df.loc[df.verdict=='TLE', 'perf_tlb_miss'] = np.nan
+df.loc[df.verdict=='RTE', 'perf_cache_misses'] = np.nan
+df.loc[df.verdict=='RTE', 'perf_tlb_miss'] = np.nan
 
 solver = df[df.solver=='default[s=minisat]']
 print('*'*80)
@@ -38,6 +46,8 @@ glibc_thp=solver[solver.group=='glibc_thp']
 
 merged = pd.merge(glibc, glibc_thp, on='instance', how='outer')
 # print(merged)
+# print(merged.columns)
+# exit(1)
 
 filtered=merged[((merged.verdict_x=='OK') | (merged.verdict_y=='OK'))]
 
@@ -45,8 +55,15 @@ filtered=merged[((merged.verdict_x=='OK') | (merged.verdict_y=='OK'))]
 # filtered = merged[]
 
 # printme = ['solver_x', 'instance','runsolver_WCTIME_x', 'perf_tlb_miss_x', 'return_code_x', 'verdict_x', 'runsolver_WCTIME_y', 'runsolver_STATUS_y', 'perf_tlb_miss_y', 'verdict_y']
-printme = ['solver_x', 'instance','runsolver_WCTIME_x', 'return_code_x', 'verdict_x', 'runsolver_WCTIME_y', 'runsolver_STATUS_y', 'verdict_y']
+printme = ['solver_x', 'instance','runsolver_WCTIME_x', 'runsolver_WCTIME_y', 'perf_elapsed_x', 'perf_elapsed_y', 'return_code_x', 'return_code_y', 'verdict_x', 'verdict_y', 'perf_tlb_miss_x', 'perf_tlb_miss_y', 'perf_cache_misses_x', 'perf_cache_misses_y']
 filtered = filtered[printme].sort_values(by=['instance'])
+
+
+
+filtered['perf_tlb_miss_diff'] = filtered['perf_tlb_miss_x']  - filtered['perf_tlb_miss_y']
+filtered['perf_cache_misses_diff'] = filtered['perf_cache_misses_x']  - filtered['perf_cache_misses_y']
+filtered['perf_elapsed_diff'] = filtered['perf_elapsed_x']  - filtered['perf_elapsed_y']
+filtered=filtered[filtered.runsolver_WCTIME_x > 20]
 print(filtered)
 
 exit(1)

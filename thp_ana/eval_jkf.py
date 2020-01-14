@@ -5,7 +5,7 @@ pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
-df = pd.read_csv('output_sat_solvers_2020_01_12.csv')
+df = pd.read_csv('output_sat_solvers_minisat.csv')
 # print(df)
 
 
@@ -37,10 +37,10 @@ df1=df_red
 # df1=df_red[df_red.solver=='default[s=plingeling]']
 # df1=df_red[df_red.solver=='default[s=minisat]']
 # df1=df_red[df_red.solver=='default[s=mergesat]']
-df1=df1[df1.verdict=='OK']
+# df1=df1[df1.verdict=='OK']
 # print(df1)
 
 # x=df1.groupby('group').agg({'wall_time': np.median})
-x=df1.groupby(['group','solver']).agg('wall_time')
+x=df1.groupby(['group','solver','verdict']).agg('wall_time')
 print(x.describe())
 # print(x)
