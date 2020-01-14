@@ -31,7 +31,7 @@ class SetupKernel(Step):
         if 'transparent_hugepage' in config:
             logger.info('THP value was:')
             with open('/sys/kernel/mm/transparent_hugepage/enabled', 'r') as thp:
-                logger.error(thp.readlines())
+                logger.info(thp.readlines())
             logger.info('THP setting value to "%s"' % config['transparent_hugepage'])
             try:
                 with open('/sys/kernel/mm/transparent_hugepage/enabled', 'w') as thp:
@@ -42,7 +42,7 @@ class SetupKernel(Step):
             logger.info('THP value is now:')
             with open('/sys/kernel/mm/transparent_hugepage/enabled', 'r') as thp:
                 value = thp.readlines()
-                logger.error(value)
+                logger.info(value)
                 info['transparent_hugepage']=value
 
         return info

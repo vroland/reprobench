@@ -28,7 +28,7 @@ else
   prep_cmd="zcat -f $filename"
 fi
 
-decomp_filename=$(basename $filename)
+decomp_filename=$temp/$(basename $filename)
 echo "Preparing instance in /dev/shm..."
 echo "$prep_cmd > $decomp_filename"
 $prep_cmd > $decomp_filename
