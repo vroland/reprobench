@@ -19,7 +19,12 @@ runsolver_re = {
 
 
 perf_re = {
-    "tlb_miss": re.compile(r"\s*(?P<val>[0-9]+(\.[0-9]+)?)\s*dTLB-load-misses\s*"),
+    "dTLB_load_misses": re.compile(r"\s*(?P<val>[0-9]+(\.[0-9]+)?)\s*dTLB-load-misses\s*"),
+    "dTLB_loads": re.compile(r"\s*(?P<val>[0-9]+(\.[0-9]+)?)\s*dTLB-loads\s*"),
+    "dTLB_store_misses": re.compile(r"\s*(?P<val>[0-9]+(\.[0-9]+)?)\s*dTLB-store-misses\s*"),
+    "dTLB_stores": re.compile(r"\s*(?P<val>[0-9]+(\.[0-9]+)?)\s*dTLB-stores\s*"),
+    "iTLB_load_misses": re.compile(r"\s*(?P<val>[0-9]+(\.[0-9]+)?)\s*iTLB-load-misses\s*"),
+    "iTLB_loads": re.compile(r"\s*(?P<val>[0-9]+(\.[0-9]+)?)\s*iTLB-loads\s*"),
     "cycles": re.compile(r"\s*(?P<val>[0-9]+(\.[0-9]+)?)\s*cycles\s*"),
     "stall_cycles": re.compile(r"\s*(?P<val>[0-9]+(\.[0-9]+)?)\s*stalled-cycles-backend\s*"),
     "cache_misses": re.compile(r"\s*(?P<val>[0-9]+(\.[0-9]+)?)\s*cache-misses\s*"),
@@ -71,7 +76,8 @@ class RunSolverPerfEval(Executor):
 
     @staticmethod
     def compile_stats(stats, run_id, nonzero_as_rte):
-        perf_keys = ['perf_tlb_miss', 'perf_cycles', 'perf_cache_misses', 'perf_elapsed']
+        perf_keys = ['perf_dTLB_load_misses', 'perf_dTLB_loads', 'perf_dTLB_store_misses', 'perf_dTLB_stores',
+                     'perf_iTLB_load_misses', 'perf_iTLB_loads', 'perf_cycles', 'perf_cache_misses', 'perf_elapsed']
 
         if 'runsolver_error' in stats:
             stats['cpu_time'] = '-1'
@@ -133,8 +139,8 @@ class RunSolverPerfEval(Executor):
         logger.debug(perflog)
 
         solver_cmd = "%s %s" %(' '.join(cmdline), input_str)
-
-        perfcmdline = "/usr/bin/perf stat -o %s -e dTLB-load-misses,cycles,stalled-cycles-backend,cache-misses %s" % (
+        # perf list
+        perfcmdline = "/usr/bin/perf stat -o %s -e dTLB-load-misses,dTLB-loads,dTLB-store-misses,dTLB-stores,iTLB-load-misses,iTLB-loads,cycles,stalled-cycles-backend,cache-misses %s" % (
         perflog, solver_cmd)
         runsolver = os.path.expanduser("~/bin/runsolver")
         run_cmd = f"{runsolver:s} --vsize-limit {self.mem_limit:.0f} -W {self.cpu_limit:.0f}  -w {watcher:s} -v {varfile:s} {perfcmdline:s} > {stdout_p:s} 2>> {stderr_p:s}"
