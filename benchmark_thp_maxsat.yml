@@ -2,7 +2,7 @@ title: sat_solvers
 description: Benchmark for different runtimes with and without glibc hack
 
 limits:
-  time: 5 # s
+  time: 900 # s
   memory: 8048 # mb
   scheduler_memory: 32768 #mb
 
@@ -38,7 +38,7 @@ tasks:
     type: file
     urls:
       - http://www.maxsat.udl.cat/14/benchmarks/wpms_industrial.tgz
-    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/MAXSAT/
+    path: /scratch/p_gpusat/automated-reasoner-builds/benchmarks/MAXSAT_wpms-2014
 #    path: ./tasks/thp/sat/
     extract_archives: true
     patterns: |
