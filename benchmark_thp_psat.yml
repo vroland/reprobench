@@ -74,9 +74,8 @@ tools:
     parameters:
       default:
         s:
-          - minisat
-#          - mergesat
-#          - plingeling
+          - manysat2.0
+          - plingeling
   glibc_thp:
     module: tools.sat.satExecutor.SATTool
     parameters:
@@ -85,7 +84,6 @@ tools:
         t: 1
         #s = solver
         s:
-          - minisat
-#          - mergesat
-#          - plingeling
+          - manysat2.0
+          - plingeling
 

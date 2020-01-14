@@ -60,7 +60,7 @@ source ../../bash_shared/sysinfo.sh
 source ../../bash_shared/tcat.sh
 
 if [ "$solver" == "plingeling" ] ; then
-  solver_cmd="./"$solver"_glibc -t 1 -g 8 $@"
+  solver_cmd="./"$solver"_glibc -t 4 -g 8 $@"
 #elif [ "$solver" == "mergesat" ] ; then
 else
   solver_cmd="./$solver"_glibc $@
