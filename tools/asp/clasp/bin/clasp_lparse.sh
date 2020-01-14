@@ -23,7 +23,12 @@ done
 
 shift $((OPTIND-1))
 
-trap 'kill -TERM $PID' TERM
+function interrupted(){
+  kill -TERM $PID
+  echo "Received signal..."
+}
+trap interrupted TERM
+trap interrupted INT
 
 if [ ! -z $thp ] ; then
   export GLIBC_THP_ALWAYS=1

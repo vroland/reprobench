@@ -25,7 +25,11 @@ done
 
 shift $((OPTIND-1))
 
-trap 'kill -TERM $PID' TERM
+function interrupted(){
+  kill -TERM $PID
+}
+trap interrupted TERM
+trap interrupted INT
 
 
 if [ -z $solver ] ; then
