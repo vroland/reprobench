@@ -54,25 +54,32 @@ if send_events:
 df = None
 
 #TODO: handling of multiple keys
-keys = ['runsolver_WCTIME', 'runsolver_CPUTIME', 'runsolver_USERTIME', 'runsolver_SYSTEMTIME', 'runsolver_CPUUSAGE', 'runsolver_MAXVM', 'runsolver_TIMEOUT', 'runsolver_MEMOUT', 'runsolver_STATUS', 'perf_tlb_miss', 'perf_cycles', 'perf_cache_misses', 'perf_elapsed', 'return_code', 'cpu_time', 'wall_time', 'max_memory', 'platform', 'hostname', 'run_id', 'verdict']
+keys = ['runsolver_WCTIME', 'runsolver_CPUTIME', 'runsolver_USERTIME', 'runsolver_SYSTEMTIME', 'runsolver_CPUUSAGE', 'runsolver_MAXVM', 'runsolver_TIMEOUT', 'runsolver_MEMOUT', 'runsolver_STATUS', 'perf_tlb_miss', 'perf_cycles', 'perf_cache_misses', 'perf_elapsed', 'return_code', 'cpu_time', 'wall_time', 'max_memory', 'platform', 'hostname', 'run_id', 'verdict', 'runsolver_error']
 
 for folder in folders:
     for file in glob.glob('%s/**/result.json' % folder, recursive=True):
         my_folder = os.path.dirname(file)
         result_p = "%s/result.json" % my_folder
         with open(result_p, 'r') as result_f:
-            result = json.load(result_f)
+            try:
+                result = json.load(result_f)
+            except json.decoder.JSONDecodeError as e:
+                logger.error(e)
+                logger.error(result_p)
+                exit(1)
             stats = RunSolverPerfEval.compile_stats(stats=result, run_id=result['run_id'], nonzero_as_rte=nonzero_rte)
             if df is None:
                 # TODO: handling of missing keys and default from file
-                df = pd.DataFrame(columns=result.keys())
-                # df = pd.DataFrame(columns=keys)
+                # df = pd.DataFrame(columns=result.keys())
+                df = pd.DataFrame(columns=keys)
             print(result.keys())
             cols = df.columns
             try:
                 df.loc[len(df)] = stats
             except ValueError as e:
                 missing = set(cols) - set(stats.keys())
+                logger.info("Following keys where missing... adding na.")
+                logger.info(missing)
                 for e in missing:
                     stats[e]='NaN'
                 df.loc[len(df)] = stats

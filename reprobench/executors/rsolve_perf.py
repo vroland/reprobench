@@ -73,39 +73,47 @@ class RunSolverPerfEval(Executor):
     def compile_stats(stats, run_id, nonzero_as_rte):
         perf_keys = ['perf_tlb_miss', 'perf_cycles', 'perf_cache_misses', 'perf_elapsed']
 
-        try:
-            stats['return_code'] = stats['runsolver_STATUS']
-        except KeyError:
-            stats['return_code'] = '9'
-        stats['cpu_time'] = stats['runsolver_CPUTIME']
-        stats['wall_time'] = stats['runsolver_WCTIME']
-        stats['max_memory'] = stats['runsolver_MAXVM']
-
-        logger.error(stats)
-
-        if stats["runsolver_TIMEOUT"] == 'true':
-            verdict = RunStatisticExtended.TIMEOUT
-        elif stats["runsolver_MEMOUT"] == 'true':
-            verdict = RunStatisticExtended.MEMOUT
-        elif ("error" in stats and stats["error"] != '') or \
-            (nonzero_as_rte and nonzero_as_rte.lower() == 'true' and int(stats['return_code']) != 0):
-            verdict = RunStatisticExtended.RUNTIME_ERR
+        if 'runsolver_error' in stats:
+            stats['cpu_time'] = '-1'
+            stats['wall_time'] = '-1'
+            stats['max_memory'] = '-1'
+            stats['return_code'] = '-1'
+            stats['verdict'] = RunStatisticExtended.RUNTIME_ERR
         else:
-            verdict = RunStatisticExtended.SUCCESS
+            try:
+                stats['return_code'] = stats['runsolver_STATUS']
+            except KeyError:
+                stats['return_code'] = '9'
+            stats['cpu_time'] = stats['runsolver_CPUTIME']
+            stats['wall_time'] = stats['runsolver_WCTIME']
+            stats['max_memory'] = stats['runsolver_MAXVM']
+
+
+            if stats["runsolver_TIMEOUT"] == 'true':
+                verdict = RunStatisticExtended.TIMEOUT
+            elif stats["runsolver_MEMOUT"] == 'true':
+                verdict = RunStatisticExtended.MEMOUT
+            elif ("error" in stats and stats["error"] != '') or \
+                (nonzero_as_rte and nonzero_as_rte.lower() == 'true' and int(stats['return_code']) != 0):
+                verdict = RunStatisticExtended.RUNTIME_ERR
+            else:
+                verdict = RunStatisticExtended.SUCCESS
+            if 'runsolver_STATUS' not in stats:
+                stats['runsolver_STATUS'] = 1
+
+            stats['verdict'] = verdict
+
 
         if 'error' in stats:
             del stats["error"]
-        if 'runsolver_STATUS' not in stats:
-            stats['runsolver_STATUS'] = 1
 
         for key in perf_keys:
             if not key in stats:
                 stats[key] = '-1'
 
         stats['run_id'] = run_id
-        stats['verdict'] = verdict
 
-        logger.trace(stats)
+        logger.warning(stats)
         return stats
 
     def run(
@@ -181,16 +189,21 @@ class RunSolverPerfEval(Executor):
     def parse_logs(perflog, varfile, watcher, stats=None):
         if stats is None:
             stats={}
-        # runsolver parser
-        with open(f"{varfile:s}") as f:
-            for line in f:
-                # TODO: debuglevel
-                # logger.debug(line)
-                if line.startswith('#') or len(line) == 0:
-                    continue
-                line = line[:-1].split("=")
-                stats['runsolver_%s' % line[0]] = line[1]
-        logger.trace(stats)
+        try:
+            # runsolver parser
+            with open(f"{varfile:s}") as f:
+                for line in f:
+                    # TODO: debuglevel
+                    # logger.debug(line)
+                    if line.startswith('#') or len(line) == 0:
+                        continue
+                    line = line[:-1].split("=")
+                    stats['runsolver_%s' % line[0]] = line[1]
+            logger.trace(stats)
+        except FileNotFoundError as e:
+            logger.error(e)
+            stats['runsolver_error'] = 'true'
+
         # runsolver watcher parser (returncode etc)
         # for line in codecs.open(perflog, errors='ignore', encoding='utf-8'):
         with open(f"{watcher:s}") as f:
