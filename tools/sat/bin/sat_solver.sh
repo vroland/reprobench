@@ -27,11 +27,6 @@ shift $((OPTIND-1))
 
 trap 'kill -TERM $PID' TERM
 
-cat /etc/hostname
-
-echo /sys/kernel/mm/transparent_hugepage/enabled
-cat /sys/kernel/mm/transparent_hugepage/enabled
-
 
 if [ -z $solver ] ; then
   echo "No Solver given. Exiting..."
@@ -52,20 +47,13 @@ if [ $thp == 1 ] ; then
   env="GLIBC_THP_ALWAYS=1"
 fi
 
-echo $env
+cd "$(dirname "$0")"
 
-type=$(file -b --mime-type $filename)
-echo $type
+#get basic info
+source ../../bash_shared/sysinfo.sh
 
-if [ $type == "application/x-lzma" ] ; then
-  cmd="lzcat $filename"
-elif [ $type == "application/x-bzip2" ] ; then
-  cmd="bzcat $filename"
-elif [ $type == "application/x-xz" ] ; then
-  cmd="xzcat $filename"
-else
-  cmd="zcat -f $filename"
-fi
+#get file transparently from compressed file and temporarily store in shm
+source ../../bash_shared/tcat.sh
 
 if [ "$solver" == "plingeling" ] ; then
   solver_cmd="./"$solver"_glibc -t 1 -g 8 $@"
@@ -74,10 +62,9 @@ else
   solver_cmd="./$solver"_glibc $@
 fi
 
-cd "$(dirname "$0")"
-echo "$cmd | env $env $solver_cmd"
-$cmd | $solver_cmd &
+echo "cat $decomp_filename | env $env $solver_cmd"
+#run call in background and wait for finishing
+cat $decomp_filename | $solver_cmd &
 PID=$!
 wait $PID
 exit $?
-

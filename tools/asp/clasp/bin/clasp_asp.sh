@@ -27,16 +27,10 @@ shift $((OPTIND-1))
 
 trap 'kill -TERM $PID' TERM
 
-cat /etc/hostname
-
-echo /sys/kernel/mm/transparent_hugepage/enabled
-cat /sys/kernel/mm/transparent_hugepage/enabled
-
 if [ ! -z $thp ] ; then
   export GLIBC_THP_ALWAYS=1
   echo "Using THP option in libc"
 fi
-
 
 if [ -z $filename ] ; then
   echo "No filename given. Exiting..."
@@ -59,24 +53,19 @@ if [ ! -f $encoding ] ; then
 fi
 
 
-type=$(file -b --mime-type $filename)
-echo $type
+cd "$(dirname "$0")"
+#get basic info
+source ../../../bash_shared/sysinfo.sh
+#get file transparently from compressed file and temporarily store in shm
+source ../../../bash_shared/tcat.sh
 
-if [ $type == "application/x-lzma" ] ; then
-  cmd="lzcat $filename"
-elif [ $type == "application/x-bzip2" ] ; then
-  cmd="bzcat $filename"
-elif [ $type == "application/x-xz" ] ; then
-  cmd="xzcat $filename"
-else
-  cmd="zcat -f $filename"
-fi
 
 solver_cmd="./clasp_glibc" $@
 
 cd "$(dirname "$0")"
-echo "$cmd | env $env $solver_cmd"
-$cmd | ./gringo - $encoding | $solver_cmd &
+echo "cat $decomp_filename | ./gringo - $encoding | $solver_cmd"
+#run call in background and wait for finishing
+cat $decomp_filename | ./gringo - $encoding | $solver_cmd &
 
 PID=$!
 wait $PID
