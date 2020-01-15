@@ -1,4 +1,4 @@
-title: sat_solvers
+title: maxsat_solvers
 description: Benchmark for different runtimes with and without glibc hack
 
 limits:
