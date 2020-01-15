@@ -2,9 +2,9 @@ title: bmc
 description: Benchmark for different runtimes with and without glibc hack
 
 limits:
-  time: 5 # s
-  memory: 4024 # mb
-  scheduler_memory: 62000 #mb
+  time: 900 # s
+  memory: 8048 # mb
+  scheduler_memory: 32768 #mb
 
 steps:
   run:
@@ -34,20 +34,38 @@ observers:
   - module: reprobench.executors.RunStatisticExtendedObserver
 
 tasks:
-  hwmcc_bench:
-    type: url
+  hwmcc17_bench:
+    type: file
     urls:
       - http://fmv.jku.at/hwmcc17/hwmcc17-single-benchmarks.tar.xz
-    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/HWBMC/
+    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/BMC/hwmcc17-single-benchmarks.tar/
+#    path: /scratch/p_gpusat/automated-reasoner-builds/benchmarks/AIG_hwmcc17-deep
     #    path: ./tasks/thp/bmc/
     extract_archives: true
     patterns: |
-      **/*
+      6s0.aig
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
       !**/*.tgz
       !**/*.tar
+#      **/*
+
+#  hwmcc19_bench:
+#    type: file
+#    urls:
+#      - http://fmv.jku.at/hwmcc17/hwmcc17-single-benchmarks.tar.xz
+#    path: /scratch/p_gpusat/automated-reasoner-builds/benchmarks/HWMCC_2019-single/aig/
+#    #    path: ./tasks/thp/bmc/
+#    extract_archives: true
+#    patterns: |
+#      6s0.aig
+#      !**/*.tar.bz2
+#      !**/*.tar.xz
+#      !**/*.tar.gz
+#      !**/*.tgz
+#      !**/*.tar
+#      **/*
 
 tools:
   glibc:

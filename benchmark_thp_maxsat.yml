@@ -39,6 +39,7 @@ tasks:
     urls:
       - http://www.maxsat.udl.cat/14/benchmarks/wpms_industrial.tgz
     path: /scratch/p_gpusat/automated-reasoner-builds/benchmarks/MAXSAT_wpms-2014
+#    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/MAXSAT/wpms_industrial/
 #    path: ./tasks/thp/sat/
     extract_archives: true
     patterns: |

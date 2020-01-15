@@ -25,18 +25,16 @@ done
 
 shift $((OPTIND-1))
 
-trap 'kill -TERM $PID' TERM
-
-cat /etc/hostname
-
-echo /sys/kernel/mm/transparent_hugepage/enabled
-cat /sys/kernel/mm/transparent_hugepage/enabled
+function interrupted(){
+  kill -TERM $PID
+}
+trap interrupted TERM
+trap interrupted INT
 
 if [ -z $solver ] ; then
   echo "No Solver given. Exiting..."
   exit 1
 fi
-solver_cmd="./$solver"_glibc $@
 
 if [ -z $filename ] ; then
   echo "No filename given. Exiting..."
@@ -52,25 +50,20 @@ if [ $thp == 1 ] ; then
   env="GLIBC_THP_ALWAYS=1"
 fi
 
-echo $env
-
-type=$(file -b --mime-type $filename)
-echo $type
-
-if [ $type == "application/x-lzma" ] ; then
-  cmd="lzcat $filename"
-elif [ $type == "application/x-bzip2" ] ; then
-  cmd="bzcat $filename"
-elif [ $type == "application/x-xz" ] ; then
-  cmd="xzcat $filename"
-else
-  cmd="zcat -f $filename"
-fi
-
-
 cd "$(dirname "$0")"
-echo "$cmd | env $env $solver_cmd"
-$cmd | $solver_cmd &
+
+#get basic info
+source ../../bash_shared/sysinfo.sh
+
+
+solver_cmd="./$solver"_glibc $@
+
+echo "env $env $solver_cmd $filename"
+echo
+echo
+
+#run call in background and wait for finishing
+$solver_cmd $filename &
 PID=$!
 wait $PID
 exit $?

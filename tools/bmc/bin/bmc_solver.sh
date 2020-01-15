@@ -24,12 +24,11 @@ done
 
 shift $((OPTIND-1))
 
-trap 'kill -TERM $PID' TERM
-
-cat /etc/hostname
-
-echo /sys/kernel/mm/transparent_hugepage/enabled
-cat /sys/kernel/mm/transparent_hugepage/enabled
+function interrupted(){
+  kill -TERM $PID
+}
+trap interrupted TERM
+trap interrupted INT
 
 if [ -z $solver ] ; then
   echo "No Solver given. Exiting..."
@@ -46,6 +45,15 @@ if [ ! -z $thp ] ; then
   echo "Using THP option in libc"
 fi
 
+cd "$(dirname "$0")"
+
+#get basic info
+source ../../bash_shared/sysinfo.sh
+
+# so far no compression here
+##get file transparently from compressed file and temporarily store in shm
+#source ../../bash_shared/tcat.sh
+
 if [ "$solver" == "aigbmc" ] ; then
   cmd="./"$solver"_glibc $@ -m -n 100 $filename"
 elif [ "$solver" == "cbmc" ] ; then
@@ -59,12 +67,15 @@ else
   echo 'Default parameters for solver undefined'
   exit 1
 fi
-echo $cmd
 
-cd "$(dirname "$0")"
-bash -c 'echo GLIBC_THP_ALWAYS=$GLIBC_THP_ALWAYS'
-bash -c "$cmd"  &
+echo $cmd
+$cmd  &
+
+#so far no compression here
+#echo "cat $decomp_filename | env $env $solver_cmd"
+##run call in background and wait for finishing
+#cat $decomp_filename | $solver_cmd &
+
 PID=$!
 wait $PID
 exit $?
-

@@ -56,9 +56,6 @@ cd "$(dirname "$0")"
 #get basic info
 source ../../bash_shared/sysinfo.sh
 
-#get file transparently from compressed file and temporarily store in shm
-source ../../bash_shared/tcat.sh
-
 if [ "$solver" == "plingeling" ] ; then
   solver_cmd="./"$solver"_glibc -t 4 -g 8 $@"
 #elif [ "$solver" == "mergesat" ] ; then
@@ -66,9 +63,14 @@ else
   solver_cmd="./$solver"_glibc $@
 fi
 
-echo "cat $decomp_filename | env $env $solver_cmd"
+
+echo "env $env $solver_cmd $filename"
+echo
+echo
+
 #run call in background and wait for finishing
-cat $decomp_filename | $solver_cmd &
+$solver_cmd $filename &
+
 PID=$!
 wait $PID
 exit $?

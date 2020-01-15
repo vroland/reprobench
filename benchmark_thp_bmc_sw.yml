@@ -2,9 +2,9 @@ title: bmc
 description: Benchmark for different runtimes with and without glibc hack
 
 limits:
-  time: 5 # s
-  memory: 4024 # mb
-  scheduler_memory: 62000 #mb
+  time: 900 # s
+  memory: 8048 # mb
+  scheduler_memory: 32768 #mb
 
 steps:
   run:

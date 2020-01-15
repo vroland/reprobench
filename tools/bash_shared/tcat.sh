@@ -1,9 +1,22 @@
 #!/usr/bin/env bash
-#TODO: use slurm provided temp
-temp=$(mktemp -d -p /dev/shm -t tmp.$(basename $0).XXXXXXXXX)
-echo "Created temp working directory $temp"
+# A POSIX variable
+OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
-#template does not support curly brackets
+while getopts "h?f:o:" opt; do
+    case "$opt" in
+    h|\?)
+        show_help
+        exit 0
+        ;;
+    f)  filename=$OPTARG
+        ;;
+    o)  output=$OPTARG
+        ;;
+    esac
+done
+
+shift $((OPTIND-1))
+
 function cleanup(){
   if [[ $temp == /dev/shm/tmp.* ]] ; then
     rm -r $temp
@@ -12,7 +25,19 @@ function cleanup(){
   echo "Deleted temp working directory $temp"
   echo "========================================================="
 }
-trap cleanup EXIT
+
+if [ -z $filename ] ; then
+  echo 'Missing filename. Exiting...'
+  exit 1
+fi
+
+if [ -z $output ] ; then
+  temp=$(mktemp -d -p /dev/shm -t tmp.$(basename $0).XXXXXXXXX)
+  echo "Created temp working directory $temp"
+  trap cleanup EXIT
+  output=$temp/$(basename $filename)
+fi
+
 
 
 type=$(file -b --mime-type $filename)
@@ -28,8 +53,7 @@ else
   prep_cmd="zcat -f $filename"
 fi
 
-decomp_filename=$temp/$(basename $filename)
-echo "Preparing instance in /dev/shm..."
-echo "$prep_cmd > $decomp_filename"
-$prep_cmd > $decomp_filename
+echo "Preparing instance in $output"
+echo "$prep_cmd > $output"
+$prep_cmd > $output
 

@@ -38,14 +38,15 @@ fi
 cd "$(dirname "$0")"
 #get basic info
 source ../../../bash_shared/sysinfo.sh
-#get file transparently from compressed file and temporarily store in shm
-source ../../../bash_shared/tcat.sh
-
 
 solver_cmd="./clasp_glibc" $@
-echo "cat $decomp_filename | env $env $solver_cmd"
+
+echo "env $env $solver_cmd $filename"
+echo
+echo
+
 #run call in background and wait for finishing
-cat $decomp_filename | $solver_cmd &
+$solver_cmd $filename &
 PID=$!
 wait $PID
 exit $?

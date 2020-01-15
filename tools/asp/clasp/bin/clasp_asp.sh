@@ -56,16 +56,13 @@ fi
 cd "$(dirname "$0")"
 #get basic info
 source ../../../bash_shared/sysinfo.sh
-#get file transparently from compressed file and temporarily store in shm
-source ../../../bash_shared/tcat.sh
-
 
 solver_cmd="./clasp_glibc" $@
 
 cd "$(dirname "$0")"
-echo "cat $decomp_filename | ./gringo - $encoding | $solver_cmd"
+echo "./gringo $filename $encoding | $solver_cmd"
 #run call in background and wait for finishing
-cat $decomp_filename | ./gringo - $encoding | $solver_cmd &
+./gringo $filename $encoding | $solver_cmd &
 
 PID=$!
 wait $PID
