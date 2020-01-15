@@ -53,8 +53,12 @@ if send_events:
 
 df = None
 
-#TODO: handling of multiple keys
-keys = ['runsolver_WCTIME', 'runsolver_CPUTIME', 'runsolver_USERTIME', 'runsolver_SYSTEMTIME', 'runsolver_CPUUSAGE', 'runsolver_MAXVM', 'runsolver_TIMEOUT', 'runsolver_MEMOUT', 'runsolver_STATUS', 'perf_tlb_miss', 'perf_cycles', 'perf_cache_misses', 'perf_elapsed', 'return_code', 'cpu_time', 'wall_time', 'max_memory', 'platform', 'hostname', 'run_id', 'verdict', 'runsolver_error']
+# TODO: handling of multiple keys
+keys = ['runsolver_WCTIME', 'runsolver_CPUTIME', 'runsolver_USERTIME', 'runsolver_SYSTEMTIME', 'runsolver_CPUUSAGE',
+        'runsolver_MAXVM', 'runsolver_TIMEOUT', 'runsolver_MEMOUT', 'runsolver_STATUS', 'perf_dTLB_load_misses',
+        'perf_dTLB_loads', 'perf_dTLB_store_misses', 'perf_dTLB_stores', 'perf_iTLB_load_misses', 'perf_iTLB_loads',
+        'perf_cycles', 'perf_cache_misses', 'perf_elapsed', 'return_code', 'cpu_time', 'wall_time',
+        'max_memory', 'platform', 'hostname', 'run_id', 'verdict', 'runsolver_error']
 
 for folder in folders:
     for file in glob.glob('%s/**/result.json' % folder, recursive=True):
@@ -81,7 +85,7 @@ for folder in folders:
                 logger.info("Following keys where missing... adding na.")
                 logger.info(missing)
                 for e in missing:
-                    stats[e]='NaN'
+                    stats[e] = 'NaN'
                 df.loc[len(df)] = stats
         # logger.info(result)
         if send_events:
@@ -91,5 +95,4 @@ for folder in folders:
             socket.send_multipart([STORE_THP_RUNSTATS, encode_message(result)])
             logger.error('Done...')
 
-
-df.to_csv('output_%s.csv' %config['title'])
+df.to_csv('output_%s.csv' % config['title'])
