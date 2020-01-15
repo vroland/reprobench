@@ -1,22 +1,23 @@
-#TODO: replace platform by standardlib
-import platform
-import os
-from subprocess import Popen, PIPE
-import re
-from loguru import logger
+# TODO: replace platform by standardlib
 import json
+import os
+import platform
+import re
+import tempfile
+from subprocess import Popen, PIPE
+
+from loguru import logger
 
 import reprobench
 from reprobench.utils import send_event
 from .base import Executor
-from .db import RunStatistic, RunStatisticExtended
-from .events import STORE_RUNSTATS, STORE_THP_RUNSTATS
+from .db import RunStatisticExtended
+from .events import STORE_THP_RUNSTATS
 
 runsolver_re = {
     "SEGFAULT": re.compile(r"^\s*Child\s*ended\s*because\s*it\s*received\s*signal\s*11\s*\((?P<val>SIGSEGV)\)\s*"),
     "STATUS": re.compile(r"Child status: (?P<val>[0-9]+)"),
 }
-
 
 perf_re = {
     "dTLB_load_misses": re.compile(r"\s*(?P<val>[0-9]+(\.[0-9]+)?)\s*dTLB-load-misses\s*"),
@@ -33,6 +34,7 @@ perf_re = {
     "page_faults": re.compile(r"\s*(?P<val>[0-9]+)\s*page-faults\s*"),
     "context_switches": re.compile(r"\s*context-switches\s*"),
 }
+
 
 class RunSolverPerfEval(Executor):
     def __init__(self, context, config):
@@ -52,8 +54,7 @@ class RunSolverPerfEval(Executor):
         self.wall_limit = time_limit + wall_grace
         self.cpu_limit = time_limit
         self.mem_limit = float(limits["memory"]) * MB
-        self.reprobench_path = os.path.abspath(os.path.join(os.path.dirname(reprobench.__file__),'..'))
-
+        self.reprobench_path = os.path.abspath(os.path.join(os.path.dirname(reprobench.__file__), '..'))
 
     @staticmethod
     def perf_parse_from_file(perflog):
@@ -72,7 +73,6 @@ class RunSolverPerfEval(Executor):
     @classmethod
     def register(cls, config=None):
         RunStatisticExtended.create_table()
-
 
     @staticmethod
     def compile_stats(stats, run_id, nonzero_as_rte):
@@ -94,7 +94,6 @@ class RunSolverPerfEval(Executor):
             stats['wall_time'] = stats['runsolver_WCTIME']
             stats['max_memory'] = stats['runsolver_MAXVM']
 
-
             if stats["runsolver_TIMEOUT"] == 'true':
                 verdict = RunStatisticExtended.TIMEOUT
             elif stats["runsolver_MEMOUT"] == 'true':
@@ -108,7 +107,6 @@ class RunSolverPerfEval(Executor):
                 stats['runsolver_STATUS'] = 1
 
             stats['verdict'] = verdict
-
 
         if 'error' in stats:
             del stats["error"]
@@ -131,54 +129,65 @@ class RunSolverPerfEval(Executor):
         directory=None,
         **kwargs,
     ):
-
-        #TODO: fix out_path
-        outdir = os.path.abspath(os.path.join(self.reprobench_path,os.path.dirname(out_path)))
-        payload_p, perflog, stderr_p, stdout_p, varfile, watcher, runparameters_p = self.log_paths(outdir)
-
-        logger.debug(perflog)
-
-        solver_cmd = "%s %s" %(' '.join(cmdline), input_str)
-        # perf list
-        perfcmdline = "/usr/bin/perf stat -o %s -e dTLB-load-misses,dTLB-loads,dTLB-store-misses,dTLB-stores,iTLB-load-misses,iTLB-loads,cycles,stalled-cycles-backend,cache-misses %s" % (
-        perflog, solver_cmd)
-        runsolver = os.path.expanduser("~/bin/runsolver")
-        run_cmd = f"{runsolver:s} --vsize-limit {self.mem_limit:.0f} -W {self.cpu_limit:.0f}  -w {watcher:s} -v {varfile:s} {perfcmdline:s} > {stdout_p:s} 2>> {stderr_p:s}"
-
-        logger.trace('Logging run parameters to %s' %runparameters_p)
-        with open(runparameters_p, 'w') as runparameters_f:
-            run_details = {'run_id': self.run_id}
-            runparameters_f.write(json.dumps(run_details))
-
-        logger.debug(run_cmd)
-        logger.debug(f"Running {directory}")
-        p_solver = Popen(run_cmd, stdout=PIPE, stderr=PIPE, shell=True, close_fds=True, cwd=outdir)
-        output, err = p_solver.communicate()
-
         stats = {}
-        if err != b'':
-            logger.error(err)
-            stats['error'] = err
-        else:
-            stats['error'] = ''
-
-        stats = self.parse_logs(perflog, varfile, watcher, stats)
-
-        logger.trace(stats)
-        logger.debug(f"Finished {directory}")
-
         stats['platform'] = platform.platform(aliased=True)
         stats['hostname'] = platform.node()
 
-        payload = self.compile_stats(stats, self.run_id, self.nonzero_as_rte)
+        with tempfile.NamedTemporaryFile(prefix='rsolve_perf_tmp', dir='/dev/shm', delete=True) as f:
+            logger.debug(f"Extracting instance {input_str} to {f.name}")
+            transparent_cat = f"{self.reprobench_path}/tools/bash_shared/tcat.sh {input_str} -o {f.name}"
 
-        logger.error(payload)
-        with open(payload_p, 'w') as payload_f:
-            payload_f.write(json.dumps(payload))
+            p_tmpout = Popen(transparent_cat, stdout=PIPE, stderr=PIPE, shell=True, close_fds=True, cwd=self.reprobench_path)
+            output, err = p_tmpout.communicate()
+            logger.debug(f"Instance is available at {f.name}")
+            if err != b'':
+                logger.error(err)
+                stats['error'] = err
+                exit(1)
+
+            # TODO: fix out_path
+            outdir = os.path.abspath(os.path.join(self.reprobench_path, os.path.dirname(out_path)))
+            payload_p, perflog, stderr_p, stdout_p, varfile, watcher, runparameters_p = self.log_paths(outdir)
+
+            logger.debug(perflog)
+
+            solver_cmd = "%s -f %s" % (' '.join(cmdline), f.name)
+            # perf list
+            perfcmdline = "/usr/bin/perf stat -o %s -e dTLB-load-misses,dTLB-loads,dTLB-store-misses,dTLB-stores,iTLB-load-misses,iTLB-loads,cycles,stalled-cycles-backend,cache-misses %s" % (
+                perflog, solver_cmd)
+            runsolver = os.path.expanduser("~/bin/runsolver")
+            run_cmd = f"{runsolver:s} --vsize-limit {self.mem_limit:.0f} -W {self.cpu_limit:.0f}  -w {watcher:s} -v {varfile:s} {perfcmdline:s} > {stdout_p:s} 2>> {stderr_p:s}"
+
+            logger.trace('Logging run parameters to %s' % runparameters_p)
+            with open(runparameters_p, 'w') as runparameters_f:
+                run_details = {'run_id': self.run_id}
+                runparameters_f.write(json.dumps(run_details))
+
+            logger.debug(run_cmd)
+            logger.debug(f"Running {directory}")
+            p_solver = Popen(run_cmd, stdout=PIPE, stderr=PIPE, shell=True, close_fds=True, cwd=outdir)
+            output, err = p_solver.communicate()
+
+            if err != b'':
+                logger.error(err)
+                stats['error'] = err
+            else:
+                stats['error'] = ''
+
+            stats = self.parse_logs(perflog, varfile, watcher, stats)
+
+            logger.trace(stats)
+            logger.debug(f"Finished {directory}")
 
 
-        # send_event(self.socket, STORE_RUNSTATS, payload)
-        send_event(self.socket, STORE_THP_RUNSTATS, payload)
+            payload = self.compile_stats(stats, self.run_id, self.nonzero_as_rte)
+
+            logger.error(payload)
+            with open(payload_p, 'w') as payload_f:
+                payload_f.write(json.dumps(payload))
+
+            # send_event(self.socket, STORE_RUNSTATS, payload)
+            send_event(self.socket, STORE_THP_RUNSTATS, payload)
 
     @staticmethod
     def log_paths(outdir):
@@ -194,7 +203,7 @@ class RunSolverPerfEval(Executor):
     @staticmethod
     def parse_logs(perflog, varfile, watcher, stats=None):
         if stats is None:
-            stats={}
+            stats = {}
         try:
             # runsolver parser
             with open(f"{varfile:s}") as f:

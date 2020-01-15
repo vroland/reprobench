@@ -5,7 +5,8 @@ pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
-df = pd.read_csv('output_sat_solvers_minisat.csv')
+# df = pd.read_csv('output_sat_solvers_minisat.csv')
+df = pd.read_csv('output_maxsat_solvers.csv')
 # print(df)
 
 
