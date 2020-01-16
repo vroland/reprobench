@@ -28,8 +28,8 @@ shift $((OPTIND-1))
 trap 'kill -TERM $PID' TERM
 
 if [ ! -z $thp ] ; then
-  export GLIBC_THP_ALWAYS=1
   echo "Using THP option in libc"
+  env=GLIBC_THP_ALWAYS=1
 fi
 
 if [ -z $filename ] ; then
@@ -62,7 +62,7 @@ solver_cmd="./clasp_glibc" $@
 cd "$(dirname "$0")"
 echo "./gringo $filename $encoding | $solver_cmd"
 #run call in background and wait for finishing
-./gringo $filename $encoding | $solver_cmd &
+$env ./gringo $filename $encoding | $solver_cmd &
 
 PID=$!
 wait $PID

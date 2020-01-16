@@ -48,7 +48,7 @@ if [ ! -f $filename ] ; then
 fi
 
 if [ $thp == 1 ] ; then
-  env="GLIBC_THP_ALWAYS=1"
+  env=GLIBC_THP_ALWAYS=1
 fi
 
 cd "$(dirname "$0")"
@@ -63,12 +63,12 @@ else
   solver_cmd="./$solver"_glibc $@
 fi
 
-echo "env $env $solver_cmd $filename"
+echo "$env $solver_cmd $filename"
 echo
 echo
 
 #run call in background and wait for finishing
-$solver_cmd $filename &
+$env $solver_cmd $filename &
 PID=$!
 wait $PID
 exit $?

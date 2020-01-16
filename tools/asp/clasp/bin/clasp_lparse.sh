@@ -31,7 +31,7 @@ trap interrupted TERM
 trap interrupted INT
 
 if [ ! -z $thp ] ; then
-  export GLIBC_THP_ALWAYS=1
+  env=GLIBC_THP_ALWAYS=1
   echo "Using THP option in libc"
 fi
 
@@ -41,12 +41,12 @@ source ../../../bash_shared/sysinfo.sh
 
 solver_cmd="./clasp_glibc" $@
 
-echo "env $env $solver_cmd $filename"
+echo "$env $solver_cmd $filename"
 echo
 echo
 
 #run call in background and wait for finishing
-$solver_cmd $filename &
+$env $solver_cmd $filename &
 PID=$!
 wait $PID
 exit $?
