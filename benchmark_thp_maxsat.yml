@@ -9,6 +9,9 @@ limits:
 steps:
   run:
     - module: reprobench.core.sysinfo.CollectSystemInfo
+    - module: reprobench.core.setup.SetupKernel
+      config:
+        transparent_hugepage: madvise
     - module: reprobench.executors.RunSolverPerfEval
 #    - module: reprobench.executors.PsmonExecutor
       config:
