@@ -63,7 +63,8 @@ echo
 echo
 
 #run call in background and wait for finishing
-$solver_cmd $filename &
+env $solver_cmd $filename &
+#(export $env; $solver_cmd $filename) &
 PID=$!
 wait $PID
 exit $?
