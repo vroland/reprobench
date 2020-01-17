@@ -79,6 +79,7 @@ tools:
           - minisat
 #          - mergesat
 #          - plingeling
+          - glucose-4.2.1
   glibc_thp:
     module: tools.sat.satExecutor.SATTool
     parameters:
@@ -90,4 +91,5 @@ tools:
           - minisat
 #          - mergesat
 #          - plingeling
+          - glucose-4.2.1
 

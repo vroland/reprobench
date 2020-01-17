@@ -6,7 +6,8 @@ pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 2000)
 
 # df = pd.read_csv('output_sat_solvers.csv')
-df = pd.read_csv('output_maxsat_solvers2.csv')
+df = pd.read_csv('output_sat_solvers_plingeling_b.csv')
+# df = pd.read_csv('output_sat_solvers-2019-01-17.csv')
 # print(df)
 
 

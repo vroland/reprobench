@@ -12,7 +12,8 @@ pd.set_option('display.width', 1000)
 
 # df = pd.read_csv('output_asp_solvers_2020_01_14.csv')
 # df = pd.read_csv('output_sat_solvers_eperf.csv')
-df = pd.read_csv('output_maxsat_solvers2.csv')
+df = pd.read_csv('output_sat_solvers_plingeling_b.csv')
+# df = pd.read_csv('output_maxsat_solvers-2020-01-17.csv')
 # print(df)
 
 
