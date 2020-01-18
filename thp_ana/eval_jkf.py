@@ -7,7 +7,8 @@ pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
 for filename in ['output_sat_solvers_2020-01-17.csv', 'output_sat_solvers_2020-01-17_plingeling.csv',
-                 'output_maxsat_solvers-2020-01-17.csv']:
+                 'output_maxsat_solvers-2020-01-17_2.csv', 'output_maxsat_solvers-2020-01-17_glucose.csv',
+                 'output_asp_solvers-2020-01-18.csv']:
     print('=' * 200)
     print(filename)
     print('=' * 200)
@@ -77,6 +78,8 @@ for filename in ['output_sat_solvers_2020-01-17.csv', 'output_sat_solvers_2020-0
 
     myff['speedupfact_wall'] = myff[('wall_time_x', 'sum')] / myff[('wall_time_y', 'sum')]
     myff['speedupfact_TLB_load_misses'] = myff[('perf_dTLB_load_misses_x', 'sum')] / \
-                              myff[('perf_dTLB_load_misses_y', 'sum')]
+                                          myff[('perf_dTLB_load_misses_y', 'sum')]
     myff['speedupfact_cache_misses'] = myff[('perf_cache_misses_x', 'sum')] / \
-                           myff[('perf_cache_misses_y', 'sum')]
+                                       myff[('perf_cache_misses_y', 'sum')]
+    myff.to_csv(f'1-outputs/{filename}_summary.csv')
+    myff.to_latex(f'1-outputs/{filename}_summary.tex')
