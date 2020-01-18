@@ -7,10 +7,10 @@ import reprobench
 from reprobench.tools.executable import ExecutableTool
 
 
-class ClaspASPTool(ExecutableTool):
-    name = "Clasp ASP Tool"
+class ASPGroundingTool(ExecutableTool):
+    name = "ASP Grounding Tool"
     prefix = '-'
-    path = "./bin/clasp_asp.sh"
+    path = "./bin/asp_solver_gringo_grounding.sh"
 
     @classmethod
     def is_ready(cls):
@@ -45,10 +45,10 @@ class ClaspASPTool(ExecutableTool):
         )
 
 
-class ClaspTool(ClaspASPTool):
-    name = "Clasp Tool"
+class ASPTool(ASPGroundingTool):
+    name = "ASP Tool"
     prefix = '-'
-    path = "./bin/clasp_lparse.sh"
+    path = "./bin/asp_solver.sh"
 
     def get_arguments(self):
-        return [f"{self.prefix}{key}={value}" for key, value in self.parameters.items()]
+        return [f"{self.prefix}{key} {value}" for key, value in self.parameters.items()]

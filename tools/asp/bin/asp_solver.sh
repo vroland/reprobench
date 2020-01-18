@@ -16,6 +16,8 @@ while getopts "h?vt:s:f:" opt; do
         ;;
     t)  thp=1
         ;;
+    s)  solver=$OPTARG
+        ;;
     f)  filename=$OPTARG
         ;;
     esac
@@ -30,6 +32,22 @@ function interrupted(){
 trap interrupted TERM
 trap interrupted INT
 
+
+if [ -z $solver ] ; then
+  echo "No Solver given. Exiting..."
+  exit 1
+fi
+
+if [ -z $filename ] ; then
+  echo "No filename given. Exiting..."
+  exit 1
+fi
+
+if [ ! -f $filename ] ; then
+  echo "Filename does not exist. Exiting..."
+  exit 1
+fi
+
 if [ ! -z $thp ] ; then
   env=GLIBC_THP_ALWAYS=1
   echo "Using THP option in libc"
@@ -37,9 +55,9 @@ fi
 
 cd "$(dirname "$0")"
 #get basic info
-source ../../../bash_shared/sysinfo.sh
+source ../../bash_shared/sysinfo.sh
 
-solver_cmd="./clasp_glibc" $@
+solver_cmd="./$solver"_glibc $@
 
 echo "$env $solver_cmd $filename"
 echo

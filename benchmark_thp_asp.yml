@@ -48,18 +48,18 @@ tasks:
       !**/*.tar.xz
       !**/*.tar.gz
       !**/*.tgz
-#      **/rand_200_1800_1154991214_9.gph
+#      **/15.10.schur
 
 tools:
   glibc:
-    module: tools.asp.clasp.claspExecutor.ClaspTool
+    module: tools.asp.aspExecutor.ASPTool
     parameters:
       default:
         s:
           - clasp
           - wasp
   glibc_thp:
-    module: tools.asp.clasp.claspExecutor.ClaspTool
+    module: tools.asp.aspExecutor.ASPTool
     parameters:
       default:
         t: 1
