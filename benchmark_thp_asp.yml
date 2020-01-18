@@ -2,7 +2,7 @@ title: asp_solvers
 description: Benchmark for different runtimes with and without glibc hack
 
 limits:
-  time: 5 # s
+  time: 900 # s
   memory: 8048 # mb
   scheduler_memory: 32768 #mb
 
@@ -43,12 +43,12 @@ tasks:
 #    path: ./tasks/thp/ASP/
     extract_archives: true
     patterns: |
-      **/rand_200_1800_1154991214_9.gph
+      **/*
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
       !**/*.tgz
-#      **/*
+#      **/rand_200_1800_1154991214_9.gph
 
 tools:
   glibc:
@@ -57,6 +57,7 @@ tools:
       default:
         s:
           - clasp
+          - wasp
   glibc_thp:
     module: tools.asp.clasp.claspExecutor.ClaspTool
     parameters:
@@ -64,3 +65,4 @@ tools:
         t: 1
         s:
           - clasp
+          - wasp
