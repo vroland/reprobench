@@ -62,7 +62,7 @@ solver_cmd="./clasp_glibc" $@
 cd "$(dirname "$0")"
 echo "./gringo $filename $encoding | $solver_cmd"
 #run call in background and wait for finishing
-$env ./gringo $filename $encoding | $solver_cmd &
+env $env ./gringo $filename $encoding | $solver_cmd &
 
 PID=$!
 wait $PID

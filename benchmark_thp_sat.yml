@@ -76,10 +76,12 @@ tools:
     parameters:
       default:
         s:
-          - minisat
+#          - minisat
 #          - mergesat
 #          - plingeling
-          - glucose-4.2.1
+#          - glucose-4.2.1
+          - lingeling
+          - MapleLCMDiscChronoBT-DL-v3
   glibc_thp:
     module: tools.sat.satExecutor.SATTool
     parameters:
@@ -88,8 +90,10 @@ tools:
         t: 1
         #s = solver
         s:
-          - minisat
+#          - minisat
 #          - mergesat
 #          - plingeling
           - glucose-4.2.1
+          - lingeling
+          - MapleLCMDiscChronoBT-DL-v3
 

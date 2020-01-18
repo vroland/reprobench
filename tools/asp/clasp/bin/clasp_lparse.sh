@@ -46,7 +46,7 @@ echo
 echo
 
 #run call in background and wait for finishing
-$env $solver_cmd $filename &
+env $env $solver_cmd $filename &
 PID=$!
 wait $PID
 exit $?
