@@ -64,7 +64,7 @@ echo
 echo
 
 #run call in background and wait for finishing
-env $env $solver_cmd $filename &
+cat $filename | env $env $solver_cmd &
 PID=$!
 wait $PID
 exit $?
