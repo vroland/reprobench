@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 # for filename in ['output_sat_solvers_2020-01-19.csv',
 #                      'output_maxsat_solvers-2020-01-17_2.csv',
 #                      'output_asp_solvers-2020-01-19.csv']:
-for filename in ['output_sat_solvers_2020-01-19.csv', 'output_asp_solvers-2020-01-20_wasp.csv']:
+for filename in ['output_sat_solvers_2020-01-19.csv']:
     print('=' * 200)
     print(filename)
     print('=' * 200)
