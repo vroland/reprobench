@@ -34,15 +34,18 @@ if [ -z $solver ] ; then
   echo "No Solver given. Exiting..."
   exit 1
 fi
-
 if [ -z $filename ] ; then
   echo "No filename given. Exiting..."
   exit 1
 fi
 
-if [ ! -z $thp ] ; then
-  export GLIBC_THP_ALWAYS=1
-  echo "Using THP option in libc"
+if [ ! -f $filename ] ; then
+  echo "Filename does not exist. Exiting..."
+  exit 1
+fi
+
+if [ $thp == 1 ] ; then
+  env=GLIBC_THP_ALWAYS=1
 fi
 
 cd "$(dirname "$0")"
@@ -68,8 +71,10 @@ else
   exit 1
 fi
 
-echo $cmd
-$cmd  &
+echo "env $env $solver_cmd $filename"
+echo
+echo
+env $env $solver_cmd $filename &
 
 #so far no compression here
 #echo "cat $decomp_filename | env $env $solver_cmd"
