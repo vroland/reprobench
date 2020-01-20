@@ -64,6 +64,7 @@ class RunStatisticExtended(BaseModel):
     runsolver_TIMEOUT = TextField(null=True)
     runsolver_MEMOUT = TextField(null=True)
     runsolver_STATUS = IntegerField(null=True)
+    runsolver_SEGFAULT = CharField(null=True)
     runsolver_error = CharField(null=True)
 
     perf_dTLB_load_misses = FloatField(null=True)
