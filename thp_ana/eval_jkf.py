@@ -5,15 +5,22 @@ import pandas as pd
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
+# pd.options.mode.chained_assignment = 'warn'
+
+import matplotlib as mpl
+
+mpl.use('Agg')
+import matplotlib.pyplot as plt
 
 # for filename in ['output_sat_solvers_2020-01-17.csv', 'output_sat_solvers_2020-01-17_plingeling.csv',
 #                  'output_sat_solvers-2020-01-17_glucose.csv',
 #                  'output_sat_solvers-2020-01-18_lingeling_maple.csv',
 #                  'output_maxsat_solvers-2020-01-17_2.csv',
 #                  'output_asp_solvers-2020-01-19.csv']:
-for filename in ['output_sat_solvers_2020-01-19.csv',
-                     'output_maxsat_solvers-2020-01-17_2.csv',
-                     'output_asp_solvers-2020-01-19.csv']:
+# for filename in ['output_sat_solvers_2020-01-19.csv',
+#                      'output_maxsat_solvers-2020-01-17_2.csv',
+#                      'output_asp_solvers-2020-01-19.csv']:
+for filename in ['output_sat_solvers_2020-01-19.csv', 'output_asp_solvers-2020-01-20_wasp.csv']:
     print('=' * 200)
     print(filename)
     print('=' * 200)
@@ -88,3 +95,105 @@ for filename in ['output_sat_solvers_2020-01-19.csv',
                                        myff[('perf_cache_misses_y', 'sum')]
     myff.to_csv(f'1-outputs/{filename}_summary.csv')
     myff.to_latex(f'1-outputs/{filename}_summary.tex')
+
+    print(myff.columns)
+    myff[('wall_time_x', 'sum')] = (myff[('wall_time_x', 'sum')] / 3600).round(2)
+    myff[('wall_time_y', 'sum')] = (myff[('wall_time_y', 'sum')] / 3600).round(2)
+
+    mygf = myff.copy()
+    mygf['solver'] = mygf['solver'].str.replace(r'default\[s=', '').str.replace(r'\]', '')
+    mygf['count'] = mygf[('wall_time_x', 'count')]
+    mygf['t[h]'] = mygf[('wall_time_x', 'sum')]
+    mygf['t_thp[h]'] = mygf[('wall_time_y', 'sum')]
+    mygf['TLB'] = mygf[('perf_dTLB_load_misses_x', 'sum')]
+    mygf['TLB_thp'] = mygf[('perf_dTLB_load_misses_y', 'sum')]
+
+    mygf['TLB'] = mygf['TLB'].apply(lambda x: '{:.2E}'.format(x))
+    mygf['TLB_thp'] = mygf['TLB_thp'].apply(lambda x: '{:.2E}'.format(x))
+
+    # print(mygf)
+    mygf['s[t]'] = mygf['speedupfact_wall'].round(2)
+    mygf['s[tlb]'] = mygf['speedupfact_TLB_load_misses'].round(2)
+    mygf['r[tlb]'] = ((myff[('perf_dTLB_load_misses_y', 'sum')] /
+                                          myff[('perf_dTLB_load_misses_x', 'sum')]) * 100).round(2)
+
+    output = mygf[['solver', 'count', 't[h]', 't_thp[h]', 's[t]', 'TLB', 'TLB_thp', 's[tlb]', 'r[tlb]']]
+
+    output['solver'] = output['solver'].str.replace('MapleLCMDiscChronoBT-DL-v3', 'maplesat')
+    output['solver'] = output['solver'].str.replace('glucose-4.2.1', 'glucose')
+
+    output = output.sort_values(by=['solver'])
+
+    print(output)
+    output.to_latex(f'1-outputs/{filename}_zz_paper.tex')
+
+    #CACTUS
+    # cactus = df[(df.verdict == 'OK')]
+    cactus = df.copy()
+
+    cactus['group'] = cactus['group'].str.replace(r'_', '')
+    cactus['solver'] = cactus['solver'].str.replace(r'default\[s=', '').str.replace(r'\]', '')
+    cactus['solver'] = cactus['solver'].str.replace('MapleLCMDiscChronoBT-DL-v3', 'maplesat')
+    cactus['solver'] = cactus['solver'].str.replace('glucose-4.2.1', 'glucose')
+
+    cactus['solver_t'] = cactus["solver"].map(str) + '-' + cactus["group"]\
+        #.replace('glibc_','').replace('glibc','')
+    # print(cactus[['solver','group','instance','wall_time']])
+
+    cactus.sort_values(by=['wall_time'], inplace=True)
+    print(cactus[['solver_t','instance','wall_time']])
+
+    configs = cactus['solver_t'].unique()
+    NUM_COLORS = len(configs) + 1
+    plt.rc('font', family='serif')
+    # plt.rc('text', usetex=True)
+    plt.rcParams['text.usetex'] = True
+    plt.rcParams['text.latex.preamble'] = [r'\usepackage{amsmath}\def\hy{\hbox{-}\nobreak\hskip0pt}']
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    lfont = lambda x: '$\mathtt{%s}$' % x.replace('-', '\hy')
+    color_m = {'lingeling-glibcthp': ('lingeling(thp)', '#a6cee3', '-'),
+               'lingeling-glibc': ('lingeling', '#1f78b4', '-'),
+               'glucose-glibc': ('glucose', '#33a02c', '-'),
+               'glucose-glibcthp': ('glucose(thp)', '#b2df8a', '-'),
+               'minisat-glibc': ('minisat', '#e31a1c', '-'),
+               'minisat-glibcthp': ('minisat(thp)', '#fb9a99', '-'),
+               'maplesat-glibc': ('maplesat', '#ff7f00', '-'),
+               'maplesat-glibcthp': ('maplesat(thp)', '#fdbf6f', '-'),
+               'mergesat-glibc': ('mergesat', '#6a3d9a', '-'),
+               'mergesat-glibcthp': ('mergesat(thp)', '#cab2d6', '-'),
+               'plingeling-glibc': ('plingeling', '#b15928', '-'),
+               'plingeling-glibcthp': ('plingeling(thp)', '#ffff99', '-'),
+               }
+    skip = ['maplesat-glibc', 'maplesat-glibcthp',
+            'lingeling-glibc', 'lingeling-glibcthp',
+            'minisat-glibc', 'minisat-glibcthp',
+            'mergesat-glibc', 'mergesat-glibcthp',
+            'plingeling-glibc', 'plingeling-glibcthp']
+
+    for key in configs:
+        # if key in skip:
+        #     continue
+        solver_df = cactus[(cactus['solver_t'] == key)]
+        pd.options.mode.chained_assignment = None
+        solver_df.sort_values(by=['wall_time'], inplace=True)
+        pd.options.mode.chained_assignment = 'warn'
+        solver_df.reset_index(inplace=True)
+        ts = pd.Series(solver_df['wall_time'])
+        # label = lfont(mapping[key][1]) if mapping.has_key(key) else key
+        ax = ts.plot(xlim=125, markeredgecolor='none', label=color_m[key][0],
+                    color=color_m[key][1], linestyle=color_m[key][2])
+        # ax = ts.plot(markeredgecolor='none', label=label, color=mapping[key][2], linestyle=mapping[key][3])
+
+    fig.subplots_adjust(bottom=0.3, left=0.1)
+    handles, labels = ax.get_legend_handles_labels()
+    labels, handles = zip(*sorted(zip(labels, handles), key=lambda t: t[0]))
+    # print labels
+    # ax.set_yscale('log')
+    ax.legend(handles, labels, loc='best', prop={'size': 6}, frameon=False, mode='expand')
+    plt.savefig('%s-%s.pdf' % (filename, 'wall_time'), bbox_inches="tight")  # ,
+
+    # plot.reset_index(inplace=True)
+
