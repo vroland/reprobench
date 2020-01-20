@@ -6,9 +6,14 @@ pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
-for filename in ['output_sat_solvers_2020-01-17.csv', 'output_sat_solvers_2020-01-17_plingeling.csv',
-                 'output_maxsat_solvers-2020-01-17_2.csv', 'output_maxsat_solvers-2020-01-17_glucose.csv',
-                 'output_asp_solvers-2020-01-18.csv']:
+# for filename in ['output_sat_solvers_2020-01-17.csv', 'output_sat_solvers_2020-01-17_plingeling.csv',
+#                  'output_sat_solvers-2020-01-17_glucose.csv',
+#                  'output_sat_solvers-2020-01-18_lingeling_maple.csv',
+#                  'output_maxsat_solvers-2020-01-17_2.csv',
+#                  'output_asp_solvers-2020-01-19.csv']:
+for filename in ['output_sat_solvers_2020-01-19.csv',
+                     'output_maxsat_solvers-2020-01-17_2.csv',
+                     'output_asp_solvers-2020-01-19.csv']:
     print('=' * 200)
     print(filename)
     print('=' * 200)
