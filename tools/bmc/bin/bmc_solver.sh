@@ -5,6 +5,7 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 # Initialize our own variables:
 verbose=0
+thp=0
 while getopts "h?vts:f:" opt; do
     case "$opt" in
     h|\?)
@@ -74,7 +75,7 @@ fi
 echo "env $env $solver_cmd $filename"
 echo
 echo
-env $env $solver_cmd $filename &
+env $env $solver_cmd &
 
 #so far no compression here
 #echo "cat $decomp_filename | env $env $solver_cmd"
