@@ -4,10 +4,7 @@
 ## Development Guide
 ----------
 
-
-### Installation
-----------
-##### Vagrant & miniconda
+#### Vagrant & miniconda
 After installing vagrant on your operating system, create a vagrant box and init it:
 ```
 vagrant box add ubuntu/trusty64
