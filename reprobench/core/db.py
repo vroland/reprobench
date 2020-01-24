@@ -91,6 +91,8 @@ class Run(BaseModel):
     )
 
     id = CharField(null=True, primary_key=True)
+    cluster_job_id = IntegerField(default=-1)
+    pinned_host = CharField(null=True)
     created_at = DateTimeField(default=datetime.now)
     tool = ForeignKeyField(Tool, backref="runs")
     tool_version = CharField(null=True)

@@ -47,7 +47,7 @@ if send_events:
 
 # hack the server and send bootstrap & sysinfo messages
 # send_event(socket, RUN_START, 'payload')
-# send_event(socket, BOOTSTRAP, 'payload')
+# send_event(socket, SUBMITTER_BOOTSTRAP, 'payload')
 #
 # send_event(socket, RUN_START, 'payload')
 

@@ -1,4 +1,5 @@
-BOOTSTRAP = b"core:bootstrap"
+SUBMITTER_BOOTSTRAP = b"core:bootstrap"
+SUBMITTER_PING = b"core:ping"
 
 WORKER_JOIN = b"worker:join"
 

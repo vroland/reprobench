@@ -1,5 +1,5 @@
-#config: "./benchmark_thp_sat.yml"
-config: "./benchmark_thp_asp.yml"
+config: "./benchmark_thp_sat.yml"
+#config: "./benchmark_thp.yml"
 #config: "./benchmark_thp_bmc_sw.yml"
 #config: "./benchmark_thp_bmc_hw.yml"
 #config: "./benchmark_thp_maxsat.yml"

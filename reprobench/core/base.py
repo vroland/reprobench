@@ -14,11 +14,11 @@ class Observer:
     @classmethod
     def observe(cls, server):
         logger.debug(cls)
-
         server.observers.append(cls)
 
     @classmethod
     def handle_event(cls, event_type, payload, **kwargs):
+        logger.debug(event_type)
         pass
 
 

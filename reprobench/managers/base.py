@@ -1,8 +1,8 @@
 import zmq
 from loguru import logger
 
-from reprobench.core.events import BOOTSTRAP
 from reprobench.core.bootstrap import bootstrap_client
+from reprobench.core.events import SUBMITTER_BOOTSTRAP, SUBMITTER_PING
 from reprobench.utils import decode_message, read_config, send_event
 
 
@@ -19,6 +19,9 @@ class BaseManager(object):
         context = zmq.Context()
         self.socket = context.socket(zmq.DEALER)
 
+        self.socket.connect(self.server_address)
+
+
     def prepare(self):
         pass
 
@@ -26,18 +29,19 @@ class BaseManager(object):
         raise NotImplementedError
 
     def bootstrap(self):
-        self.socket.connect(self.server_address)
-
         client_results = bootstrap_client(self.config)
         bootstrapped_config = {**self.config, **client_results}
 
         logger.info(f"Sending bootstrap event to server {self.server_address}")
         payload = dict(
-            config=bootstrapped_config, output_dir=self.output_dir, repeat=self.repeat
+            config=bootstrapped_config, output_dir=self.output_dir,
+            repeat=self.repeat, **self.cluster_parameters()
         )
-        send_event(self.socket, BOOTSTRAP, payload)
-
+        send_event(self.socket, SUBMITTER_BOOTSTRAP, payload)
         self.pending = decode_message(self.socket.recv())
+
+    def cluster_parameters(self):
+        return dict(cluster_job_id=-1)
 
     def wait(self):
         pass
@@ -45,8 +49,18 @@ class BaseManager(object):
     def stop(self):
         pass
 
+    def ping_server(self):
+        logger.info('Pinging Server')
+        send_event(self.socket, SUBMITTER_PING, {})
+        # we are actually not really interested in the result here,
+        # just that there is some response
+        logger.info('Waiting for response...')
+        recv = decode_message(self.socket.recv())
+        logger.info('Received the following reply: "%s". Good to go...' %recv)
+
     def run(self):
         self.prepare()
+        self.ping_server()
         self.bootstrap()
         self.spawn_workers()
         self.wait()

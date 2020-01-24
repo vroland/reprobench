@@ -114,9 +114,15 @@ class SlurmManager(BaseManager):
 
         logger.trace(worker_submit_cmd)
         self.worker_job = subprocess.check_output(" ".join(worker_submit_cmd), shell=True).decode().strip()
-        logger.info(f"Worker job array id: {self.worker_job}")
+        logger.info(f"Worker SLURM_JOB_ID: {self.worker_job}")
+
+    def cluster_parameters(self):
+        #Give the cluster_job_id to the server
+        return dict(cluster_job_id=self.worker_job)
+
 
     def wait(self):
         if self.tunneling is not None:
             self.server.stop()
+
 

@@ -12,6 +12,7 @@ steps:
     - module: reprobench.core.setup.SetupKernel
       config:
         transparent_hugepage: madvise
+    # TODO: performance govenors / --cpu-freq srun
     - module: reprobench.executors.RunSolverPerfEval
     # provide non-perf runner
     # provide configurable perf parameters
@@ -73,29 +74,34 @@ tasks:
 #
 
 tools:
-  glibc:
+  sat:
     module: tools.sat.satExecutor.SATTool
     parameters:
-      default:
-        s:
-#          - minisat
+      # if you set "by" to "parameter"
+      #   it allows you to pin runs with the following parameter variations to
+      #   one node only, e.g.,
+      #   if specifiying s: minisat_t=0 and minisat_t=1 will run on one host
+      #   however, mergesat_t=0 may run on a different host than minisat_t=0
+      # if you set "by" to "tool"
+      #   all configurations of one tool will run on one node
+      node_pining_parameters:
+        by: parameter
+        parameters:
+# observers.py:L40
+          - s
+      s:
+        - minisat
 #          - mergesat
 #          - plingeling
 #          - glucose-4.2.1
-          - lingeling
-          - MapleLCMDiscChronoBT-DL-v3
-  glibc_thp:
-    module: tools.sat.satExecutor.SATTool
-    parameters:
-      default:
-        #t = transparent huge pages
-        t: 1
-        #s = solver
-        s:
-#          - minisat
-#          - mergesat
-#          - plingeling
-          - glucose-4.2.1
-          - lingeling
-          - MapleLCMDiscChronoBT-DL-v3
+#          - lingeling
+#          - MapleLCMDiscChronoBT-DL-v3
+      t:
+        - 1
+        - 0
+    # if there are no benchmarks given then take all found
+    benchmarks:
+      - sat_gauss_bench
 
+run:
+  - sat

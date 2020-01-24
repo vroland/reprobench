@@ -190,7 +190,7 @@ def bootstrap_tools(config):
             create_parameter_group(tool_name, group, parameters)
 
 
-def bootstrap_runs(config, output_dir, repeat=1):
+def bootstrap_runs(config, output_dir, repeat=1, cluster_job_id=-1):
     parameter_groups = ParameterGroup.select().iterator()
     tasks = Task.select().iterator()
     total = ParameterGroup.select().count() * Task.select().count()
@@ -213,6 +213,7 @@ def bootstrap_runs(config, output_dir, repeat=1):
 
                 query = Run.insert(
                     id=directory,
+                    cluster_job_id=cluster_job_id,
                     tool=parameter_group.tool_id,
                     task=task,
                     parameter_group=parameter_group,
@@ -222,7 +223,7 @@ def bootstrap_runs(config, output_dir, repeat=1):
                 query.execute()
 
 
-def bootstrap(config=None, output_dir=None, repeat=1, server=None):
+def bootstrap(config=None, output_dir=None, repeat=1, server=None, cluster_job_id=-1):
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     bootstrap_db(output_dir)
     bootstrap_limits(config)
@@ -231,4 +232,4 @@ def bootstrap(config=None, output_dir=None, repeat=1, server=None):
     register_steps(config)
     bootstrap_tasks(config)
     bootstrap_tools(config)
-    bootstrap_runs(config, output_dir, repeat)
+    bootstrap_runs(config, output_dir, repeat, cluster_job_id)

@@ -173,7 +173,7 @@ def decode_message(msg):
     return msgpack.unpackb(msg, raw=False)
 
 
-@retry(wait_exponential_multiplier=500)
+@retry(wait_fixed=2000, stop_max_attempt_number=2)
 def send_event(socket, event_type, payload=None):
     """Used in the worker with a DEALER socket to send events to the server.
 
@@ -261,7 +261,9 @@ def read_config(config_path, resolve_files=False):
     """
     with open(config_path, "r") as f:
         config_text = f.read()
-        config = strictyaml.load(config_text, schema=schema).data
+        #TODO: fixeme, ignore Schema for now....
+        #, schema=schema
+        config = strictyaml.load(config_text).data
 
     if resolve_files:
         resolve_files_uri(config)

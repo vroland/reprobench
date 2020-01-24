@@ -1,15 +1,11 @@
-from pathlib import Path
-
 import click
 import gevent
 import zmq.green as zmq
 from loguru import logger
+
 from reprobench.console.decorators import common, server_info
-from reprobench.core.bootstrap.server import bootstrap
-from reprobench.core.db import Observer
-from reprobench.core.events import BOOTSTRAP
 from reprobench.core.observers import CoreObserver
-from reprobench.utils import decode_message, import_class
+from reprobench.utils import decode_message
 
 
 class BenchmarkServer(object):
@@ -20,7 +16,10 @@ class BenchmarkServer(object):
         self.observers = []
 
     def receive_event(self):
+        logger.debug('Waiting to receive events')
         address, event_type, payload = self.frontend.recv_multipart()
+        logger.debug(address)
+        logger.trace('Received the following event')
         logger.trace((address, event_type, decode_message(payload)))
         return address, event_type, payload
 
@@ -28,6 +27,8 @@ class BenchmarkServer(object):
         while True:
             address, event_type, payload = self.receive_event()
             payload = decode_message(payload)
+            logger.debug('Received an event of the following'
+                         ' type "%s"' % event_type)
             for observer in self.observers:
                 observer.handle_event(event_type, payload,
                                       address=address,

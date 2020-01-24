@@ -1,18 +1,19 @@
-import sys
 import atexit
 import json
 import multiprocessing as mp
+import os
+import socket as sct
+import subprocess
+import sys
+import threading
 import time
 from pathlib import Path
-import os
 from sys import platform
-import threading
-import subprocess
 
 import click
 import zmq
-from sshtunnel import SSHTunnelForwarder, BaseSSHTunnelForwarderError
 from loguru import logger
+from sshtunnel import SSHTunnelForwarder, BaseSSHTunnelForwarderError
 
 from reprobench.console.decorators import common, server_info, use_tunneling
 from reprobench.core.events import (
@@ -100,7 +101,8 @@ class BenchmarkWorker:
             # NUMA information. Since it caused errors on Taurus, it is not used here
 
             # Get number of physical CPUs, not cores
-            numcpu = int(subprocess.check_output('cat /proc/cpuinfo | grep "physical id" | sort -u | wc -l', shell=True))
+            numcpu = int(
+                subprocess.check_output('cat /proc/cpuinfo | grep "physical id" | sort -u | wc -l', shell=True))
             cores_per_cpu = mp.cpu_count() // numcpu
             ppcpu = cores_per_cpu // self.multirun_cores
 
@@ -143,9 +145,18 @@ class BenchmarkWorker:
         socket = context.socket(zmq.DEALER)
         logger.debug(f"Connecting to {self.server_address}")
         socket.connect(self.server_address)
+        logger.debug(f"Connected to {self.server_address}")
 
-        send_event(socket, WORKER_JOIN)
+        # TODO: pinning
+        # pinned_host=sct.gethostname()
+
+        # TODO: @Andre; you might want to update it for SGE
+        send_event(socket, WORKER_JOIN,
+                   dict(cluster_job_id=int(os.getenv('SLURM_JOB_ID', -1)))
+                   )
+
         run = decode_message(socket.recv())
+        logger.debug(f"Run to {run}")
 
         if run is None:
             logger.info("No more tasks left, exiting...")
@@ -198,6 +209,7 @@ class BenchmarkWorker:
 def cli(**kwargs):
     worker = BenchmarkWorker(**kwargs)
     worker.run()
+
 
 if __name__ == "__main__":
     cli()
