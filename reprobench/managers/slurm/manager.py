@@ -25,7 +25,7 @@ class SlurmManager(BaseManager):
     def prepare(self):
         Path(self.output_dir).mkdir(parents=True, exist_ok=True)
         limits = self.config["limits"]
-        time_limit_minutes = int(math.ceil(limits["time"] / 60.0))
+        time_limit_minutes = int(math.ceil(float(limits["time"]) / 60.0))
 
         if self.cpu_count == 0:
             self.cpu_count = limits.get("cores", 1)
