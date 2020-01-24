@@ -54,10 +54,8 @@ cd "$(dirname "$0")"
 #get basic info
 source ../../bash_shared/sysinfo.sh
 
+cwd=$(pwd)
 # so far no compression here
-##get file transparently from compressed file and temporarily store in shm
-#source ../../bash_shared/tcat.sh
-
 if [ "$solver" == "aigbmc" ] ; then
   solver_cmd="./"$solver"_glibc $@ -m -n 100 $filename"
 elif [ "$solver" == "cbmc" ] ; then
@@ -66,21 +64,18 @@ elif [ "$solver" == "cbmc" ] ; then
   #TODO: think of a better way to handle those cases with the benchmark tool
   fdir=$(dirname $filename)
   params=$(cat $filename | sed "s|\$BENCHDIR/|"$fdir"/|g")
-  solver_cmd="./"$solver"_glibc $@ $params"
+  solver_cmd=$cwd"/"$solver"_glibc $@ $params"
 else
   echo 'Default parameters for solver undefined'
   exit 1
 fi
 
+#TODO: fixme
+cd /scratch/p_gpusat/automated-reasoner-builds/benchmarks/SWMC_llbmc_1.1/
 echo "env $env $solver_cmd $filename"
 echo
 echo
 env $env $solver_cmd &
-
-#so far no compression here
-#echo "cat $decomp_filename | env $env $solver_cmd"
-##run call in background and wait for finishing
-#cat $decomp_filename | $solver_cmd &
 
 PID=$!
 wait $PID
