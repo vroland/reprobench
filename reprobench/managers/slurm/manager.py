@@ -21,6 +21,7 @@ class SlurmManager(BaseManager):
         self.time_limit = kwargs.pop("reserve_time")
         self.reserve_hosts = kwargs.pop("reserve_hosts")
         self.email = kwargs.pop("email")
+        self.worker_job = None
 
     def prepare(self):
         Path(self.output_dir).mkdir(parents=True, exist_ok=True)
@@ -115,6 +116,7 @@ class SlurmManager(BaseManager):
         logger.trace(worker_submit_cmd)
         self.worker_job = subprocess.check_output(" ".join(worker_submit_cmd), shell=True).decode().strip()
         logger.info(f"Worker SLURM_JOB_ID: {self.worker_job}")
+
 
     def cluster_parameters(self):
         #Give the cluster_job_id to the server
