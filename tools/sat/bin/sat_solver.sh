@@ -49,6 +49,8 @@ fi
 
 if [ $thp == 1 ] ; then
   env=GLIBC_THP_ALWAYS=1
+else
+  env=VOID=1
 fi
 
 cd "$(dirname "$0")"
