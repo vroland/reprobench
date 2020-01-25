@@ -2,7 +2,6 @@ import atexit
 import json
 import multiprocessing as mp
 import os
-import socket as sct
 import subprocess
 import sys
 import threading
@@ -29,10 +28,17 @@ REQUEST_TIMEOUT = 15000
 
 
 class BenchmarkWorker:
-    def __init__(self, server_address, tunneling, multirun_cores=0):
+    def __init__(self, server_address, tunneling, multirun_cores=0, cluster_job_id=None):
         self.server_address = server_address
         self.multirun_cores = multirun_cores
         self.isunix = (platform == "linux" or platform == "linux2")
+        if cluster_job_id is None:
+            self.cluster_job_id = int(os.getenv('SLURM_JOB_ID', -1))
+        else:
+            logger.warning("*" * 80)
+            logger.warning("The cluster_job_id has been set manually... (jobs might not match)")
+            logger.warning("*" * 80)
+            self.cluster_job_id = cluster_job_id
 
         if tunneling is not None:
             for _ in range(1, 5):
@@ -151,9 +157,7 @@ class BenchmarkWorker:
         # pinned_host=sct.gethostname()
 
         # TODO: @Andre; you might want to update it for SGE
-        send_event(socket, WORKER_JOIN,
-                   dict(cluster_job_id=int(os.getenv('SLURM_JOB_ID', -1)))
-                   )
+        send_event(socket, WORKER_JOIN, dict(cluster_job_id=self.cluster_job_id))
 
         run = decode_message(socket.recv())
         logger.debug(f"Run to {run}")

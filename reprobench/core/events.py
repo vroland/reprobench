@@ -1,5 +1,6 @@
 SUBMITTER_BOOTSTRAP = b"core:bootstrap"
 SUBMITTER_PING = b"core:ping"
+SUBMITTER_REPORTBACK = b"core:reportback"
 
 WORKER_JOIN = b"worker:join"
 

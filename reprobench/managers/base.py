@@ -35,13 +35,18 @@ class BaseManager(object):
         logger.info(f"Sending bootstrap event to server {self.server_address}")
         payload = dict(
             config=bootstrapped_config, output_dir=self.output_dir,
-            repeat=self.repeat, **self.cluster_parameters()
+            repeat=self.repeat, cluster_job_id=self.get_initial_cluster_id()
         )
         send_event(self.socket, SUBMITTER_BOOTSTRAP, payload)
         self.pending = decode_message(self.socket.recv())
 
-    def cluster_parameters(self):
-        return dict(cluster_job_id=-1)
+    # set a random number to identify the submitter
+    # for clusters number needs to be updated after the scheduler assigned a job_id
+    def get_initial_cluster_id(self):
+        return -1
+
+    def report_back(self):
+        pass
 
     def wait(self):
         pass
@@ -58,9 +63,13 @@ class BaseManager(object):
         recv = decode_message(self.socket.recv())
         logger.info('Received the following reply: "%s". Good to go...' %recv)
 
+    def report_back(self):
+        pass
+
     def run(self):
         self.prepare()
         self.ping_server()
         self.bootstrap()
         self.spawn_workers()
+        self.report_back()
         self.wait()

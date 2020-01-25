@@ -1,15 +1,15 @@
 import math
+import random
 import subprocess
 import sys
 from pathlib import Path
 
 from loguru import logger
-
 from sshtunnel import SSHTunnelForwarder
-from reprobench.managers.base import BaseManager
-from reprobench.utils import read_config
 
-from .utils import to_comma_range
+from reprobench.core.events import SUBMITTER_REPORTBACK
+from reprobench.managers.base import BaseManager
+from reprobench.utils import send_event
 
 
 class SlurmManager(BaseManager):
@@ -21,7 +21,8 @@ class SlurmManager(BaseManager):
         self.time_limit = kwargs.pop("reserve_time")
         self.reserve_hosts = kwargs.pop("reserve_hosts")
         self.email = kwargs.pop("email")
-        self.worker_job = None
+        self.slurm_job_id = None
+        self.cluster_job_id = None
 
     def prepare(self):
         Path(self.output_dir).mkdir(parents=True, exist_ok=True)
@@ -40,7 +41,6 @@ class SlurmManager(BaseManager):
                 self.mem_limit = limits["scheduler_memory"]
             else:
                 self.mem_limit = 0
-
 
         if self.tunneling is not None:
             self.server = SSHTunnelForwarder(
@@ -80,7 +80,7 @@ class SlurmManager(BaseManager):
             host_limit = self.reserve_hosts
 
         worker_submit_cmd = [
-            "sbatch",
+            "./sbatch",
             "--parsable",
             f"--array=1-{host_limit}",
             f"--time={self.time_limit}",
@@ -102,29 +102,30 @@ class SlurmManager(BaseManager):
             additional_args = self.additional.split(" ")
             for i in range(0, len(additional_args), 2):
                 # TODO: This is a hack
-                if i+1 < len(additional_args) and additional_args[i].startswith("-") and not additional_args[i+1].startswith("-"):
-                    worker_submit_cmd.append(f"{additional_args[i]} {additional_args[i+1]}")
+                if i + 1 < len(additional_args) and additional_args[i].startswith("-") and not additional_args[
+                    i + 1].startswith("-"):
+                    worker_submit_cmd.append(f"{additional_args[i]} {additional_args[i + 1]}")
                     i += 1
                 else:
                     worker_submit_cmd.append(additional_args[i])
                     if i + 1 < len(additional_args):
-                        worker_submit_cmd.append(additional_args[i+1])
+                        worker_submit_cmd.append(additional_args[i + 1])
 
         # Finaly add command
         worker_submit_cmd.append(f"--wrap=\"srun {worker_cmd}\"")
 
         logger.trace(worker_submit_cmd)
-        self.worker_job = subprocess.check_output(" ".join(worker_submit_cmd), shell=True).decode().strip()
-        logger.info(f"Worker SLURM_JOB_ID: {self.worker_job}")
+        self.slurm_job_id = subprocess.check_output(" ".join(worker_submit_cmd), shell=True).decode().strip()
+        logger.info(f"Worker SLURM_JOB_ID: {self.slurm_job_id}")
 
+    def get_initial_cluster_id(self):
+        self.cluster_job_id = random.randint(0, 65536)
+        return self.cluster_job_id
 
-    def cluster_parameters(self):
-        #Give the cluster_job_id to the server
-        return dict(cluster_job_id=self.worker_job)
-
+    def report_back(self):
+        send_event(self.socket, SUBMITTER_REPORTBACK,
+                   dict(old_cluster_job_id=self.cluster_job_id, cluster_job_id=self.slurm_job_id))
 
     def wait(self):
         if self.tunneling is not None:
             self.server.stop()
-
-

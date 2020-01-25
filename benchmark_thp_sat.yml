@@ -48,12 +48,13 @@ tasks:
 #    path: ./tasks/thp/sat/
     extract_archives: true
     patterns: |
-      **/*
+      AProVE09-01.cnf.gz
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
       !**/*.tgz
 #      AProVE09-01.cnf.gz
+#      **/*
 
 #  sat2014_app_bench:
 #    type: file
