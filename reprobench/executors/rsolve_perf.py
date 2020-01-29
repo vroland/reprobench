@@ -1,6 +1,7 @@
 # TODO: replace platform by standardlib
 import json
 import os
+import pathlib
 import platform
 import re
 import tempfile
@@ -76,8 +77,9 @@ class RunSolverPerfEval(Executor):
 
     @staticmethod
     def compile_stats(stats, run_id, nonzero_as_rte):
-        perf_keys = ['perf_dTLB_load_misses', 'perf_dTLB_loads', 'perf_dTLB_store_misses', 'perf_dTLB_stores',
-                     'perf_iTLB_load_misses', 'perf_iTLB_loads', 'perf_cycles', 'perf_cache_misses', 'perf_elapsed']
+        perf_keys = ['perf_dTLB_load_misses', 'perf_dTLB_loads', 'perf_dTLB_store_misses',
+                     'perf_dTLB_stores', 'perf_iTLB_load_misses', 'perf_iTLB_loads',
+                     'perf_cycles', 'perf_cache_misses', 'perf_elapsed']
 
         if 'runsolver_error' in stats:
             stats['cpu_time'] = '-1'
@@ -120,6 +122,40 @@ class RunSolverPerfEval(Executor):
         logger.warning(stats)
         return stats
 
+    @staticmethod
+    def exec_lib(path, stdout, stderr, cwd=str(pathlib.Path.cwd())):
+        output = None
+        if isinstance(path, pathlib.Path):
+            path = str(path)
+        if os.path.exists(path):
+            logger.debug(f"File for sysinfo found at {path}")
+            if not os.access(path, os.X_OK):
+                logger.error(f"File for sysinfo found at {path}. But is NOT executable!!")
+            else:
+                p_stats = Popen(path, stdout=PIPE, stderr=PIPE, shell=True,
+                                close_fds=True, cwd=cwd)
+                output, err = p_stats.communicate()
+                logger.debug(output)
+                with open(stdout, 'w+') as f:
+                    f.write(str(output))
+                if err !='':
+                    logger.error(err)
+                    with open(stderr, 'w+') as f:
+                        f.write(str(err))
+        else:
+            logger.error(f"Expected file for sysinfo at {path}, but was missing.")
+        return output
+
+    def prerun(self, cmdline, out_path, **kwargs):
+        outdir = self.output_dir(out_path)
+        stdout_p, stderr_p, _, _, _, _, _ = self.log_paths(outdir)
+
+        bin = "lib/sysinfo.sh"
+        sysinfo_path = pathlib.Path(cmdline[0]).parent.parent.parent.joinpath(bin).resolve()
+        RunSolverPerfEval.exec_lib(path=sysinfo_path,stdout=stdout_p, stderr=stderr_p)
+        RunSolverPerfEval.exec_lib(path=pathlib.Path.cwd().joinpath("lib/sysinfo.sh").absolute(), stdout=stdout_p, stderr=stderr_p)
+
+
     def run(
         self,
         cmdline,
@@ -133,11 +169,14 @@ class RunSolverPerfEval(Executor):
         stats['platform'] = platform.platform(aliased=True)
         stats['hostname'] = platform.node()
 
+        cmdline[0] = str(pathlib.Path(cmdline[0]).resolve())
+
         with tempfile.NamedTemporaryFile(prefix='rsolve_perf_tmp', dir='/dev/shm', delete=True) as f:
             logger.debug(f"Extracting instance {input_str} to {f.name}")
-            transparent_cat = f"{self.reprobench_path}/tools/bash_shared/tcat.sh {input_str} -o {f.name}"
+            transparent_cat = f"{self.reprobench_path}/lib/tcat.sh {input_str} -o {f.name}"
 
-            p_tmpout = Popen(transparent_cat, stdout=PIPE, stderr=PIPE, shell=True, close_fds=True, cwd=self.reprobench_path)
+            p_tmpout = Popen(transparent_cat, stdout=PIPE, stderr=PIPE, shell=True, close_fds=True,
+                             cwd=self.reprobench_path)
             output, err = p_tmpout.communicate()
             logger.debug(f"Instance is available at {f.name}")
             if err != b'':
@@ -146,7 +185,7 @@ class RunSolverPerfEval(Executor):
                 exit(1)
 
             # TODO: fix out_path
-            outdir = os.path.abspath(os.path.join(self.reprobench_path, os.path.dirname(out_path)))
+            outdir = self.output_dir(out_path)
             payload_p, perflog, stderr_p, stdout_p, varfile, watcher, runparameters_p = self.log_paths(outdir)
 
             logger.debug(perflog)
@@ -179,7 +218,6 @@ class RunSolverPerfEval(Executor):
             logger.trace(stats)
             logger.debug(f"Finished {directory}")
 
-
             payload = self.compile_stats(stats, self.run_id, self.nonzero_as_rte)
 
             logger.error(payload)
@@ -188,6 +226,9 @@ class RunSolverPerfEval(Executor):
 
             # send_event(self.socket, STORE_RUNSTATS, payload)
             send_event(self.socket, STORE_THP_RUNSTATS, payload)
+
+    def output_dir(self, out_path):
+        return os.path.abspath(os.path.join(self.reprobench_path, os.path.dirname(out_path)))
 
     @staticmethod
     def log_paths(outdir):

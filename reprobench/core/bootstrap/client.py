@@ -35,6 +35,7 @@ def bootstrap_tools(config):
     logger.info("Setting up tools...")
 
     tools = {}
+    logger.error(config["tools"])
     for tool_name, tool in config["tools"].items():
         tools[tool_name] = dict(
             module=tool["module"], parameters=tool.get("parameters")

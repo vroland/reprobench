@@ -32,6 +32,14 @@ class ExecutableTool(Tool):
     def get_error(self):
         return self.get_err_path().read_bytes()
 
+    def prerun(self, executor):
+        executor.prerun(
+            self.get_cmdline(),
+            directory=self.cwd,
+            out_path=self.get_out_path(),
+            err_path=self.get_err_path(),
+        )
+
     def run(self, executor):
         logger.debug([*self.get_cmdline(), self.task])
         executor.run(
@@ -39,4 +47,5 @@ class ExecutableTool(Tool):
             directory=self.cwd,
             out_path=self.get_out_path(),
             err_path=self.get_err_path(),
+            task=self.task
         )

@@ -1,4 +1,9 @@
-config: "./benchmark_thp_sat.yml"
+#default_exp_config: "./0-experiments/thp/thp_exp.yml"
+default_exp_config: "./experiment/thp/0thp_exp_all.yml"
+#TODO: add_loglevel
+#
+
+#config: "./benchmark_thp_sat.yml"
 #config: "./benchmark_thp.yml"
 #config: "./benchmark_thp_bmc_sw.yml"
 #config: "./benchmark_thp_bmc_hw.yml"

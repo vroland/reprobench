@@ -176,6 +176,7 @@ def create_parameter_group(tool, group, parameters):
 def bootstrap_tools(config):
     logger.info("Bootstrapping tools...")
 
+    #FIXME
     for tool_name, tool in config["tools"].items():
         query = Tool.insert(name=tool_name, module=tool["module"]).on_conflict(
             "replace"

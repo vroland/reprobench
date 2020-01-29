@@ -14,7 +14,7 @@ from reprobench.executors.events import STORE_THP_RUNSTATS
 from reprobench.utils import read_config, encode_message
 
 mconfig = None
-with open('./meta_config.yml') as config_f:
+with open('./benchmark_system_config.yml') as config_f:
     try:
         mconfig = yaml.safe_load(config_f)
     except yaml.YAMLError as exc:

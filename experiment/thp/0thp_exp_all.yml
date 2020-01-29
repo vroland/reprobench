@@ -1,4 +1,4 @@
-title: sat_solvers
+title: THP
 description: Benchmark for different runtimes with and without glibc hack
 
 limits:
@@ -8,17 +8,23 @@ limits:
 
 steps:
   run:
-    - module: reprobench.core.sysinfo.CollectSystemInfo
+    - module: reprobench.core.sysinfo.CollectSystemInfo4Server
     - module: reprobench.core.setup.SetupKernel
       config:
         transparent_hugepage: madvise
-        #TODO: govenors
+    # TODO: performance govenors / --cpu-freq srun
     - module: reprobench.executors.RunSolverPerfEval
     # provide non-perf runner
     # provide configurable perf parameters
 #    - module: reprobench.executors.PsmonExecutor
       config:
         nonzero_rte: False
+
+observers:
+  - module: reprobench.core.sysinfo.SystemInfoObserver
+#  - module: reprobench.executors.RunStatisticObserver
+  - module: reprobench.executors.RunStatisticExtendedObserver
+
 #  analysis:
 #    - module: reprobench.statistics.tables.RunTable
 #      config:
@@ -34,11 +40,6 @@ steps:
 #        measure: wall_time
 #        output: statistics/cactus.ipynb
 
-observers:
-  - module: reprobench.core.sysinfo.SystemInfoObserver
-#  - module: reprobench.executors.RunStatisticObserver
-  - module: reprobench.executors.RunStatisticExtendedObserver
-
 tasks:
   sat_gauss_bench:
     type: file
@@ -49,13 +50,12 @@ tasks:
 #    path: ./tasks/thp/sat/
     extract_archives: true
     patterns: |
-      AProVE09-01.cnf.gz
+      **/*
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
       !**/*.tgz
 #      AProVE09-01.cnf.gz
-#      **/*
 
 #  sat2014_app_bench:
 #    type: file
@@ -73,31 +73,41 @@ tasks:
 #      !**/*.tar
 #      !**/.*
 #
-
 tools:
-  glibc:
-    module: tools.sat.satExecutor.SATTool
+  sat:
+    module: experiment.thp.tool.sat.satExecutor.SATTool
     parameters:
+      #name of parameter configuration: we may have multiple ones
       default:
         s:
-#          - minisat
-#          - mergesat
-#          - plingeling
-#          - glucose-4.2.1
-          - lingeling
-          - MapleLCMDiscChronoBT-DL-v3
-  glibc_thp:
-    module: tools.sat.satExecutor.SATTool
-    parameters:
-      default:
-        #t = transparent huge pages
-        t: 1
-        #s = solver
-        s:
-#          - minisat
-#          - mergesat
-#          - plingeling
-          - glucose-4.2.1
-          - lingeling
-          - MapleLCMDiscChronoBT-DL-v3
+          - minisat
+  #            - mergesat
+  #          - plingeling
+  #          - glucose-4.2.1
+  #          - lingeling
+  #          - MapleLCMDiscChronoBT-DL-v3
+        t:
+          - 1
+          - 0
+
+run:
+#  #TODO:
+#  parameters:
+#    # if you set "by" to "parameter"
+#    #   it allows you to pin runs with the following parameter variations to
+#    #   one node only, e.g.,
+#    #   if specifiying s: minisat_t=0 and minisat_t=1 will run on one host
+#    #   however, mergesat_t=0 may run on a different host than minisat_t=0
+#    # if you set "by" to "tool"
+#    #   all configurations of one tool will run on one node
+#    node_pining_parameters:
+#      by: parameter
+#      parameters:
+#        # observers.py:L40
+#        - s
+#    allow limitation to solver
+  tools:
+    sat:
+      all:
+        - sat_gauss_bench
 

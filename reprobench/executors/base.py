@@ -30,6 +30,9 @@ class Executor(Step):
     def __init__(self, *args, **kwargs):
         pass
 
+    def prerun(self):
+        raise NotImplementedError
+
     def run(
         self,
         cmdline,
@@ -49,4 +52,5 @@ class Executor(Step):
     def execute(cls, context, config=None):
         tool = context["tool"]
         executor = cls(context, config)
+        tool(context).prerun(executor)
         tool(context).run(executor)

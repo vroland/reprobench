@@ -1,6 +1,8 @@
 """Various utilities"""
 
 import importlib
+import os
+import pathlib
 import re
 import tarfile
 import zipfile
@@ -259,14 +261,33 @@ def read_config(config_path, resolve_files=False):
     Returns:
         dict: Configuration
     """
+    config = None
+
+    if config_path.startswith("./"):
+        config_path = pathlib.Path.cwd().absolute().joinpath(config_path)
+
     with open(config_path, "r") as f:
         config_text = f.read()
         #TODO: fixeme, ignore Schema for now....
         #, schema=schema
         config = strictyaml.load(config_text).data
 
+        if 'additional_config_files' in config:
+            stream = config_text
+            logger.debug('We found additional configs. Will try to open them.')
+            for fname in config['additional_config_files']:
+                config_dir = os.path.dirname(config_path)
+                fpath = f"{config_dir}/{fname}"
+                with open(fpath, 'r') as r:
+                    stream = stream + r.read()
+                logger.trace(stream)
+            config = strictyaml.load(config_text).data
+
     if resolve_files:
-        resolve_files_uri(config)
+        try:
+            resolve_files_uri(config)
+        except IsADirectoryError as e:
+            logger.info(e)
 
     return config
 

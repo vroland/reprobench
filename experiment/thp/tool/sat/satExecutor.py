@@ -1,3 +1,4 @@
+import inspect
 import os
 from pathlib import Path
 
@@ -12,19 +13,13 @@ class SATTool(ExecutableTool):
     prefix = '-'
     path = "./bin/sat_solver.sh"
 
-    @classmethod
-    def is_ready(cls):
-        return Path(cls.path).is_file()
-
     def get_arguments(self):
         return [f"{self.prefix}{key} {value}" for key, value in self.parameters.items()]
 
     def get_cmdline(self):
-        logger.warning(self.path)
+        logger.warning(self.get_path())
         logger.trace(self.get_arguments())
-        path = os.path.abspath(os.path.join(os.path.dirname(__file__), self.path))
-        logger.trace(path)
-        return [path, *self.get_arguments()]
+        return [self.get_path(), *self.get_arguments()]
 
     def run(self, executor):
         my_env = os.environ.copy()

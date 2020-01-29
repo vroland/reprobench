@@ -1,6 +1,7 @@
-from loguru import logger
+import inspect
+import os
 
-from reprobench.utils import recv_event
+from loguru import logger
 
 try:
     import zmq.green as zmq
@@ -40,6 +41,9 @@ class Tool:
         self.parameters = context["run"]["parameters"]
         self.task = context["run"]["task"]
 
+    def prerun(self, executor):
+        raise NotImplementedError
+
     def run(self, executor):
         raise NotImplementedError
 
@@ -59,8 +63,15 @@ class Tool:
 
     @classmethod
     def is_ready(cls):
-        pass
+        return Path(cls.path).is_file() and os.access(self.get_path, os.X_OK)
 
     @classmethod
     def teardown(cls):
         pass
+
+    def get_path(self):
+        runtm_path = os.path.join(os.path.dirname(inspect.getfile(self.__class__)), self.path)
+        if os.path.islink(runtm_path):
+            os.path.abspath(runtm_path)
+        else:
+            return os.path.relpath(runtm_path)

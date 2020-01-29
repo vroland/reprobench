@@ -55,8 +55,6 @@ fi
 
 cd "$(dirname "$0")"
 
-#get basic info
-source ../../bash_shared/sysinfo.sh
 
 if [ "$solver" == "plingeling" ] ; then
   solver_cmd="./"$solver"_glibc -t 1 -g 8 $@"
@@ -71,7 +69,9 @@ echo
 
 #run call in background and wait for finishing
 #env $env $solver_cmd $filename &
+#TODO: if redirect the solver output then to stdlog.txt
 (export $env; $solver_cmd $filename) &
 PID=$!
 wait $PID
+echo "Solver finished with exit code="$?
 exit $?

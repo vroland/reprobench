@@ -49,7 +49,7 @@ class SystemInfoObserver(Observer):
             ).execute()
 
 
-class CollectSystemInfo(Step):
+class CollectSystemInfo4Server(Step):
     @classmethod
     def register(cls, config=None):
         db.create_tables(MODELS)

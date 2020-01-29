@@ -3,8 +3,10 @@ from loguru import logger
 import sys
 import yaml
 
+#TODO: merge this into a single file
+
 mconfig = None
-with open('./meta_config.yml') as config_f:
+with open('./benchmark_system_config.yml') as config_f:
     try:
         mconfig=yaml.safe_load(config_f)
     except yaml.YAMLError as exc:
