@@ -161,13 +161,14 @@ class BenchmarkWorker:
 
         run = decode_message(socket.recv())
         logger.trace(f"Run to {run}")
-        logger.info(f"Running {run['task']} with tool {run['tool']} and "
-                     f"parameters {run['parameters']} limits: {run['limits']}")
         if run is None:
             logger.info("No more tasks left, exiting...")
             if ret is not None:
                 ret.value = False
             return False
+
+        logger.info(f"Running {run['task']} with tool {run['tool']} and "
+                     f"parameters {run['parameters']} limits: {run['limits']}")
 
         run_id = run["id"]
         # TODO: This probably needs correction
