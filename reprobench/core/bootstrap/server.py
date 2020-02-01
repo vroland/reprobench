@@ -95,7 +95,7 @@ def register_steps(config):
 
 def bootstrap_tasks(config):
     for (name, tasks) in config["tasks"].items():
-        logger.error(f"{name}, {tasks}")
+        logger.trace(f"{name}, {tasks}")
         TaskGroup.insert(name=name).on_conflict("ignore").execute()
         with db.atomic():
             for batch in chunked(tasks, 100):
@@ -110,20 +110,19 @@ def bootstrap_tasks(config):
 def bootstrap_tasks2tools(config):
     tasks2tools = []
     for (tool_name, run_config) in config["runs"].items():
-        logger.error(tool_name)
+        logger.trace(tool_name)
         if Tool.select().where(Tool.name == tool_name).count() != 1:
             logger.warning("Tool not found or multiple entries. Things might go wrong. "
                            "Pls check your configuration file.")
         for group, tasks in run_config.items():
-            logger.warning(group)
-            logger.warning(tasks)
+            logger.trace(f"group: {group}, tasks: {tasks}")
             for task in tasks:
                 if TaskGroup.select().where(TaskGroup.name == task).count() != 1:
                     logger.warning(
                         "Benchmark task missing or duplicate entry. Things might go wrong. "
                         "Pls check your configuration file.")
                 tasks2tools.append(dict(benchmark_name=config["title"], tool=tool_name, task=task, pg=group))
-    logger.debug(f"Inserting tasks: {tasks2tools}")
+    logger.trace(f"Inserting tasks: {tasks2tools}")
     query = Task2Tool.insert_many(tasks2tools).on_conflict_ignore()
     query.execute()
 
@@ -213,11 +212,7 @@ def bootstrap_tools(config):
 
 
 def bootstrap_runs(benchmark_name, output_dir, repeat=1, cluster_job_id=-1):
-    tasks = Task.select().iterator()
-    logger.warning([x for x in tasks])
     tasks2tools = Task2Tool.select().where(Task2Tool.benchmark_name == benchmark_name)
-
-    logger.error([x for x in tasks2tools.namedtuples()])
     # collect task groups
     params = {}
     for tt_id, benchmark_name, task, tool, group in tasks2tools.namedtuples():
@@ -246,10 +241,10 @@ def bootstrap_runs(benchmark_name, output_dir, repeat=1, cluster_job_id=-1):
                 continue
             for e in params[group]:
                 # tt_id, benchmark_name, tool, parameters
-                logger.info(f"|path| {path}")
-                logger.info(f"|group| {group} |e| {e}")
+                logger.debug(f"{path}/{instance}")
+                logger.trace(f"|path| {path}")
+                logger.trace(f"|group| {group} |e| {e}")
                 for iteration in range(repeat):
-                    logger.error(path)
                     directory = (
                         Path(output_dir)
                         / e['tool']
