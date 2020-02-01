@@ -80,7 +80,7 @@ class SlurmManager(BaseManager):
             host_limit = self.reserve_hosts
 
         worker_submit_cmd = [
-            "./sbatch",
+            "sbatch",
             "--parsable",
             f"--array=1-{host_limit}",
             f"--time={self.time_limit}",
