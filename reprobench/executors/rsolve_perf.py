@@ -119,7 +119,7 @@ class RunSolverPerfEval(Executor):
 
         stats['run_id'] = run_id
 
-        logger.warning(stats)
+        logger.debug(stats)
         return stats
 
     @staticmethod
@@ -138,7 +138,7 @@ class RunSolverPerfEval(Executor):
                 logger.debug(output)
                 with open(stdout, 'w+') as f:
                     f.write(str(output))
-                if err !='':
+                if len(err) !=0 :
                     logger.error(err)
                     with open(stderr, 'w+') as f:
                         f.write(str(err))
@@ -175,14 +175,16 @@ class RunSolverPerfEval(Executor):
             logger.debug(f"Extracting instance {input_str} to {f.name}")
             transparent_cat = f"{self.reprobench_path}/lib/tcat.sh {input_str} -o {f.name}"
 
+            logger.trace(transparent_cat)
             p_tmpout = Popen(transparent_cat, stdout=PIPE, stderr=PIPE, shell=True, close_fds=True,
                              cwd=self.reprobench_path)
             output, err = p_tmpout.communicate()
-            logger.debug(f"Instance is available at {f.name}")
             if err != b'':
                 logger.error(err)
                 stats['error'] = err
                 exit(1)
+            else:
+                logger.debug(f"Instance is available at {f.name}")
 
             # TODO: fix out_path
             outdir = self.output_dir(out_path)
@@ -202,8 +204,8 @@ class RunSolverPerfEval(Executor):
                 run_details = {'run_id': self.run_id}
                 runparameters_f.write(json.dumps(run_details))
 
-            logger.debug(run_cmd)
-            logger.debug(f"Running {directory}")
+            logger.trace(run_cmd)
+            logger.info(f"Running {directory}")
             p_solver = Popen(run_cmd, stdout=PIPE, stderr=PIPE, shell=True, close_fds=True, cwd=outdir)
             output, err = p_solver.communicate()
 
@@ -220,7 +222,7 @@ class RunSolverPerfEval(Executor):
 
             payload = self.compile_stats(stats, self.run_id, self.nonzero_as_rte)
 
-            logger.error(payload)
+            logger.trace(f"payload: {payload}")
             with open(payload_p, 'w') as payload_f:
                 payload_f.write(json.dumps(payload))
 

@@ -2,6 +2,7 @@ from functools import lru_cache
 
 from loguru import logger
 from peewee import fn
+from pathlib import Path
 
 from reprobench.core.base import Observer
 from reprobench.core.bootstrap.server import bootstrap
@@ -72,9 +73,11 @@ class CoreObserver(Observer):
         limits = cls.get_limits()
         pg = {key: value for group, key, value in
               Parameter.select().where(Parameter.group==run.parameter_group.id).namedtuples()}
+
+        task = Task.select().where(Task.id == run.task_id).first()
         run_dict = dict(
             id=run.id,
-            task=run.task_id,
+            task=str(Path(task.path) / task.instance),
             tool=run.tool.module,
             parameters=pg,
             steps=list(runsteps.dicts()),

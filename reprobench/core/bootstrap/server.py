@@ -277,5 +277,4 @@ def bootstrap(config=None, output_dir=None, repeat=1, server=None, cluster_job_i
     bootstrap_tasks(config)
     bootstrap_tools(config)
     bootstrap_tasks2tools(config)
-    logger.critical(output_dir)
     bootstrap_runs(config['title'], output_dir, repeat, cluster_job_id)

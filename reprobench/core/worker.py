@@ -160,8 +160,9 @@ class BenchmarkWorker:
         send_event(socket, WORKER_JOIN, dict(cluster_job_id=self.cluster_job_id))
 
         run = decode_message(socket.recv())
-        logger.debug(f"Run to {run}")
-
+        logger.trace(f"Run to {run}")
+        logger.info(f"Running {run['task']} with tool {run['tool']} and "
+                     f"parameters {run['parameters']} limits: {run['limits']}")
         if run is None:
             logger.info("No more tasks left, exiting...")
             if ret is not None:

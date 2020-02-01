@@ -125,7 +125,7 @@ tools:
           - 1
           - 0
   asp:
-    module: tools.asp.aspExecutor.ASPTool
+    module: experiment.thp.tool.asp.aspExecutor.ASPTool
     parameters:
       default:
         s:
