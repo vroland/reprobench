@@ -49,6 +49,8 @@ elif [ $type == "application/x-bzip2" ] ; then
   prep_cmd="bzcat $filename"
 elif [ $type == "application/x-xz" ] ; then
   prep_cmd="xzcat $filename"
+elif [ $type == "application/octet-stream" ] ; then
+  prep_cmd="lzcat $filename"
 else
   prep_cmd="zcat -f $filename"
 fi
