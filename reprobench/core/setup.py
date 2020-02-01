@@ -29,9 +29,8 @@ class SetupKernel(Step):
         info["platform"] = platform.platform(aliased=True)
 
         if 'transparent_hugepage' in config:
-            logger.info('THP value was:')
             with open('/sys/kernel/mm/transparent_hugepage/enabled', 'r') as thp:
-                logger.info(thp.readlines())
+                logger.info(f"THP value was: {thp.readlines()}")
             logger.info('THP setting value to "%s"' % config['transparent_hugepage'])
             try:
                 with open('/sys/kernel/mm/transparent_hugepage/enabled', 'w') as thp:
@@ -39,10 +38,9 @@ class SetupKernel(Step):
             except IOError as e:
                 logger.error('Unable to write to file "/sys/kernel/mm/transparent_hugepage/enabled".')
                 logger.error(e)
-            logger.info('THP value is now:')
             with open('/sys/kernel/mm/transparent_hugepage/enabled', 'r') as thp:
                 value = thp.readlines()
-                logger.info(value)
+                logger.info(f"THP value is now: {value}")
                 info['transparent_hugepage']=value
 
         return info
