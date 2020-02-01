@@ -5,7 +5,7 @@ from peewee import fn
 
 from reprobench.core.base import Observer
 from reprobench.core.bootstrap.server import bootstrap
-from reprobench.core.db import Limit, Run, Step, ParameterGroup, Task
+from reprobench.core.db import Limit, Run, Step, ParameterGroup, Task, Parameter
 from reprobench.core.events import (
     SUBMITTER_PING,
     SUBMITTER_BOOTSTRAP,
@@ -33,11 +33,8 @@ class CoreObserver(Observer):
         # Check for pinned_host
         try:
             if pinned_host is None:
-                # run = Run.select().where(Run.status == 0, Run.cluster_job_id == cluster_job_id). \
-                #     join(ParameterGroup).join(Task).where(Run.task == Task.id).get_or_none() #.where(
                 run = Run.select().where(Run.status == 0, Run.cluster_job_id == cluster_job_id). \
-                    join(Task).switch(Run).join(ParameterGroup).first() #.where(ParameterGroup.id == Run.parameter_group).\
-                    # join(Task).where(Task.id == Run.task)
+                    join(Task).switch(Run).join(ParameterGroup).first()
             else:
                 raise NotImplementedError("TODO:")
                 run = Run.get_or_none((Run.status == 0) &
@@ -50,10 +47,6 @@ class CoreObserver(Observer):
                 # make it work with a parameter
                 # TODO: pin both to the current host
                 # introduce PIN_GROUP??
-                logger.error('run')
-                logger.warn(run)
-                logger.error(run)
-                logger.error('-' * 80)
 
                 res = Run.select()
                 for x in res:
@@ -77,17 +70,17 @@ class CoreObserver(Observer):
             (Step.category == Step.RUN) & (Step.id > last_step)
         )
         limits = cls.get_limits()
-        # parameters = {p.key: p.value for p in run.parameter_group.name}
+        pg = {key: value for group, key, value in
+              Parameter.select().where(Parameter.group==run.parameter_group.id).namedtuples()}
         run_dict = dict(
             id=run.id,
             task=run.task_id,
             tool=run.tool.module,
-            parameters={run.parameter_group.name: run.parameter_group.tool},
+            parameters=pg,
             steps=list(runsteps.dicts()),
             limits=limits,
         )
-        logger.error(run_dict)
-        # raise RuntimeError
+        logger.trace(run_dict)
         return run_dict
 
     @classmethod
