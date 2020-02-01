@@ -50,29 +50,64 @@ tasks:
 #    path: ./tasks/thp/sat/
     extract_archives: true
     patterns: |
+      AProVE09-01.cnf.gz
+      AProVE09-05.cnf.gz
+      !**/*.tar.bz2
+      !**/*.tar.xz
+      !**/*.tar.gz
+      !**/*.tgz
+#      **/*
+
+  sat2014_app_bench:
+    type: file
+#    urls:
+#      - http://satcompetition.org/2014/files/sc14-app.tar
+    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/SAT_2014app/
+#    path: ./tasks/thp/sat/
+    extract_archives: true
+    patterns: |
       **/*
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
       !**/*.tgz
-#      AProVE09-01.cnf.gz
+      !**/*.tar
+      !**/.*
+      !**.*~
 
-#  sat2014_app_bench:
-#    type: file
-##    urls:
-##      - http://satcompetition.org/2014/files/sc14-app.tar
-#    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/SAT_2014app/
-##    path: ./tasks/thp/sat/
-#    extract_archives: true
-#    patterns: |
-#      **/*
-#      !**/*.tar.bz2
-#      !**/*.tar.xz
-#      !**/*.tar.gz
-#      !**/*.tgz
-#      !**/*.tar
-#      !**/.*
-#
+  boo:
+    type: file
+#    urls:
+#      - http://satcompetition.org/2014/files/sc14-app.tar
+    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/SAT_2014app/
+#    path: ./tasks/thp/sat/
+    extract_archives: true
+    patterns: |
+      **/*
+      !**/*.tar.bz2
+      !**/*.tar.xz
+      !**/*.tar.gz
+      !**/*.tgz
+      !**/*.tar
+      !**/.*
+
+  asp_bench:
+    type: file
+#    type: url
+#    urls:
+#      - https://www.cs.uni-potsdam.de/wv/projects/sets/set-asp-gauss.tar.xz
+    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/ASP_gauss/
+#    path: ./tasks/thp/ASP/
+    extract_archives: true
+    patterns: |
+      **/15.10.schur
+      **/15.17.schur
+      !**/*.tar.bz2
+      !**/*.tar.xz
+      !**/*.tar.gz
+      !**/*.tgz
+#      **/15.10.schur
+
 tools:
   sat:
     module: experiment.thp.tool.sat.satExecutor.SATTool
@@ -89,8 +124,17 @@ tools:
         t:
           - 1
           - 0
+  asp:
+    module: tools.asp.aspExecutor.ASPTool
+    parameters:
+      default:
+        s:
+          - clasp
+          - wasp
+        t:
+          - 1
+          - 0
 
-run:
 #  #TODO:
 #  parameters:
 #    # if you set "by" to "parameter"
@@ -106,8 +150,16 @@ run:
 #        # observers.py:L40
 #        - s
 #    allow limitation to solver
-  tools:
-    sat:
-      all:
-        - sat_gauss_bench
+
+#TODO:
+runs:
+  sat:
+    all:
+      - sat_gauss_bench
+      - sat2014_app_bench
+#    s=minisat/t=1:
+#      - boo
+  asp:
+    all:
+      - asp_bench
 

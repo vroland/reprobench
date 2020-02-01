@@ -1,7 +1,8 @@
 from pathlib import Path
-from loguru import logger
-from reprobench.utils import download_file, extract_archives
 
+from loguru import logger
+
+from reprobench.utils import download_file, extract_archives
 from .file import FileSource
 
 
@@ -9,15 +10,10 @@ class UrlSource(FileSource):
     TYPE = "url"
 
     def __init__(
-        self,
-        urls=None,
-        path=None,
-        patterns="",
-        skip_existing=True,
-        extract_archives=True,
-        **kwargs,
+        self, urls=None, path=None, patterns="", skip_existing=True, extract_archives=True,
+        resolve=False, **kwargs,
     ):
-        super().__init__(path, patterns=patterns)
+        super().__init__(path, patterns=patterns, resolve=resolve)
         self.urls = urls or []
         self.extract_archives = extract_archives
         self.skip_existing = skip_existing

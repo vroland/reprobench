@@ -5,7 +5,7 @@ from peewee import fn
 
 from reprobench.core.base import Observer
 from reprobench.core.bootstrap.server import bootstrap
-from reprobench.core.db import Limit, Run, Step
+from reprobench.core.db import Limit, Run, Step, ParameterGroup, Task
 from reprobench.core.events import (
     SUBMITTER_PING,
     SUBMITTER_BOOTSTRAP,
@@ -30,16 +30,20 @@ class CoreObserver(Observer):
 
     @classmethod
     def get_next_pending_run(cls, cluster_job_id, pinned_host=None):
-        # TODO: check for pinned_host
+        # Check for pinned_host
         try:
             if pinned_host is None:
-                run = Run.get_or_none((Run.status == 0) &
-                                      (Run.cluster_job_id == cluster_job_id))
+                # run = Run.select().where(Run.status == 0, Run.cluster_job_id == cluster_job_id). \
+                #     join(ParameterGroup).join(Task).where(Run.task == Task.id).get_or_none() #.where(
+                run = Run.select().where(Run.status == 0, Run.cluster_job_id == cluster_job_id). \
+                    join(Task).switch(Run).join(ParameterGroup).first() #.where(ParameterGroup.id == Run.parameter_group).\
+                    # join(Task).where(Task.id == Run.task)
             else:
+                raise NotImplementedError("TODO:")
                 run = Run.get_or_none((Run.status == 0) &
                                       (Run.cluster_job_id == cluster_job_id) &
                                       ((Run.pinned_host == pinned_host) |
-                                                (Run.pinned_host == None)))
+                                       (Run.pinned_host is None)))
                 raise NotImplementedError("TODO:")
                 # Attribute error occurs, if no open runs can be found
                 # update pinned_host
@@ -59,6 +63,7 @@ class CoreObserver(Observer):
                 exit(1)
 
         except (Run.DoesNotExist, AttributeError):
+            logger.error(run)
             return None
 
         if run is None:
@@ -68,24 +73,21 @@ class CoreObserver(Observer):
         run.save()
 
         last_step = run.last_step_id or 0
-        # TODO: pinned_host
-        # TODO: make sure here that we have only the right job_id
-        # worker needs to report the job_id
         runsteps = Step.select().where(
             (Step.category == Step.RUN) & (Step.id > last_step)
         )
         limits = cls.get_limits()
-        parameters = {p.key: p.value for p in run.parameter_group.parameters}
-
+        # parameters = {p.key: p.value for p in run.parameter_group.name}
         run_dict = dict(
             id=run.id,
             task=run.task_id,
             tool=run.tool.module,
-            parameters=parameters,
+            parameters={run.parameter_group.name: run.parameter_group.tool},
             steps=list(runsteps.dicts()),
             limits=limits,
         )
-
+        logger.error(run_dict)
+        # raise RuntimeError
         return run_dict
 
     @classmethod
@@ -119,11 +121,13 @@ class CoreObserver(Observer):
             reply.send_multipart([address, encode_message('echo reply')])
             logger.trace('Done')
         elif event_type == SUBMITTER_BOOTSTRAP:
+            logger.error(payload)
             bootstrap(server=server, **payload)
             pending_runs = cls.get_pending_runs()
             logger.debug(payload)
             logger.debug('Sending bootstrap "%s"' % address)
             reply.send_multipart([address, encode_message(pending_runs)])
+            # raise RuntimeError
         elif event_type == SUBMITTER_REPORTBACK:
             pending_runs = cls.update_cluster_id_for_runs(**payload)
         elif event_type == WORKER_JOIN:

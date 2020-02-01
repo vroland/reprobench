@@ -1,10 +1,7 @@
-import atexit
 import itertools
 import json
-import shutil
 from pathlib import Path
 
-import gevent
 from loguru import logger
 from peewee import chunked
 from tqdm import tqdm
@@ -21,7 +18,7 @@ from reprobench.core.db import (
     TaskGroup,
     Tool,
     db,
-)
+    Task2Tool)
 from reprobench.utils import (
     check_valid_config_space,
     get_db_path,
@@ -98,13 +95,37 @@ def register_steps(config):
 
 def bootstrap_tasks(config):
     for (name, tasks) in config["tasks"].items():
+        logger.error(f"{name}, {tasks}")
         TaskGroup.insert(name=name).on_conflict("ignore").execute()
         with db.atomic():
             for batch in chunked(tasks, 100):
                 query = Task.insert_many(
-                    [{"path": task, "group": name} for task in batch]
+                    [{"path": task[0], "instance": task[1], "group": name} for task in batch]
                 ).on_conflict("ignore")
                 query.execute()
+
+
+# TODO: merge all this into one entity (if we move to a document storage)
+# does conceptually only make partially sense
+def bootstrap_tasks2tools(config):
+    tasks2tools = []
+    for (tool_name, run_config) in config["runs"].items():
+        logger.error(tool_name)
+        if Tool.select().where(Tool.name == tool_name).count() != 1:
+            logger.warning("Tool not found or multiple entries. Things might go wrong. "
+                           "Pls check your configuration file.")
+        for group, tasks in run_config.items():
+            logger.warning(group)
+            logger.warning(tasks)
+            for task in tasks:
+                if TaskGroup.select().where(TaskGroup.name == task).count() != 1:
+                    logger.warning(
+                        "Benchmark task missing or duplicate entry. Things might go wrong. "
+                        "Pls check your configuration file.")
+                tasks2tools.append(dict(benchmark_name=config["title"], tool=tool_name, task=task, pg=group))
+    logger.debug(f"Inserting tasks: {tasks2tools}")
+    query = Task2Tool.insert_many(tasks2tools).on_conflict_ignore()
+    query.execute()
 
 
 def create_parameter_group(tool, group, parameters):
@@ -176,7 +197,7 @@ def create_parameter_group(tool, group, parameters):
 def bootstrap_tools(config):
     logger.info("Bootstrapping tools...")
 
-    #FIXME
+    # FIXME
     for tool_name, tool in config["tools"].items():
         query = Tool.insert(name=tool_name, module=tool["module"]).on_conflict(
             "replace"
@@ -191,37 +212,59 @@ def bootstrap_tools(config):
             create_parameter_group(tool_name, group, parameters)
 
 
-def bootstrap_runs(config, output_dir, repeat=1, cluster_job_id=-1):
-    parameter_groups = ParameterGroup.select().iterator()
+def bootstrap_runs(benchmark_name, output_dir, repeat=1, cluster_job_id=-1):
     tasks = Task.select().iterator()
-    total = ParameterGroup.select().count() * Task.select().count()
+    logger.warning([x for x in tasks])
+    tasks2tools = Task2Tool.select().where(Task2Tool.benchmark_name == benchmark_name)
 
+    logger.error([x for x in tasks2tools.namedtuples()])
+    # collect task groups
+    params = {}
+    for tt_id, benchmark_name, task, tool, group in tasks2tools.namedtuples():
+        logger.trace(f"Considering: tt_id: {tt_id}, benchmark_name: {benchmark_name}, task: {task}, "
+                     f"tool: {tool}, group: {group}")
+        for pg_id, pg_name, pg_tool in \
+            ParameterGroup.select().where(ParameterGroup.tool_id == tool).namedtuples():
+            logger.trace(f"pg_id: {pg_id}, pg_name:{pg_name}, pg_tool: {pg_tool}")
+            # TODO: fixme here...
+            if group != 'all':
+                configs = [x for x in group.split("/")]
+                if any([c not in pg_name for c in configs]):
+                    continue
+            p = dict(tt_id=tt_id, pg_id=pg_id, benchmark_name=benchmark_name, tool=tool, parameters=pg_name)
+            if task in params:
+                params[task].append(p)
+            else:
+                params[task] = [p]
+            logger.trace(p)
+
+    logger.trace("Merging task groups with tasks.")
     with db.atomic():
-        for (parameter_group, task) in tqdm(
-            itertools.product(parameter_groups, tasks),
-            desc="Bootstrapping runs",
-            total=total,
-        ):
-            for iteration in range(repeat):
-                directory = (
-                    Path(output_dir)
-                    / parameter_group.tool_id
-                    / parameter_group.name
-                    / task.group_id
-                    / Path(task.path).name
-                    / str(iteration)
-                )
-
-                query = Run.insert(
-                    id=directory,
-                    cluster_job_id=cluster_job_id,
-                    tool=parameter_group.tool_id,
-                    task=task,
-                    parameter_group=parameter_group,
-                    status=Run.PENDING,
-                    iteration=iteration,
-                ).on_conflict("ignore")
-                query.execute()
+        for t_id, group, path, instance in tqdm(Task.select().namedtuples(), desc="Bootstrapping runs"):
+            logger.trace(f"group:{group}, path:{path}, instance:{instance}")
+            if group not in params:
+                continue
+            for e in params[group]:
+                # tt_id, benchmark_name, tool, parameters
+                logger.info(f"|path| {path}")
+                logger.info(f"|group| {group} |e| {e}")
+                for iteration in range(repeat):
+                    logger.error(path)
+                    directory = (
+                        Path(output_dir)
+                        / e['tool']
+                        / e['parameters']
+                        / group
+                        / instance
+                        / str(iteration)
+                    )
+                    myrun = dict(id=str(directory), cluster_job_id=cluster_job_id, tool=e['tool'],
+                                 task=t_id, parameter_group=e['pg_id'], status=Run.PENDING,
+                                 iteration=iteration)
+                    logger.debug(myrun)
+                    query = Run.insert(myrun)  # .on_conflict("ignore")
+                    query.execute()
+    return
 
 
 def bootstrap(config=None, output_dir=None, repeat=1, server=None, cluster_job_id=-1):
@@ -233,4 +276,6 @@ def bootstrap(config=None, output_dir=None, repeat=1, server=None, cluster_job_i
     register_steps(config)
     bootstrap_tasks(config)
     bootstrap_tools(config)
-    bootstrap_runs(config, output_dir, repeat, cluster_job_id)
+    bootstrap_tasks2tools(config)
+    logger.critical(output_dir)
+    bootstrap_runs(config['title'], output_dir, repeat, cluster_job_id)

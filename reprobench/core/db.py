@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from peewee import AutoField
 from playhouse.apsw_ext import (
     Model,
     Proxy,
@@ -30,12 +31,23 @@ class TaskGroup(BaseModel):
 
 class Task(BaseModel):
     group = ForeignKeyField(TaskGroup, backref="tasks")
-    path = CharField(primary_key=True)
+    path = CharField(null=False)
+    instance = CharField(null=False)
 
 
 class Tool(BaseModel):
     module = CharField()
     name = CharField(primary_key=True)
+
+
+class Task2Tool(BaseModel):
+    tt_id = AutoField(primary_key=True)
+    benchmark_name = CharField(null=False)
+    task = CharField(null=False)
+    tool = CharField(null=False)
+    pg = CharField(null=False)
+    # task = ForeignKeyField(Task, backref="tasks")
+    # tool = ForeignKeyField(Tool, backref="tool")
 
 
 class ParameterGroup(BaseModel):
@@ -90,7 +102,7 @@ class Run(BaseModel):
         (DONE, "Done"),
     )
 
-    id = CharField(null=True, primary_key=True)
+    id = CharField(null=False, primary_key=True)
     cluster_job_id = IntegerField(default=-1)
     pinned_host = CharField(null=True)
     created_at = DateTimeField(default=datetime.now)
@@ -103,4 +115,4 @@ class Run(BaseModel):
     iteration = IntegerField(default=0)
 
 
-MODELS = (Limit, TaskGroup, Task, Tool, ParameterGroup, Parameter, Run, Step, Observer)
+MODELS = (Limit, TaskGroup, Task, Task2Tool, Tool, ParameterGroup, Parameter, Run, Step, Observer)
