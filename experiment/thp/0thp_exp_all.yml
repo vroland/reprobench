@@ -145,3 +145,8 @@ runs:
 #    all:
 #      - asp_bench
 
+
+#TODO:
+#config: "./benchmark_thp_bmc_sw.yml"
+#config: "./benchmark_thp_bmc_hw.yml"
+#config: "./benchmark_thp_maxsat.yml"

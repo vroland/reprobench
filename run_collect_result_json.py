@@ -21,7 +21,7 @@ with open('./benchmark_system_config.yml') as config_f:
         print(exc)
         exit(1)
 
-config = mconfig['config']
+config = mconfig['default_exp_config']
 config = read_config(config, resolve_files=True)
 
 for module in config['steps']['run']:

@@ -21,10 +21,7 @@ import matplotlib.pyplot as plt
 #                      'output_maxsat_solvers-2020-01-17_2.csv',
 #                      'output_asp_solvers-2020-01-19.csv']:
 #
-#SUBMISSION VERSION!!
-#for filename in ['output_sat_solvers_2020-01-20.csv']:
-#
-for filename in ['output_THP.csv']:
+for filename in ['output_sat_solvers_2020-01-20.csv']:
     print('=' * 200)
     print(filename)
     print('=' * 200)
@@ -95,8 +92,8 @@ for filename in ['output_THP.csv']:
                'lingeling-glibc': ('lingeling', '#1f78b4', '-'),
                'glucose-glibc': ('glucose', '#33a02c', '-'),
                'glucose-glibcthp': ('glucose(thp)', '#b2df8a', '-'),
-               'minisat,t=0-sat': ('minisat', '#e31a1c', '-'),
-               'minisat,t=1-sat': ('minisat(thp)', '#fb9a99', '-'),
+               'minisat-glibc': ('minisat', '#e31a1c', '-'),
+               'minisat-glibcthp': ('minisat(thp)', '#fb9a99', '-'),
                'maplesat-glibc': ('maplesat', '#ff7f00', '-'),
                'maplesat-glibcthp': ('maplesat(thp)', '#fdbf6f', '-'),
                'mergesat-glibc': ('mergesat', '#6a3d9a', '-'),
@@ -263,8 +260,8 @@ for filename in ['output_THP.csv']:
                'lingeling-glibc': ('lingeling', '#1f78b4', '-'),
                'glucose-glibc': ('glucose', '#33a02c', '-'),
                'glucose-glibcthp': ('glucose(thp)', '#b2df8a', '-'),
-               'minisat,t=0-sat': ('minisat', '#e31a1c', '-'),
-               'minisat,t=1-sat': ('minisat(thp)', '#fb9a99', '-'),
+               'minisat-glibc': ('minisat', '#e31a1c', '-'),
+               'minisat-glibcthp': ('minisat(thp)', '#fb9a99', '-'),
                'maplesat-glibc': ('maplesat', '#ff7f00', '-'),
                'maplesat-glibcthp': ('maplesat(thp)', '#fdbf6f', '-'),
                'mergesat-glibc': ('mergesat', '#6a3d9a', '-'),

@@ -1,19 +1,13 @@
-#default_exp_config: "./0-experiments/thp/thp_exp.yml"
 default_exp_config: "./experiment/thp/0thp_exp_all.yml"
+#TODO: move to benchmark file
+repeat: 5
 #TODO: add_loglevel
-#
-
-#config: "./benchmark_thp_sat.yml"
-#config: "./benchmark_thp.yml"
-#config: "./benchmark_thp_bmc_sw.yml"
-#config: "./benchmark_thp_bmc_hw.yml"
-#config: "./benchmark_thp_maxsat.yml"
 output: "output"
 reserve_hosts: 1
 reserve_cores: 24
 processes: 5
 server_url: "tcp://127.0.0.1:31313"
 email: "johannes.fichte@tu-dresden.de"
-reserve_time: "4:00:00"
+reserve_time: "18:00:00"
 
 
