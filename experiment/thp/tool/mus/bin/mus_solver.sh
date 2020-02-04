@@ -4,32 +4,36 @@
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 # Initialize our own variables:
-verbose=0
-while getopts "h?vts:f:" opt; do
+#verbose=0
+thp=0
+while getopts "h?vts:f:t:" opt; do
     case "$opt" in
     h|\?)
         show_help
         exit 0
         ;;
-    v)  verbose=1
+    v)  echo "Currently unsupported."
+        #verbose=1
         ;;
-    t)  thp=1
+    t)  thp=$OPTARG
         ;;
     s)  solver=$OPTARG
         ;;
     f)  filename=$OPTARG
+        ;;
+    i)  original_input=$OPTARG
         ;;
     esac
 done
 
 shift $((OPTIND-1))
 
-trap 'kill -TERM $PID' TERM
+function interrupted(){
+  kill -TERM $PID
+}
+trap interrupted TERM
+trap interrupted INT
 
-cat /etc/hostname
-
-echo /sys/kernel/mm/transparent_hugepage/enabled
-cat /sys/kernel/mm/transparent_hugepage/enabled
 
 if [ -z $solver ] ; then
   echo "No Solver given. Exiting..."
@@ -41,16 +45,33 @@ if [ -z $filename ] ; then
   exit 1
 fi
 
-if [ ! -z $thp ] ; then
-  export GLIBC_THP_ALWAYS=1
-  echo "Using THP option in libc"
+if [ ! -f $filename ] ; then
+  echo "Filename does not exist. Exiting..."
+  exit 1
 fi
-cmd="./"$solver"_glibc $@ $filename"
-echo $cmd
 
-cd "$(dirname "$0")"
-bash -c 'echo GLIBC_THP_ALWAYS=$GLIBC_THP_ALWAYS'
-bash -c "$cmd" &
+if [ $thp == 1 ] ; then
+  env=GLIBC_THP_ALWAYS=1
+else
+  env=VOID=1
+fi
+
+
+cd "$(dirname "$0")" || (echo "Could not change directory to $0. Exiting..."; exit 1)
+
+solver_cmd="./"$solver"_glibc $* $filename"
+
+echo "Original input instance was $original_input"
+echo "env $env $solver_cmd $filename"
+echo
+echo
+
+#NOTE: if you need to redirect the solver output in the future, we suggest to use stdlog.txt
+#
+# run call in background and wait for finishing
+env $env $solver_cmd $filename &
+#alternative approach
+#(export $env; $solver_cmd $filename) &
 PID=$!
 wait $PID
 exit $?
