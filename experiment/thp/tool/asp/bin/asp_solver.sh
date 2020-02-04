@@ -4,21 +4,24 @@
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 # Initialize our own variables:
-verbose=0
+#verbose=0
 
-while getopts "h?vt:s:f:" opt; do
+while getopts "h?vt:s:f:i:" opt; do
     case "$opt" in
     h|\?)
         show_help
         exit 0
         ;;
-    v)  verbose=1
+    v)  echo "Currently unsupported."
+        #verbose=1
         ;;
-    t)  thp=1
+    t)  thp=$OPTARG
         ;;
     s)  solver=$OPTARG
         ;;
     f)  filename=$OPTARG
+        ;;
+    i)  original_input=$OPTARG
         ;;
     esac
 done
@@ -48,17 +51,17 @@ if [ ! -f $filename ] ; then
   exit 1
 fi
 
-if [ ! -z $thp ] ; then
+if [ $thp == 1 ] ; then
   env=GLIBC_THP_ALWAYS=1
-  echo "Using THP option in libc"
+else
+  env=VOID=1
 fi
 
-cd "$(dirname "$0")"
-#get basic info
-source ../../bash_shared/sysinfo.sh
+cd "$(dirname "$0")" || (echo "Could not change directory to $0. Exiting..."; exit 1)
 
-solver_cmd="./$solver"_glibc $@
+solver_cmd="./"$solver"_glibc $*"
 
+echo "Original input instance was $original_input"
 echo "$env $solver_cmd $filename"
 echo
 echo

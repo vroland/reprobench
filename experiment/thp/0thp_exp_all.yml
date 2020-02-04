@@ -46,7 +46,6 @@ tasks:
 #    urls:
 #      - https://www.cs.uni-potsdam.de/wv/projects/sets/set-industrial-09-12-gauss.tar.xz
     path: /scratch/p_gpusat/automated-reasoner-builds/benchmarks/SAT_gauss
-#    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/SAT_gauss/
 #    path: ./tasks/thp/sat/
     extract_archives: true
     patterns: |

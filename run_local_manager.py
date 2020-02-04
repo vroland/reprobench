@@ -17,6 +17,6 @@ with open(os.path.join(path,'./benchmark_system_config.yml')) as config_f:
 
 
 m = LocalManager(num_workers=1, server_address=mconfig['server_url'], output_dir=mconfig['output'], multirun_cores=0,
-                 config=mconfig['default_exp_config'], tunneling=None, repeat=1, rbdir="")
+                 config=mconfig['default_exp_config'], tunneling=None, repeat=mconfig['repeat'], rbdir="")
 
 m.run()

@@ -16,7 +16,7 @@ class BenchmarkServer(object):
         self.observers = []
 
     def receive_event(self):
-        logger.debug('Waiting to receive events')
+        logger.trace('Waiting to receive events')
         address, event_type, payload = self.frontend.recv_multipart()
         logger.trace(address)
         logger.trace('Received the following event')
