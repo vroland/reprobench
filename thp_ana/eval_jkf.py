@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
+from pandas.plotting import scatter_matrix
 import pandas as pd
 
 pd.set_option('display.max_rows', 500)
@@ -24,18 +25,22 @@ import matplotlib.pyplot as plt
 #SUBMISSION VERSION!!
 #for filename in ['output_sat_solvers_2020-01-20.csv']:
 #
-for filename in ['output_THP.csv']:
+#output_THP.csv
+for filename in ['output_THP_sat_t0_1-3.csv']:
     print('=' * 200)
     print(filename)
     print('=' * 200)
     df = pd.read_csv(filename)
 
+    df['instance'] = df['run_id'].apply(lambda row: '/'.join(row.split('/')[3:-1]))
+    df['run'] = df['run_id'].apply(lambda row: row.split('/')[-1])
     df['group'] = df['run_id'].apply(lambda row: row.split('/')[1])
     df['solver'] = df['run_id'].apply(lambda row: row.split('/')[2])
-    df['instance'] = df['run_id'].apply(lambda row: '/'.join(row.split('/')[3:]))
+    df['instance'] = df['run_id'].apply(lambda row: '/'.join(row.split('/')[3:-1]))
+    df['hostname'] = df['hostname'].apply(lambda row: row.split('.')[0])
 
     # quick overview on solved instances etc...
-    z = df.groupby(['group', 'solver', 'verdict']).agg(
+    z = df.groupby(['group', 'run', 'solver', 'verdict']).agg(
         {'wall_time': [np.sum, 'count', np.mean], 'perf_dTLB_load_misses': [np.sum, np.mean],
          'perf_dTLB_loads': [np.sum, np.mean], 'perf_dTLB_store_misses': [np.sum, np.mean],
          'perf_dTLB_stores': [np.sum, np.mean], 'perf_iTLB_load_misses': [np.sum, np.mean],
@@ -51,33 +56,35 @@ for filename in ['output_THP.csv']:
     mem = mem[mem.verdict == 'OK']
     mem['solver'] = mem['solver'].str.replace(r'default\[s=', '').str.replace(r'\]', '')
     mem['group'] = mem['group'].str.replace(r'_', '')
+    mem['run'] = mem['run_id'].apply(lambda row: row.split('/')[-1])
     mem['solver'] = mem['solver'].str.replace(r'default\[s=', '').str.replace(r'\]', '')
     mem['solver'] = mem['solver'].str.replace('MapleLCMDiscChronoBT-DL-v3', 'maplesat')
     mem['solver'] = mem['solver'].str.replace('glucose-4.2.1', 'glucose')
     mem['solver_t'] = mem["solver"].map(str) + '-' + mem["group"]\
 
     mem['runsolver_MAXVM'] = mem['runsolver_MAXVM'] / 1024
-    mem = mem[['solver_t', 'solver','group', 'instance', 'runsolver_MAXVM', 'wall_time', 'perf_dTLB_load_misses']]
+    mem = mem[['solver_t', 'solver','group', 'run', 'instance', 'runsolver_MAXVM', 'wall_time', 'perf_dTLB_load_misses']]
+
     # print(mem)
     print(mem['runsolver_MAXVM'].quantile([0.05,0.1,0.25,0.5,0.75,1]))
 
     print('*'*80)
     print('Below 1M')
     print('*'*80)
-    below1M = mem[mem.runsolver_MAXVM <= 1].groupby(['solver', 'group']).agg({'runsolver_MAXVM': 'count'})
+    below1M = mem[mem.runsolver_MAXVM <= 1].groupby(['solver', 'group', 'run']).agg({'runsolver_MAXVM': 'count'})
     print(below1M)
     print('*'*80)
     print('Below 10M')
     print('*'*80)
-    below10M = mem[(mem.runsolver_MAXVM > 1) & (mem.runsolver_MAXVM <= 10)].groupby(['solver', 'group']).agg({'runsolver_MAXVM': 'count'})
+    below10M = mem[(mem.runsolver_MAXVM > 1) & (mem.runsolver_MAXVM <= 10)].groupby(['solver', 'group', 'run']).agg({'runsolver_MAXVM': 'count'})
     print(below10M)
     print('*'*80)
     print('Below 100M')
     print('*'*80)
-    below100M = mem[(mem.runsolver_MAXVM > 10) & (mem.runsolver_MAXVM <= 400)].groupby(['solver', 'group']).agg({'runsolver_MAXVM': 'count'})
+    below100M = mem[(mem.runsolver_MAXVM > 10) & (mem.runsolver_MAXVM <= 400)].groupby(['solver', 'group', 'run']).agg({'runsolver_MAXVM': 'count'})
     print(below100M)
 
-    mmem = mem.groupby(['solver', 'group']).agg({'runsolver_MAXVM': ['count', np.mean, np.median]})
+    mmem = mem.groupby(['solver', 'group', 'run']).agg({'runsolver_MAXVM': ['count', np.mean, np.median]})
     print(mmem.reset_index())
 
     mconfigs = mem['solver_t'].unique()
@@ -143,7 +150,7 @@ for filename in ['output_THP.csv']:
     glibc = solver[solver.group == 'glibc']
     glibc_thp = solver[solver.group == 'glibc_thp']
 
-    merged = pd.merge(glibc, glibc_thp, on=['instance', 'solver'], how='outer')
+    merged = pd.merge(glibc, glibc_thp, on=['instance', 'solver','run'], how='outer')
     merged.to_csv(f'1-outputs/{filename}_merged.csv')
     merged.to_latex(f'1-outputs/{filename}_merged.tex')
     # print(merged.columns)
@@ -161,9 +168,9 @@ for filename in ['output_THP.csv']:
     add.to_csv(f'1-outputs/{filename}_merged_notok.csv')
     add.to_latex(f'1-outputs/{filename}_merge_notok.tex')
 
-    df1 = df[['instance', 'wall_time', 'perf_dTLB_load_misses', 'perf_cache_misses', 'solver', 'verdict', 'group']]
+    df1 = df[['instance', 'wall_time', 'perf_dTLB_load_misses', 'perf_cache_misses', 'solver', 'verdict', 'group', 'run', 'hostname']]
 
-    x = df1.groupby(['group', 'solver', 'verdict']).agg({'wall_time': np.sum,
+    x = df1.groupby(['group', 'run', 'solver', 'verdict','hostname']).agg({'wall_time': np.sum,
                                                          'perf_dTLB_load_misses': np.sum,
                                                          'perf_cache_misses': np.sum})
     x.to_csv(f'1-outputs/{filename}_perf_overview.csv')
@@ -176,7 +183,7 @@ for filename in ['output_THP.csv']:
 
     # print(ok.columns)
     myff = ok.copy()
-    myff = ok.groupby(['solver']).agg({'wall_time_x': [np.sum, 'count'],
+    myff = ok.groupby(['solver', 'run']).agg({'wall_time_x': [np.sum, 'count'],
                                        'wall_time_y': [np.sum, 'count'],
                                        'runsolver_MAXVM_x': np.mean,
                                        'runsolver_MAXVM_y': np.mean,
@@ -201,7 +208,7 @@ for filename in ['output_THP.csv']:
     myff[('wall_time_y', 'sum')] = (myff[('wall_time_y', 'sum')] / 3600).round(2)
 
     mygf = myff.copy()
-    mygf['solver'] = mygf['solver'].str.replace(r'default\[s=', '').str.replace(r'\]', '')
+    mygf['solver'] = mygf['solver'].replace(r'default\[s=', '').replace(r'\]', '')
     mygf['count'] = mygf[('wall_time_x', 'count')]
     mygf['t[h]'] = mygf[('wall_time_x', 'sum')]
     mygf['t_thp[h]'] = mygf[('wall_time_y', 'sum')]
@@ -224,8 +231,8 @@ for filename in ['output_THP.csv']:
 
     output = mygf[['solver', 'count', 't[h]', 't_thp[h]', 's[t]', 'm[MB]', 'm_thp[MB]', 'TLB', 'TLB_thp', 's[tlb]', 'r[tlb]']]
 
-    output['solver'] = output['solver'].str.replace('MapleLCMDiscChronoBT-DL-v3', 'maplesat')
-    output['solver'] = output['solver'].str.replace('glucose-4.2.1', 'glucose')
+    output['solver'] = output['solver'].replace('MapleLCMDiscChronoBT-DL-v3', 'maplesat')
+    output['solver'] = output['solver'].replace('glucose-4.2.1', 'glucose')
 
     output = output.sort_values(by=['solver'])
 
@@ -246,7 +253,7 @@ for filename in ['output_THP.csv']:
     # print(cactus[['solver','group','instance','wall_time']])
 
     cactus.sort_values(by=['wall_time'], inplace=True)
-    print(cactus[['solver_t','instance','wall_time']])
+    print(cactus[['solver_t','run','instance','wall_time']])
 
     configs = cactus['solver_t'].unique()
     NUM_COLORS = len(configs) + 1
@@ -255,8 +262,6 @@ for filename in ['output_THP.csv']:
     plt.rcParams['text.usetex'] = True
     plt.rcParams['text.latex.preamble'] = [r'\usepackage{amsmath}\def\hy{\hbox{-}\nobreak\hskip0pt}']
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
 
     lfont = lambda x: '$\mathtt{%s}$' % x.replace('-', '\hy')
     color_m = {'lingeling-glibcthp': ('lingeling(thp)', '#a6cee3', '-'),
@@ -278,21 +283,48 @@ for filename in ['output_THP.csv']:
             'mergesat-glibc', 'mergesat-glibcthp',
             'plingeling-glibc', 'plingeling-glibcthp']
 
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    runs = cactus['run'].unique()
     for key in configs:
-        # if key in skip:
-        #     continue
-        solver_df = cactus[(cactus['solver_t'] == key)]
-        pd.options.mode.chained_assignment = None
-        solver_df.sort_values(by=['wall_time'], inplace=True)
-        pd.options.mode.chained_assignment = 'warn'
-        solver_df.reset_index(inplace=True)
-        ts = pd.Series(solver_df['wall_time'])
-        # label = lfont(mapping[key][1]) if mapping.has_key(key) else key
-        # , ylim = [10, 1000]
-        #
-        ax = ts.plot(xlim=125, markeredgecolor='none', label=color_m[key][0],
-                    color=color_m[key][1], linestyle=color_m[key][2])
-        # ax = ts.plot(markeredgecolor='none', label=label, color=mapping[key][2], linestyle=mapping[key][3])
+        collect = None
+        for run in runs:
+            # if key in skip:
+            #     continue
+            solver_df = cactus[(cactus['solver_t'] == key) & (cactus['run'] == run)]
+            pd.options.mode.chained_assignment = None
+            solver_df.sort_values(by=['wall_time'], inplace=True)
+            pd.options.mode.chained_assignment = 'warn'
+            solver_df.reset_index(inplace=True)
+            ts = pd.Series(solver_df['wall_time'])
+            # label = lfont(mapping[key][1]) if mapping.has_key(key) else key
+            # , ylim = [10, 1000]
+            #
+            ax = ts.plot(xlim=125, markeredgecolor='none', label=(color_m[key][0], run),
+                        color=color_m[key][1], linestyle=color_m[key][2])
+            # ax = ts.plot(markeredgecolor='none', label=label, color=mapping[key][2], linestyle=mapping[key][3])
+            if collect is None:
+                collect = solver_df[['instance', 'wall_time']]
+                # collect['wall_time']=pd.to_numeric(collect['wall_time'], errors='coerce')
+            else:
+                collect = pd.merge(collect, solver_df[['instance', 'wall_time']], on=['instance'], how='outer')
+                run1 = int(run)+1
+                collect.rename({'wall_time': f'wall{run}', 'wall_time_y': f'wall{run}', 'wall_time_x': f'wall{run1}'}, inplace=True, axis='columns')
+
+        cols = list(map(lambda x: f'wall{x}', runs))
+        print(collect.columns)
+        collect['min']=collect[cols].min(axis=1)
+        collect['max']=collect[cols].max(axis=1)
+        collect['diff']=collect['max']-collect['min']
+        # pd.set_option('precision', 2)
+        collect.to_csv(f'1-outputs/{filename}_{color_m[key][0]}_runs_overview.csv', float_format="%.1f")
+
+        fig_scatter = plt.figure()
+        ax_sc = fig_scatter.add_subplot(111)
+        collect.drop(['instance', 'min', 'max', 'diff'], axis=1, inplace=True)
+        scatter_matrix(collect, ax=ax_sc, grid=True, alpha=0.6, marker='.', figsize=(30,30), diagonal='hist')
+        fig_scatter.savefig(f'1-outputs/{filename}-{color_m[key][0]}_scatter_wall_time.pdf', bbox_inches="tight")  # ,
 
     fig.subplots_adjust(bottom=0.3, left=0.1)
     handles, labels = ax.get_legend_handles_labels()
@@ -300,7 +332,7 @@ for filename in ['output_THP.csv']:
     # print labels
     # ax.set_yscale('log')
     ax.legend(handles, labels, loc='best', prop={'size': 6}, frameon=False, mode='expand')
-    plt.savefig('%s-%s.pdf' % (filename, 'wall_time'), bbox_inches="tight")  # ,
+    fig.savefig('1-outputs/%s-%s.pdf' % (filename, 'wall_time'), bbox_inches="tight")  # ,
 
     # plot.reset_index(inplace=True)
 
