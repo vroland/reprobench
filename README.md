@@ -41,7 +41,7 @@ conda env create -f environment.yml
 
 then activate that environment:
 ```
-conda activate myenv
+conda activate rb
 ```
 
 Verify that the new environment was installed correctly:
