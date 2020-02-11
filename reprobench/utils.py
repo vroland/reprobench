@@ -14,6 +14,8 @@ from shutil import which
 import numpy
 import requests
 import strictyaml
+import zmq
+
 from reprobench.core.exceptions import ExecutableNotFoundError, NotSupportedError
 from reprobench.core.schema import schema
 from retrying import retry
@@ -176,7 +178,7 @@ def decode_message(msg):
 
 
 @retry(wait_fixed=2000, stop_max_attempt_number=2)
-def send_event(socket, event_type, payload=None):
+def send_event(socket, event_type, payload=None, reconnect=None, disconnect=False):
     """Used in the worker with a DEALER socket to send events to the server.
 
     Args:
@@ -185,7 +187,17 @@ def send_event(socket, event_type, payload=None):
         payload (any, optional): the payload for the event
     """
     event = [event_type, encode_message(payload)]
+
+    if reconnect is not None:
+        logger.trace(f"Trying to reconnect to {reconnect}")
+        socket = zmq.Context().socket(zmq.DEALER)
+        socket.connect(reconnect)
+        logger.trace(f"Connected to {reconnect}")
+    logger.trace(f"Sending payload")
     socket.send_multipart(event)
+    if disconnect:
+        socket.close()
+        logger.trace(f"Closing connection")
 
 
 def recv_event(socket):

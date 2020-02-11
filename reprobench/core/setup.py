@@ -52,4 +52,5 @@ class SetupKernel(Step):
         info = cls._set_thp(config)
         run_id = context["run"]["id"]
         payload = dict(run_id=run_id, node=dict(hostname=hostname, **info))
-        send_event(context["socket"], STORE_SYSINFO, payload)
+        send_event(socket=context["socket"], event_type=STORE_SYSINFO, payload=payload,
+                   reconnect=context['server_address'], disconnect=True)

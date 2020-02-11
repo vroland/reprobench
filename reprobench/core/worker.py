@@ -12,6 +12,7 @@ import urllib
 from functools import reduce
 from pathlib import Path
 from sys import platform
+import socket as sct
 
 import click
 import zmq
@@ -260,18 +261,14 @@ class BenchmarkWorker:
             except OSError as ee:
                 logger.error(f"Failed to set affinity {ee}")
 
-        # TODO: Keeping the connection alive for the whole time is probably not ideal (especially via SSH)
         context = zmq.Context()
         socket = context.socket(zmq.DEALER)
         logger.debug(f"Connecting to {self.server_address}")
         socket.connect(self.server_address)
         logger.debug(f"Connected to {self.server_address}")
 
-        # TODO: pinning
-        # pinned_host=sct.gethostname()
-
-        # TODO: @Andre; you might want to update it for SGE
-        send_event(socket, WORKER_JOIN, dict(cluster_job_id=self.cluster_job_id))
+        # TODO: might need update for SGE
+        send_event(socket, WORKER_JOIN, dict(cluster_job_id=self.cluster_job_id, hostname=sct.gethostname()))
 
         run = decode_message(socket.recv())
         logger.trace(f"Run to {run}")
@@ -293,14 +290,14 @@ class BenchmarkWorker:
         if not tool.is_ready():
             tool.setup()
 
-        context = {"socket": socket, "tool": tool, "run": run}
+        context = {"socket": socket, "tool": tool, "run": run, "server_address": self.server_address}
         logger.info(f"Processing task: {run['id']}")
 
         directory = Path(run["id"])
         directory.mkdir(parents=True, exist_ok=True)
 
         payload = dict(tool_version=tool.version(), run_id=run_id)
-        send_event(socket, RUN_START, payload)
+        send_event(socket=socket, event_type=RUN_START, payload=payload, disconnect=True)
 
         for runstep in run["steps"]:
             logger.debug(f"Running step {runstep['module']}")
@@ -308,9 +305,11 @@ class BenchmarkWorker:
             config = json.loads(runstep["config"])
             step.execute(context, config)
             payload = {"run_id": run_id, "step": runstep["module"]}
-            send_event(socket, RUN_STEP, payload)
+            send_event(socket=socket, event_type=RUN_STEP, payload=payload,
+                       reconnect=self.server_address, disconnect=True)
 
-        send_event(socket, RUN_FINISH, run_id)
+        logger.debug(f"Reporting finished.")
+        send_event(socket=socket, event_type=RUN_FINISH, payload=run_id, reconnect=self.server_address)
         # TODO: Probably needs changing
         atexit.unregister(self.killed)
 

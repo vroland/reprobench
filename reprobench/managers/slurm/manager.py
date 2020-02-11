@@ -96,14 +96,8 @@ class SlurmManager(BaseManager):
         # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         # PREPARE PARAMETERS FOR WORKER
         # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        # logger.error(f"{self.multicore}")
         multicore_str = urllib.parse.quote(json.dumps(self.multicore))
-        # multicore_app = []
-        # for key, value in self.multicore.items():
-        #     multicore_app.append(f"--multicore.{key}={value}")
-        # logger.error(multicore_app)
-        #
-        # raise RuntimeError
+        # TODO: change to human readable
 
         worker_cmd = f"{target_path} worker {address_args} --multicore={multicore_str}"  # {self.multicore}
         if self.debug:

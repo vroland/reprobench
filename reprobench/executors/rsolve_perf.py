@@ -41,6 +41,7 @@ class RunSolverPerfEval(Executor):
     def __init__(self, context, config, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.socket = context["socket"]
+        self.server_address = context["server_address"]
         self.run_id = context["run"]["id"]
 
         if config is None:
@@ -218,7 +219,8 @@ class RunSolverPerfEval(Executor):
                 payload_f.write(json.dumps(payload))
 
             # send_event(self.socket, STORE_RUNSTATS, payload)
-            send_event(self.socket, STORE_THP_RUNSTATS, payload)
+            send_event(socket=self.socket, event_type=STORE_THP_RUNSTATS, payload=payload,
+                       reconnect=self.server_address, disconnect=True)
 
     def output_dir(self, out_path):
         return os.path.abspath(os.path.join(self.reprobench_path, os.path.dirname(out_path)))

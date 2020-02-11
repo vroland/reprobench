@@ -1,3 +1,5 @@
+import os
+
 import zmq
 from loguru import logger
 
@@ -15,12 +17,13 @@ class BaseManager(object):
         self.repeat = kwargs.pop("repeat")
         self.rbdir = kwargs.pop("rbdir")
         self.multicore = kwargs.pop("multicore")
+        self.cluster_job_id = None
+        self.num_pending = None
 
         context = zmq.Context()
         self.socket = context.socket(zmq.DEALER)
 
         self.socket.connect(self.server_address)
-
 
     def prepare(self):
         pass
@@ -33,17 +36,14 @@ class BaseManager(object):
         bootstrapped_config = {**self.config, **client_results}
 
         logger.info(f"Sending bootstrap event to server {self.server_address}")
+        # TODO:
+        # we have to update the initial cluster id here, simply because we know the id from the cluster scheduler....
         payload = dict(
             config=bootstrapped_config, output_dir=self.output_dir,
-            repeat=self.repeat, cluster_job_id=self.get_initial_cluster_id()
+            repeat=self.repeat, cluster_job_id=self.cluster_job_id
         )
         send_event(self.socket, SUBMITTER_BOOTSTRAP, payload)
         self.num_pending = decode_message(self.socket.recv())
-
-    # set a random number to identify the submitter
-    # for clusters number needs to be updated after the scheduler assigned a job_id
-    def get_initial_cluster_id(self):
-        return -1
 
     def report_back(self):
         pass
@@ -61,7 +61,7 @@ class BaseManager(object):
         # just that there is some response
         logger.info('Waiting for response...')
         recv = decode_message(self.socket.recv())
-        logger.info('Received the following reply: "%s". Good to go...' %recv)
+        logger.info('Received the following reply: "%s". Good to go...' % recv)
 
     def report_back(self):
         pass

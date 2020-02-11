@@ -1,11 +1,11 @@
 import atexit
 import subprocess
-import time
 import sys
+import time
 from multiprocessing import Pool, Process
 
-from sshtunnel import SSHTunnelForwarder
 from loguru import logger
+from sshtunnel import SSHTunnelForwarder
 from tqdm import tqdm
 
 from reprobench.core.worker import BenchmarkWorker
@@ -20,10 +20,10 @@ class LocalManager(BaseManager):
         self.runner_process = None
         self.cluster_job_id = kwargs.get("cluster_job_id", None)
         if self.multicore is not None and self.cluster_job_id is None:
-            logger.warning("*"*120)
+            logger.warning("*" * 120)
             logger.warning("Local runner IGNORES CORE PINNING unless you set cluster_job_id manually to -1 "
                            "using command line parameter -1.")
-            logger.warning("*"*120)
+            logger.warning("*" * 120)
 
     def exit(self):
         for worker in self.workers:
@@ -54,9 +54,10 @@ class LocalManager(BaseManager):
             logger.info(f"Tunneling established at {self.server_address}")
 
     @staticmethod
-    def spawn_worker(server_address, multicore=None):
+    def spawn_worker(server_address, multicore=None, cluster_job_id=None):
         # TODO: This disables tunneling
-        worker = BenchmarkWorker(server_address=server_address, tunneling=None, multicore=multicore)
+        worker = BenchmarkWorker(server_address=server_address, tunneling=None, multicore=multicore,
+                                 cluster_job_id=cluster_job_id)
         worker.run()
 
     def spawn_workers(self):
@@ -74,11 +75,13 @@ class LocalManager(BaseManager):
             self.pool_iterator = self.pool.imap_unordered(self.spawn_worker, jobs_address)
             self.pool.close()
         else:
-            logger.warning("*"*120)
+            logger.warning("*" * 120)
             logger.warning(" Cluster JobID was specified as cluster_job_id={self.cluster_job_id}. Running call similar "
                            "to cluster worker call.")
-            logger.warning("*"*120)
-            self.runner_process = Process(target=LocalManager.spawn_worker, args=[self.server_address, self.multicore])
+            logger.warning("*" * 120)
+            logger.error("Cluster job id")
+            self.runner_process = Process(target=LocalManager.spawn_worker,
+                                          args=[self.server_address, self.multicore, self.cluster_job_id])
             self.runner_process.start()
 
     def wait(self):

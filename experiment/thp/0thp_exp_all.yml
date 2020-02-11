@@ -49,7 +49,7 @@ tasks:
 #    path: ./tasks/thp/sat/
     extract_archives: true
     patterns: |
-      AProVE09-01.cnf.gz
+      AProVE09-*.cnf.gz
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
@@ -75,22 +75,22 @@ tasks:
 #      !**/.*
 #      !**.*~
 
-  asp_bench:
-    type: file
-#    type: url
-#    urls:
-#      - https://www.cs.uni-potsdam.de/wv/projects/sets/set-asp-gauss.tar.xz
-    path: /scratch/p_gpusat/automated-reasoner-builds/benchmarks/ASP_gauss/
-#    path: ./tasks/thp/ASP/
-    extract_archives: true
-    patterns: |
-      csp010-SocialGolfer_w3_g3_s6.dlv.dat.lp.lp
-      !**/*.tar.bz2
-      !**/*.tar.xz
-      !**/*.tar.gz
-      !**/*.tgz
-      !**/.*
-      !**/*~
+#  asp_bench:
+#    type: file
+##    type: url
+##    urls:
+##      - https://www.cs.uni-potsdam.de/wv/projects/sets/set-asp-gauss.tar.xz
+#    path: /scratch/p_gpusat/automated-reasoner-builds/benchmarks/ASP_gauss/
+##    path: ./tasks/thp/ASP/
+#    extract_archives: true
+#    patterns: |
+#      csp010-SocialGolfer_w3_g3_s6.dlv.dat.lp.lp
+#      !**/*.tar.bz2
+#      !**/*.tar.xz
+#      !**/*.tar.gz
+#      !**/*.tgz
+#      !**/.*
+#      !**/*~
 #      **/*.*
 
 tools:

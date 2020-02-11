@@ -30,31 +30,24 @@ class CoreObserver(Observer):
         return {l.key: l.value for l in Limit.select()}
 
     @classmethod
-    def get_next_pending_run(cls, cluster_job_id, pinned_host=None):
+    def get_next_pending_run(cls, cluster_job_id, hostname=None):
+        logger.debug(f"cluster_job_id: {cluster_job_id} / hostname: {hostname}")
+        # TODO: check cluster_job id
         # Check for pinned_host
         try:
-            if pinned_host is None:
+            if True or hostname is None:
                 run = Run.select().where(Run.status == 0, Run.cluster_job_id == cluster_job_id). \
                     join(Task).switch(Run).join(ParameterGroup).first()
             else:
-                raise NotImplementedError("TODO:")
-                run = Run.get_or_none((Run.status == 0) &
-                                      (Run.cluster_job_id == cluster_job_id) &
-                                      ((Run.pinned_host == pinned_host) |
-                                       (Run.pinned_host is None)))
-                raise NotImplementedError("TODO:")
-                # Attribute error occurs, if no open runs can be found
-                # update pinned_host
-                # make it work with a parameter
-                # TODO: pin both to the current host
-                # introduce PIN_GROUP??
-
-                res = Run.select()
-                for x in res:
-                    logger.error(x)
-                # TODO: check with steps
-
-                exit(1)
+                #TODO: decide what happens if pinned; we need to introduce pin groups
+                run = Run.select().where((Run.status == 0) &
+                                         ((Run.pinned_host == hostname) | (Run.pinned_host is None)))\
+                    .where(Run.cluster_job_id == cluster_job_id)\
+                    .join(Task).switch(Run).join(ParameterGroup).first()
+                # run = Run.get_or_none((Run.status == 0) &
+                #                       (Run.cluster_job_id == cluster_job_id) &
+                #                       ((Run.pinned_host == pinned_host) |
+                #                        (Run.pinned_host is None)))
 
         except (Run.DoesNotExist, AttributeError):
             logger.error(f"DOES NOT EXIST for Cluster Job ID: {cluster_job_id}.")
@@ -110,17 +103,16 @@ class CoreObserver(Observer):
         address = kwargs.pop("address")
         server = kwargs.pop("server")
 
-        logger.debug('Handling an event of type %s' % event_type)
+        logger.trace('Handling an event of type %s' % event_type)
         if event_type == SUBMITTER_PING:
             logger.trace('Received ping from "%s"' % address)
             logger.trace('Sending reply to "%s"' % address)
             reply.send_multipart([address, encode_message('echo reply')])
             logger.trace('Done')
         elif event_type == SUBMITTER_BOOTSTRAP:
-            logger.error(payload)
+            logger.trace(payload)
             bootstrap(server=server, **payload)
             num_pending_runs = cls.get_pending_runs()
-            logger.debug(payload)
             logger.debug('Sending bootstrap "%s"' % address)
             reply.send_multipart([address, encode_message(num_pending_runs)])
             # raise RuntimeError

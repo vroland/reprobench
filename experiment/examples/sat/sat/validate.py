@@ -43,4 +43,5 @@ class SATValidator(Step):
         )
 
         payload = dict(run=context["run"]["id"], is_valid=is_valid)
-        send_event(context["socket"], STORE_SAT_VERDICT, payload)
+        send_event(socket=context["socket"], event_type=STORE_SAT_VERDICT, payload=payload,
+                   reconnect=context['reconnect'], disconnect=True)
