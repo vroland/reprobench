@@ -28,7 +28,7 @@ class SgeManager(BaseManager):
         self.time_limit = 2 * time_limit_minutes
         self.mem_limit = 2 * limits["memory"]
 
-        if self.multirun_cores > 0:
+        if self.multicore > 0:
             raise Exception("SGE Manager does not support cpu pinning")
 
         if self.tunneling is not None:
@@ -73,12 +73,13 @@ class SgeManager(BaseManager):
         sge_script.close()
         os.chmod('sge.sh', stat.S_IXOTH | stat.S_IROTH | stat.S_IXGRP | stat.S_IRGRP | stat.S_IRWXU)
 
+        raise RuntimeError('FIXME numpending')
         worker_submit_cmd = [
             "qsub",
             "-r y",
             # Creates the output in the output dir
             f"-wd {self.output_dir}",
-            f"-t 1-{self.pending}:1",
+            f"-t 1-{self.num_pending}:1",
             # Convert to HH:MM:SS format
             f"-l h_rt={time.strftime('%H:%M:%S', time.gmtime(self.time_limit * 60))}",
             # Convert to Gigabyte

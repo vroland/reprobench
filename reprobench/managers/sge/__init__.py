@@ -9,7 +9,7 @@ from reprobench.console.decorators import server_info, common, use_tunneling
     "-d", "--output-dir", type=click.Path(), default="./output", show_default=True
 )
 @click.option("-r", "--repeat", type=int, default=1)
-@click.option("--multirun_cores", type=int, default=0)
+@click.option("--multicore", type=int, default=0)
 @click.argument("command", type=click.Choice(("run", "stop")))
 @click.argument("config", type=click.Path(), default="./benchmark.yml")
 @click.option("--additional_args", type=str, default="")

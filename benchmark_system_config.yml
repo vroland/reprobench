@@ -1,26 +1,27 @@
 default_exp_config: "./experiment/thp/0thp_exp_all.yml"
 #TODO: move to benchmark file
-repeat: 5
+repeat: 1
 #TODO: add_loglevel
 output: "output"
 reserve_hosts: 1
 reserve_cores: 24
 #https://doc.zih.tu-dresden.de/hpc-wiki/pub/Compendium/HardwareTaurus/i4000.png
 billing: p_gpusat
-pinning:
-  controller:
-    - 0
-    - 1
-    - 14
-    - 15
-  # Ideally the processes should be distributed among NUMA regions.
-  worker:
-    1: 2..6
-    2: 7..11
-    3: 14..18
-    4: 19..23
-
-#processes: 6
+multicore:
+#  processes: 6
+#  cores_per_process: 2
+  pinning:
+    controller:
+      - 0
+      - 1
+      - 14
+      - 15
+    # Ideally the processes should be distributed among NUMA regions.
+    worker:
+      1: 2..6
+      2: 7..11
+      3: 14..18
+      4: 19..23
 server_url: "tcp://127.0.0.1:31313"
 email: "johannes.fichte@tu-dresden.de"
 reserve_time: "18:00:00"

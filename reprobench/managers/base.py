@@ -14,7 +14,7 @@ class BaseManager(object):
         self.output_dir = kwargs.pop("output_dir")
         self.repeat = kwargs.pop("repeat")
         self.rbdir = kwargs.pop("rbdir")
-        self.multirun_cores = kwargs.pop("multirun_cores")
+        self.multicore = kwargs.pop("multicore")
 
         context = zmq.Context()
         self.socket = context.socket(zmq.DEALER)
@@ -38,7 +38,7 @@ class BaseManager(object):
             repeat=self.repeat, cluster_job_id=self.get_initial_cluster_id()
         )
         send_event(self.socket, SUBMITTER_BOOTSTRAP, payload)
-        self.pending = decode_message(self.socket.recv())
+        self.num_pending = decode_message(self.socket.recv())
 
     # set a random number to identify the submitter
     # for clusters number needs to be updated after the scheduler assigned a job_id

@@ -1,7 +1,9 @@
+import json
 import math
 import random
 import subprocess
 import sys
+import urllib
 from pathlib import Path
 
 from loguru import logger
@@ -16,21 +18,22 @@ class SlurmManager(BaseManager):
     def __init__(self, config, server_address, tunneling, **kwargs):
         BaseManager.__init__(self, config, server_address, tunneling, **kwargs)
         self.additional = kwargs.pop("additional_args")
-        self.cpu_count = kwargs.pop("reserve_cores")
         self.mem_limit = kwargs.pop("reserve_memory")
         self.time_limit = kwargs.pop("reserve_time")
-        self.reserve_hosts = kwargs.pop("reserve_hosts")
+        self.reserve_hosts = kwargs.get("reserve_hosts", 1)
         self.email = kwargs.pop("email")
         self.slurm_job_id = None
         self.cluster_job_id = None
+        # TODO: fix debuglevel, exclusive as configurable parameters
+        self.debug = True
+        self.exclusive = True
+
+        self.cpus_per_task = kwargs.pop("reserve_cores", 4)
 
     def prepare(self):
         Path(self.output_dir).mkdir(parents=True, exist_ok=True)
         limits = self.config["limits"]
         time_limit_minutes = int(math.ceil(float(limits["time"]) / 60.0))
-
-        if self.cpu_count == 0:
-            self.cpu_count = limits.get("cores", 1)
 
         if self.time_limit == 0:
             # @TODO improve this
@@ -74,36 +77,44 @@ class SlurmManager(BaseManager):
         if len(self.rbdir) > 0:
             target_path = f"{self.rbdir}/reprobench-bin"
 
-        worker_cmd = f"{target_path} worker {address_args} -vv --multirun_cores={self.multirun_cores}"
-        host_limit = self.pending
-        if self.multirun_cores > 0:
-            host_limit = self.reserve_hosts
-
         worker_submit_cmd = [
-            "sbatch",
+            "./sbatch",
             "--parsable",
-            f"--array=1-{host_limit}",
+            f"--array=1-{self.reserve_hosts}",
             f"--time={self.time_limit}",
             f"--mem={self.mem_limit}",
-            f"--cpus-per-task={self.cpu_count}",
+            f"--cpus-per-task={self.cpus_per_task}",
             f"--job-name={self.config['title']}-benchmark-worker",
             f"--output={self.output_dir}/slurm-worker_%a.out",
             f"--mail-user={self.email}",
             f"--mail-type=end"
         ]
 
-        if self.multirun_cores > 0:
+        if self.exclusive:
             worker_submit_cmd.append("--exclusive")
 
-        logger.error(worker_submit_cmd)
+        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        # PREPARE PARAMETERS FOR WORKER
+        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        # logger.error(f"{self.multicore}")
+        multicore_str = urllib.parse.quote(json.dumps(self.multicore))
+        # multicore_app = []
+        # for key, value in self.multicore.items():
+        #     multicore_app.append(f"--multicore.{key}={value}")
+        # logger.error(multicore_app)
+        #
+        # raise RuntimeError
+
+        worker_cmd = f"{target_path} worker {address_args} --multicore={multicore_str}"  # {self.multicore}
+        if self.debug:
+            worker_cmd += " -vv"
 
         # Additional args may contain args that are required by the scheduler
         if len(self.additional) > 0:
             additional_args = self.additional.split(" ")
             for i in range(0, len(additional_args), 2):
                 # TODO: This is a hack
-                if i + 1 < len(additional_args) and additional_args[i].startswith("-") and not additional_args[
-                    i + 1].startswith("-"):
+                if i + 1 < len(additional_args) and additional_args[i].startswith("-") and not additional_args[i + 1].startswith("-"):
                     worker_submit_cmd.append(f"{additional_args[i]} {additional_args[i + 1]}")
                     i += 1
                 else:
@@ -113,8 +124,10 @@ class SlurmManager(BaseManager):
 
         # Finaly add command
         worker_submit_cmd.append(f"--wrap=\"srun {worker_cmd}\"")
-
+        logger.error(worker_submit_cmd)
         logger.trace(worker_submit_cmd)
+
+        #Submit to cluster scheduler and report back the JobID
         self.slurm_job_id = subprocess.check_output(" ".join(worker_submit_cmd), shell=True).decode().strip()
         logger.info(f"Worker SLURM_JOB_ID: {self.slurm_job_id}")
 

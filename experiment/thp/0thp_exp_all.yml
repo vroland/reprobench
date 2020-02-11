@@ -49,30 +49,31 @@ tasks:
 #    path: ./tasks/thp/sat/
     extract_archives: true
     patterns: |
-      **/*
+      AProVE09-01.cnf.gz
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
       !**/*.tgz
       !**/.*
       !**.*~
+#      **/*
 
-  sat2014_app_bench:
-    type: file
-#    urls:
-#      - http://satcompetition.org/2014/files/sc14-app.tar
-    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/SAT_2014app/
-#    path: ./tasks/thp/sat/
-    extract_archives: true
-    patterns: |
-      **/*
-      !**/*.tar.bz2
-      !**/*.tar.xz
-      !**/*.tar.gz
-      !**/*.tgz
-      !**/*.tar
-      !**/.*
-      !**.*~
+#  sat2014_app_bench:
+#    type: file
+##    urls:
+##      - http://satcompetition.org/2014/files/sc14-app.tar
+#    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/SAT_2014app/
+##    path: ./tasks/thp/sat/
+#    extract_archives: true
+#    patterns: |
+#      **/*
+#      !**/*.tar.bz2
+#      !**/*.tar.xz
+#      !**/*.tar.gz
+#      !**/*.tgz
+#      !**/*.tar
+#      !**/.*
+#      !**.*~
 
   asp_bench:
     type: file
@@ -83,13 +84,14 @@ tasks:
 #    path: ./tasks/thp/ASP/
     extract_archives: true
     patterns: |
-      **/*.*
+      csp010-SocialGolfer_w3_g3_s6.dlv.dat.lp.lp
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
       !**/*.tgz
       !**/.*
       !**/*~
+#      **/*.*
 
 tools:
   sat:

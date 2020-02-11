@@ -57,7 +57,7 @@ class CoreObserver(Observer):
                 exit(1)
 
         except (Run.DoesNotExist, AttributeError):
-            logger.error(run)
+            logger.error(f"DOES NOT EXIST for Cluster Job ID: {cluster_job_id}.")
             return None
 
         if run is None:
@@ -94,8 +94,8 @@ class CoreObserver(Observer):
         Run.update(status=Run.PENDING).where(
             ((Run.status < Run.DONE) | (Run.last_step_id != last_step))
         ).execute()
-        pending_runs = Run.select(Run.id).where(Run.status == Run.PENDING).count()
-        return pending_runs
+        num_pending_runs = Run.select(Run.id).where(Run.status == Run.PENDING).count()
+        return num_pending_runs
 
     @classmethod
     def update_cluster_id_for_runs(cls, old_cluster_job_id, cluster_job_id):
@@ -119,10 +119,10 @@ class CoreObserver(Observer):
         elif event_type == SUBMITTER_BOOTSTRAP:
             logger.error(payload)
             bootstrap(server=server, **payload)
-            pending_runs = cls.get_pending_runs()
+            num_pending_runs = cls.get_pending_runs()
             logger.debug(payload)
             logger.debug('Sending bootstrap "%s"' % address)
-            reply.send_multipart([address, encode_message(pending_runs)])
+            reply.send_multipart([address, encode_message(num_pending_runs)])
             # raise RuntimeError
         elif event_type == SUBMITTER_REPORTBACK:
             pending_runs = cls.update_cluster_id_for_runs(**payload)

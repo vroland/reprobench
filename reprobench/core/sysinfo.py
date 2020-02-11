@@ -17,6 +17,7 @@ class Node(BaseModel):
     python = CharField(null=True)
     cpu = CharField(null=True)
     cpu_count = IntegerField(null=True)
+    cpus_per_task = IntegerField(null=True)
     cpu_min_freq = FloatField(null=True)
     cpu_max_freq = FloatField(null=True)
     mem_total = IntegerField(null=True)
@@ -66,7 +67,7 @@ class CollectSystemInfo4Server(Step):
         info["arch"] = cpu_info["arch"]
         info["python"] = cpu_info["python_version"]
         info["cpu"] = cpu_info["brand"]
-        info["cpu_count"] = psutil.cpu_count()
+        info["cpus_per_task"] = psutil.cpu_count()
         info["cpu_min_freq"] = cpu_freq.min
         info["cpu_max_freq"] = cpu_freq.max
         info["mem_total"] = mem_info.total

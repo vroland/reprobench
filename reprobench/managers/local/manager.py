@@ -1,4 +1,5 @@
 import atexit
+import subprocess
 import time
 import sys
 from multiprocessing import Pool, Process
@@ -14,10 +15,15 @@ from reprobench.managers.base import BaseManager
 class LocalManager(BaseManager):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.num_workers = kwargs.pop("num_workers")
         self.start_time = None
         self.workers = []
         self.runner_process = None
+        self.cluster_job_id = kwargs.get("cluster_job_id", None)
+        if self.multicore is not None and self.cluster_job_id is None:
+            logger.warning("*"*120)
+            logger.warning("Local runner IGNORES CORE PINNING unless you set cluster_job_id manually to -1 "
+                           "using command line parameter -1.")
+            logger.warning("*"*120)
 
     def exit(self):
         for worker in self.workers:
@@ -48,24 +54,36 @@ class LocalManager(BaseManager):
             logger.info(f"Tunneling established at {self.server_address}")
 
     @staticmethod
-    def spawn_worker(server_address, multirun_cores=0):
+    def spawn_worker(server_address, multicore=None):
         # TODO: This disables tunneling
-        worker = BenchmarkWorker(server_address, None, multirun_cores=multirun_cores)
+        worker = BenchmarkWorker(server_address=server_address, tunneling=None, multicore=multicore)
         worker.run()
 
     def spawn_workers(self):
-        if self.multirun_cores == 0:
-            self.pool = Pool(self.num_workers)
-            jobs_address = (self.server_address for _ in range(self.pending))
+        logger.error(f"Value of cluster_job_id is {self.cluster_job_id}")
+        if self.cluster_job_id is None:
+            if self.multicore and "processes" in self.multicore:
+                num_workers = self.multicore['processes']
+            else:
+                num_workers = int(subprocess.check_output('cat /proc/cpuinfo | grep "physical id" | sort -u | wc -l',
+                                                          shell=True))
+            logger.info(f"Starting with {num_workers} workers.")
+
+            self.pool = Pool(num_workers)
+            jobs_address = (self.server_address for _ in range(self.num_pending))
             self.pool_iterator = self.pool.imap_unordered(self.spawn_worker, jobs_address)
             self.pool.close()
         else:
-            self.runner_process = Process(target=LocalManager.spawn_worker, args=[self.server_address, self.multirun_cores])
+            logger.warning("*"*120)
+            logger.warning(" Cluster JobID was specified as cluster_job_id={self.cluster_job_id}. Running call similar "
+                           "to cluster worker call.")
+            logger.warning("*"*120)
+            self.runner_process = Process(target=LocalManager.spawn_worker, args=[self.server_address, self.multicore])
             self.runner_process.start()
 
     def wait(self):
-        if self.multirun_cores == 0:
-            progress_bar = tqdm(desc="Executing runs", total=self.pending)
+        if self.cluster_job_id is None:
+            progress_bar = tqdm(desc="Executing runs", total=self.num_pending)
             for _ in self.pool_iterator:
                 progress_bar.update()
             progress_bar.close()
