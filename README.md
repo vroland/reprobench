@@ -26,7 +26,7 @@ bash Miniconda3-latest-Linux-x86_64.sh
 
 After this clone this repository to your machine:
 ```
-git clone https://github.com/daajoe/reprobench.git
+git clone -b jkf_wip https://github.com/daajoe/reprobench.git
 ```
 
 then move to thir directory:
