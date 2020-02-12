@@ -123,7 +123,7 @@ class SlurmManager(BaseManager):
 
         #Submit to cluster scheduler and report back the JobID
         self.slurm_job_id = subprocess.check_output(" ".join(worker_submit_cmd), shell=True).decode().strip()
-        logger.info(f"Worker SLURM_JOB_ID: {self.slurm_job_id}")
+        logger.info(f"Worker SLURM_ARRAY_JOB_ID/SLURM_JOB_ID: {self.slurm_job_id}")
 
     def get_initial_cluster_id(self):
         self.cluster_job_id = random.randint(0, 65536)

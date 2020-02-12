@@ -62,7 +62,7 @@ class BenchmarkWorker:
         # TODO: remove OS independence does not work anyways due to process handling etc
         self.isunix = (platform == "linux" or platform == "linux2")
         if cluster_job_id is None:
-            self.cluster_job_id = int(os.getenv('SLURM_JOB_ID', -1))
+            self.cluster_job_id = int(os.getenv('SLURM_ARRAY_JOB_ID', -1))
         else:
             logger.warning("*" * 80)
             logger.warning(f"The cluster_job_id has been set manually to {cluster_job_id}... (jobs might not match)")

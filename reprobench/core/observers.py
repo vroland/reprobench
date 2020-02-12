@@ -92,7 +92,7 @@ class CoreObserver(Observer):
 
     @classmethod
     def update_cluster_id_for_runs(cls, old_cluster_job_id, cluster_job_id):
-        logger.debug('Setting cluster_job_id for the just started jobs')
+        logger.debug(f"Setting cluster_job_id for the just started jobs from {old_cluster_job_id} to {cluster_job_id}.")
         Run.update(status=Run.PENDING, cluster_job_id=cluster_job_id).where(
             ((Run.status < Run.DONE) & (Run.cluster_job_id == old_cluster_job_id))
         ).execute()
