@@ -256,8 +256,8 @@ def bootstrap_runs(benchmark_name, output_dir, repeat=1, cluster_job_id=-1):
                     myrun = dict(id=str(directory), cluster_job_id=cluster_job_id, tool=e['tool'],
                                  task=t_id, parameter_group=e['pg_id'], status=Run.PENDING,
                                  iteration=iteration)
-                    logger.debug(myrun)
-                    query = Run.insert(myrun).on_conflict("ignore")
+                    logger.trace(myrun)
+                    query = Run.insert(myrun)
                     query.execute()
     return
 
