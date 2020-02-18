@@ -80,5 +80,6 @@ env $env $solver_cmd $filename &
 #(export $env; $solver_cmd $filename) &
 PID=$!
 wait $PID
-echo "Solver finished with exit code="$?
-exit $?
+exit_code=$?
+echo "Solver finished with exit code="$exit_code
+exit $exit_code

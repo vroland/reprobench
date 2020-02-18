@@ -89,7 +89,7 @@ class RunSolverPerfEval(Executor):
             elif stats["runsolver_MEMOUT"] == 'true':
                 verdict = RunStatisticExtended.MEMOUT
             elif ("error" in stats and stats["error"] != '') or (
-                    nonzero_as_rte and nonzero_as_rte.lower() == 'true' and int(stats['return_code']) != 0):
+                nonzero_as_rte and nonzero_as_rte.lower() == 'true' and int(stats['return_code']) != 0):
                 verdict = RunStatisticExtended.RUNTIME_ERR
             else:
                 verdict = RunStatisticExtended.SUCCESS
@@ -188,8 +188,8 @@ class RunSolverPerfEval(Executor):
                           f"dTLB-stores,iTLB-load-misses,iTLB-loads,cycles,stalled-cycles-backend,cache-misses " \
                           f"{solver_cmd}"
             runsolver = os.path.expanduser("~/bin/runsolver")
-            run_cmd = f"{runsolver:s} --vsize-limit {self.mem_limit:.0f} -W {self.cpu_limit:.0f}  -w {watcher:s} " \
-                      f"-v {varfile:s} {perfcmdline:s} > {stdout_p:s} 2>> {stderr_p:s}"
+            run_cmd = f"{runsolver:s} --delay 20 --vsize-limit {self.mem_limit:.0f} -W {self.cpu_limit:.0f}  " \
+                      f"-w {watcher:s} -v {varfile:s} {perfcmdline:s} > {stdout_p:s} 2>> {stderr_p:s}"
 
             logger.trace(f'Logging run parameters to {runparameters_p}')
             with open(runparameters_p, 'w') as runparameters_f:

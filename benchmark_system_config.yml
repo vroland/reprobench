@@ -1,4 +1,5 @@
-default_exp_config: "./experiment/thp/0thp_exp_all.yml"
+#default_exp_config: "./experiment/thp/0thp_exp_all.yml"
+default_exp_config: "./experiment/thp/0thp_exp_mc_preprocess.yml"
 #TODO: move to benchmark file
 repeat: 1
 #TODO: add_loglevel

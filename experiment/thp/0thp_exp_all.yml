@@ -93,6 +93,23 @@ tasks:
 #      !**/*~
 #      **/*.*
 
+  dfremont:
+      type: git
+      urls:
+        - https://github.com/dfremont/counting-benchmarks.git
+      path: /projects/p_gpusat/automated-reasoner-builds/benchmarks/mc
+      extract_archives: true
+      patterns: |
+        AProVE09-*.cnf.gz
+        !**/*.tar.bz2
+        !**/*.tar.xz
+        !**/*.tar.gz
+        !**/*.tgz
+        !**/.*
+        !**.*~
+  #      **/*
+#
+
 tools:
   sat:
     module: experiment.thp.tool.sat.satExecutor.SATTool
@@ -119,6 +136,34 @@ tools:
         t:
           - 0
           - 1
+
+  mc:
+    module: experiment.thp.tool.wmc.wmcExecutor.WMCTool
+    parameters:
+      #name of parameter configuration: we may have multiple ones
+      default:
+        s:
+          - c2d
+          - cachet
+          - d4
+          - minic2d
+          - sharpsat
+        t:
+          - 0
+#          - 1
+  mc_pre:
+    module: experiment.thp.tool.wmc.wmcExecutor.WMCPre
+    parameters:
+      #name of parameter configuration: we may have multiple ones
+      default:
+        s:
+          - b+e
+          - pmc
+          - pmcstar
+        t:
+          - 0
+#          - 1
+
 
 #  #TODO:
 #  parameters:
