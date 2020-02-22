@@ -8,7 +8,7 @@ from reprobench.tools.executable import ExecutableTool
 class WMCTool(ExecutableTool):
     name = "(W)MC Tool"
     prefix = '-'
-    path = "./bin/sat_solver.sh"
+    path = "./bin/wmc_solver.sh"
     pre_path = "./pre/wmc_pre.sh"
     #TODO: run preprocessor first and report preprocessing time separatley
 
