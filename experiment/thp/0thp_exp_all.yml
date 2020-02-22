@@ -143,9 +143,11 @@ tools:
       #name of parameter configuration: we may have multiple ones
       default:
         s:
+          - approxmc
           - c2d
           - cachet
           - d4
+          - ganak
           - minic2d
           - sharpsat
         t:
