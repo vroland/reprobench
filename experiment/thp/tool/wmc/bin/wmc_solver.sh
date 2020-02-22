@@ -65,7 +65,7 @@ cd "$(dirname "$0")" || (echo "Could not change directory to $0. Exiting..."; ex
 if [ "$solver" == "approxmc" ] ; then
   solver_cmd="./approxmc_glibc $*"
 elif [ "$solver" == "c2d" ] ; then
-  solver_cmd="./c2d -C $* -c"
+  solver_cmd="./c2d $*"
 elif [ "$solver" == "cachet" ] ; then
   solver_cmd="./cachet_glibc $*"
 elif [ "$solver" == "d4" ] ; then
@@ -73,7 +73,7 @@ elif [ "$solver" == "d4" ] ; then
 elif [ "$solver" == "ganak" ] ; then
   solver_cmd="./ganak_glibc -p $*"
 elif [ "$solver" == "minic2d" ] ; then
-  solver_cmd="./minic2d_glibc $*"
+  solver_cmd="./minic2d_glibc -C $* -c"
 elif [ "$solver" == "sharpsat" ] ; then
   solver_cmd="./sharpsat_glibc $*"
 else
