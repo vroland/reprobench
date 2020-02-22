@@ -73,9 +73,9 @@ elif [ "$solver" == "d4" ] ; then
 elif [ "$solver" == "ganak" ] ; then
   solver_cmd="./ganak_glibc -p $*"
 elif [ "$solver" == "minic2d" ] ; then
-  solver_cmd="./minic2d_glibc -p $*"
+  solver_cmd="./minic2d_glibc $*"
 elif [ "$solver" == "sharpsat" ] ; then
-  solver_cmd="./sharpsat $*"
+  solver_cmd="./sharpsat_glibc $*"
 else
   solver_cmd="./"$solver"_glibc $*"
 fi
