@@ -153,6 +153,11 @@ tools:
         t:
           - 0
 #          - 1
+        p:
+          - off
+          - b+e
+          - pmc
+          - pmcstar
   mc_pre:
     module: experiment.thp.tool.wmc.wmcExecutor.WMCPre
     parameters:

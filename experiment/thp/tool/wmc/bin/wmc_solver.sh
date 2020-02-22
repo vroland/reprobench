@@ -80,6 +80,7 @@ else
   solver_cmd="./"$solver"_glibc $*"
 fi
 
+
 echo "Original input instance was $original_input"
 echo "env $env $solver_cmd $filename"
 echo
