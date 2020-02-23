@@ -61,6 +61,14 @@ cd "$(dirname "$0")" || (echo "Could not change directory to $0. Exiting..."; ex
 
 if [ "$solver" == "plingeling" ] ; then
   solver_cmd="./"$solver"_glibc -t 1 -g 8 $*"
+elif [ "$solver" == "zchaff.2001" ] ; then
+  solver_cmd="./zchaff.2001 $*"
+elif [ "$solver" == "zchaff.2004.05.13" ] ; then
+  solver_cmd="./zchaff.2004.05.13 $*"
+elif [ "$solver" == "zchaff.2004.11.15" ] ; then
+  solver_cmd="./zchaff.2004.11.15 $*"
+elif [ "$solver" == "zchaff.2007.03.12_x64" ] ; then
+  solver_cmd="./zchaff.2007.03.12_x64 $*"
 #elif [ "$solver" == "mergesat" ] ; then
 else
   solver_cmd="./"$solver"_glibc $*"
