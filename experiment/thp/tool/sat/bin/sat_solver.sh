@@ -96,7 +96,7 @@ if [ ! -z "$preprocessor" ] ; then
     exit 1
     pre_cmd="./satelite -pre -no-solve -dimacs=$tmpfile $filename"
   elif [ "$preprocessor" == "glucose" ] ; then
-    pre_cmd="./glucose_glibc -pre -no-solve -dimacs=$tmpfile $filename"
+    pre_cmd="./glucose-4.2.1_glibc -pre  -dimacs=$tmpfile $filename"
   else
     echo "Preprocessor '$preprocessor' undefined. Exiting..."
     exit 5
