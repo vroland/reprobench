@@ -2,7 +2,8 @@ title: THP
 description: Benchmark for different runtimes with and without glibc hack
 
 limits:
-  time: 900 # s
+#  time: 900 # s
+  time: 3600
   memory: 8048 # mb
   scheduler_memory: 32768 #mb
 
@@ -45,18 +46,18 @@ tasks:
     type: file
 #    urls:
 #      - https://www.cs.uni-potsdam.de/wv/projects/sets/set-industrial-09-12-gauss.tar.xz
-    path: /scratch/p_gpusat/automated-reasoner-builds/benchmarks/SAT_gauss
+    path: /projects/p_gpusat/automated-reasoner-builds/benchmarks/SAT_gauss
 #    path: ./tasks/thp/sat/
     extract_archives: true
     patterns: |
-      AProVE09-*.cnf.gz
+      **/*
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
       !**/*.tgz
       !**/.*
       !**.*~
-#      **/*
+#      AProVE09-01.cnf.gz
 
 #  sat2014_app_bench:
 #    type: file
@@ -93,22 +94,27 @@ tasks:
 #      !**/*~
 #      **/*.*
 
-  dfremont:
-      type: git
-      urls:
-        - https://github.com/dfremont/counting-benchmarks.git
-      path: /projects/p_gpusat/automated-reasoner-builds/benchmarks/mc
-      extract_archives: true
-      patterns: |
-        AProVE09-*.cnf.gz
-        !**/*.tar.bz2
-        !**/*.tar.xz
-        !**/*.tar.gz
-        !**/*.tgz
-        !**/.*
-        !**.*~
-  #      **/*
-#
+#   dfremont:
+#     type: file
+# #       urls:
+# #        - https://github.com/dfremont/counting-benchmarks.git
+#     path: /projects/p_gpusat/automated-reasoner-builds/benchmarks/mc
+#     extract_archives: true
+#     patterns: |
+#       *.gz
+#       !*.b+e.gz
+#       !*.pmc.gz
+#       !*.pmcstar.gz
+#       !**/*.tar.bz2
+#       !**/*.tar.xz
+#       !**/*.tar.gz
+#       !**/*.tgz
+#       !**/.*
+#       !**.*~
+#   #      **/*
+# #
+# #      4step.cnf.gz
+# #TODO: separate runs
 
 tools:
   sat:
@@ -117,15 +123,24 @@ tools:
       #name of parameter configuration: we may have multiple ones
       default:
         s:
-          - minisat
-  #            - mergesat
-  #          - plingeling
-  #          - glucose-4.2.1
-  #          - lingeling
-  #          - MapleLCMDiscChronoBT-DL-v3
+#          - minisat
+#          - mergesat
+#          - plingeling
+#          - glucose-4.2.1
+#          - lingeling
+          - lingelingplain
+#          - MapleLCMDiscChronoBT-DL-v3
+#          - zchaff.2001
+          - zchaff.2004.05.13
+          - zchaff.2004.11.15
+          - zchaff.2007.03.12_x64
         t:
           - 0
 #          - 1
+        p:
+#          - satelite
+          - minisat2
+          - glucose
   asp:
     module: experiment.thp.tool.asp.aspExecutor.ASPTool
     parameters:
@@ -144,33 +159,35 @@ tools:
       default:
         s:
           - approxmc
-          - c2d
+#missing 32bit ELFs
+#          - c2d
           - cachet
           - d4
           - ganak
-          - minic2d
+#missing 32bit ELFs for dependency hgr2htree
+#          - minic2d
           - sharpsat
         t:
           - 0
-#          - 1
-        p:
-          - off
-          - b+e
-          - pmc
-          - pmcstar
-  mc_pre:
-    module: experiment.thp.tool.wmc.wmcExecutor.WMCPre
-    parameters:
-      #name of parameter configuration: we may have multiple ones
-      default:
-        s:
-          - b+e
-          - pmc
-          - pmcstar
-        t:
-          - 0
-#          - 1
+          - 1
+        #p:
+        #  - off
+        #  - b+e
+#          - pmc
+#          - pmcstar
 
+#  mc_pre:
+#    module: experiment.thp.tool.wmc.wmcExecutor.WMCPre
+#    parameters:
+#      #name of parameter configuration: we may have multiple ones
+#      default:
+#        s:
+#          - b+e
+#          - pmc
+#          - pmcstar
+#        t:
+#          - 0
+##          - 1
 
 #  #TODO:
 #  parameters:
@@ -197,6 +214,9 @@ runs:
 #  asp:
 #    all:
 #      - asp_bench
+  # mc:
+  #   all:
+  #     - dfremont
 
 
 #TODO:

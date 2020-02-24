@@ -6,7 +6,7 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 # Initialize our own variables:
 #verbose=0
 thp=0
-while getopts "h?vt:s:f:i:" opt; do
+while getopts "h?vt:s:f:i:p:" opt; do
     case "$opt" in
     h|\?)
         show_help
@@ -22,6 +22,8 @@ while getopts "h?vt:s:f:i:" opt; do
     f)  filename=$OPTARG
         ;;
     i)  original_input=$OPTARG
+        ;;
+    p)  preprocessor=$OPTARG
         ;;
     esac
 done
@@ -61,6 +63,8 @@ cd "$(dirname "$0")" || (echo "Could not change directory to $0. Exiting..."; ex
 
 if [ "$solver" == "plingeling" ] ; then
   solver_cmd="./"$solver"_glibc -t 1 -g 8 $*"
+elif [ "$solver" == "lingelingplain" ] ; then
+  solver_cmd="./lingeling --plain $*"
 elif [ "$solver" == "zchaff.2001" ] ; then
   solver_cmd="./zchaff.2001 $*"
 elif [ "$solver" == "zchaff.2004.05.13" ] ; then
@@ -78,6 +82,30 @@ echo "Original input instance was $original_input"
 echo "env $env $solver_cmd $filename"
 echo
 echo
+
+echo "FILENAME:"$filename
+
+if [ ! -z "$preprocessor" ] ; then
+  tmpfile=$(mktemp /tmp/sat_preprocessed.XXXXXXXXX)
+  trap "rm $tmpfile" EXIT
+  if [ "$preprocessor" == "minisat2" ] ; then
+    #experiment/thp/tool/sat/bin/minisat_glibc -pre -no-solve -dimacs=/tmp/foo
+    pre_cmd="./minisat_glibc -pre -no-solve -dimacs=$tmpfile $filename"
+  elif [ "$preprocessor" == "satelite" ] ; then
+    echo "FIXME"
+    exit 1
+    pre_cmd="./satelite -pre -no-solve -dimacs=$tmpfile $filename"
+  elif [ "$preprocessor" == "glucose" ] ; then
+    pre_cmd="./glucose_glibc -pre -no-solve -dimacs=$tmpfile $filename"
+  else
+    echo "Preprocessor '$preprocessor' undefined. Exiting..."
+    exit 5
+  fi
+  env $env $pre_cmd &
+  PID=$!
+  wait $PID
+  filename=$tmpfile
+fi
 
 
 #NOTE: if you need to redirect the solver output in the future, we suggest to use stdlog.txt
