@@ -137,6 +137,14 @@ tools:
           - grasp.1996_jkf_mh
           - grasp.2008.06.22_armin1
           - grasp.2008.06.22_armin2
+          - cryptominisat5
+          - belsat
+          - minisat1
+          - rsat_2.0
+          - siege_v1
+          - siege_v3
+          - siege_v4
+          - ubcsat2006
         t:
           - 0
 #          - 1

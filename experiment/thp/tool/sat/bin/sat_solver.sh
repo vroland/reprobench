@@ -79,6 +79,9 @@ elif [ "$solver" == "grasp.2008.06.22_armin1" ] ; then
   solver_cmd="./grasp.2008.06.22_armin1 $*"
 elif [ "$solver" == "grasp.2008.06.22_armin2" ] ; then
   solver_cmd="./grasp.2008.06.22_armin2 $*"
+
+#ubcsat -alg saps -i sample.cnf -solve
+
 else
   solver_cmd="./"$solver"_glibc $*"
 fi
