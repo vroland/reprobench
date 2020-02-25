@@ -73,7 +73,12 @@ elif [ "$solver" == "zchaff.2004.11.15" ] ; then
   solver_cmd="./zchaff.2004.11.15 $*"
 elif [ "$solver" == "zchaff.2007.03.12_x64" ] ; then
   solver_cmd="./zchaff.2007.03.12_x64 $*"
-#elif [ "$solver" == "mergesat" ] ; then
+elif [ "$solver" == "grasp.1996_jkf_mh" ] ; then
+  solver_cmd="./grasp.1996_jkf_mh $*"
+elif [ "$solver" == "grasp.2008.06.22_armin1" ] ; then
+  solver_cmd="./grasp.2008.06.22_armin1 $*"
+elif [ "$solver" == "grasp.2008.06.22_armin2" ] ; then
+  solver_cmd="./grasp.2008.06.22_armin2 $*"
 else
   solver_cmd="./"$solver"_glibc $*"
 fi
@@ -85,7 +90,7 @@ echo
 
 echo "FILENAME:"$filename
 
-if [ ! -z "$preprocessor" ] ; then
+if [ ! -z "$preprocessor" ] & [ "$preprocessor" != "none" ]; then
   tmpfile=$(mktemp /tmp/sat_preprocessed.XXXXXXXXX)
   trap "rm $tmpfile" EXIT
   if [ "$preprocessor" == "minisat2" ] ; then

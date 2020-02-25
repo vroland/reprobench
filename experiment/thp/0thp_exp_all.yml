@@ -2,8 +2,8 @@ title: THP
 description: Benchmark for different runtimes with and without glibc hack
 
 limits:
-#  time: 900 # s
-  time: 3600
+  time: 5 # s
+#  time: 3600
   memory: 8048 # mb
   scheduler_memory: 32768 #mb
 
@@ -131,16 +131,20 @@ tools:
           - lingelingplain
 #          - MapleLCMDiscChronoBT-DL-v3
 #          - zchaff.2001
-          - zchaff.2004.05.13
-          - zchaff.2004.11.15
-          - zchaff.2007.03.12_x64
+#          - zchaff.2004.05.13
+#          - zchaff.2004.11.15
+#          - zchaff.2007.03.12_x64
+          - grasp.1996_jkf_mh
+          - grasp.2008.06.22_armin1
+          - grasp.2008.06.22_armin2
         t:
           - 0
 #          - 1
         p:
+          - none
 #          - satelite
           - minisat2
-          - glucose
+#          - glucose
   asp:
     module: experiment.thp.tool.asp.aspExecutor.ASPTool
     parameters:
