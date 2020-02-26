@@ -79,9 +79,76 @@ elif [ "$solver" == "grasp.2008.06.22_armin1" ] ; then
   solver_cmd="./grasp.2008.06.22_armin1 $*"
 elif [ "$solver" == "grasp.2008.06.22_armin2" ] ; then
   solver_cmd="./grasp.2008.06.22_armin2 $*"
-
-#ubcsat -alg saps -i sample.cnf -solve
-
+elif [ "$solver" == "belsat" ] ; then
+  solver_cmd="./belsat $*"
+elif [ "$solver" == "minisat2.0" ] ; then
+  solver_cmd="./minisat2.0 $*"
+elif [ "$solver" == "rsat_2.0" ] ; then
+  solver_cmd="./rsat_2.0 $*"
+elif [ "$solver" == "siege_v1" ] ; then
+  solver_cmd="./siege_v1 $*"
+elif [ "$solver" == "siege_v3" ] ; then
+  solver_cmd="./siege_v1 $*"
+elif [ "$solver" == "siege_v4" ] ; then
+  solver_cmd="./siege_v1 $*"
+elif [ "$solver" == "ubcsat2006gsat" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg gsat -solve -i"
+elif [ "$solver" == "ubcsat2006gsats" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg gsat -v simple -solve -i"
+#elif [ "$solver" == "ubcsat2006gsatw" ] ; then
+#  solver_cmd="./ubcsat2006 $* -alg gsat -w -solve -i"
+elif [ "$solver" == "ubcsat2006gwsat" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg gwsat -solve -i"
+#elif [ "$solver" == "ubcsat2006gwsatw" ] ; then
+#  solver_cmd="./ubcsat2006 $* -alg gwsat -w -solve -i"
+elif [ "$solver" == "ubcsat2006gsat-tabu" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg gsat-tabu -solve -i"
+elif [ "$solver" == "ubcsat2006hsat" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg hsat -solve -i"
+#elif [ "$solver" == "ubcsat2006hsatw" ] ; then
+#  solver_cmd="./ubcsat2006 $* -alg hsat -w -solve -i"
+elif [ "$solver" == "ubcsat2006hwsat" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg hwsat -solve -i"
+#elif [ "$solver" == "ubcsat2006hwsatw" ] ; then
+#  solver_cmd="./ubcsat2006 $* -alg hwsat -w -solve -i"
+elif [ "$solver" == "ubcsat2006walksat" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg walksat -solve -i"
+elif [ "$solver" == "ubcsat2006walksat-tabu" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg walksat-tabu -solve -i"
+elif [ "$solver" == "ubcsat2006novelty" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg novelty -solve -i"
+elif [ "$solver" == "ubcsat2006novelty+" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg novelty+ -solve -i"
+elif [ "$solver" == "ubcsat2006novelty++" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg novelty++ -solve -i"
+elif [ "$solver" == "ubcsat2006adaptnovelty+" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg adaptnovelty+ -solve -i"
+elif [ "$solver" == "ubcsat2006rnovelty" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg rnovelty -solve -i"
+elif [ "$solver" == "ubcsat2006rnovelty+" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg rnovelty+ -solve -i"
+elif [ "$solver" == "ubcsat2006saps" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg saps -solve -i"
+elif [ "$solver" == "ubcsat2006rsaps" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg rsaps -solve -i"
+elif [ "$solver" == "ubcsat2006sapsnr" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg sapsnr -solve -i"
+elif [ "$solver" == "ubcsat2006paws" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg paws -solve -i"
+elif [ "$solver" == "ubcsat2006ddfw" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg ddfw -solve -i"
+elif [ "$solver" == "ubcsat2006g2wsat" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg g2wsat -solve -i"
+elif [ "$solver" == "ubcsat2006rots" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg rots -solve -i"
+elif [ "$solver" == "ubcsat2006irots" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg irots -solve -i"
+elif [ "$solver" == "ubcsat2006samd" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg samd -solve -i"
+elif [ "$solver" == "ubcsat2006urwalk" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg urwalk -solve -i"
+elif [ "$solver" == "ubcsat2006crwalk" ] ; then
+  solver_cmd="./ubcsat2006 $* -alg crwalk -solve -i"
 else
   solver_cmd="./"$solver"_glibc $*"
 fi

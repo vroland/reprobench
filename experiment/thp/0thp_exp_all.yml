@@ -50,13 +50,14 @@ tasks:
 #    path: ./tasks/thp/sat/
     extract_archives: true
     patterns: |
-      **/*
+      AProVE09-05.cnf.gz
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
       !**/*.tgz
       !**/.*
       !**.*~
+#      **/*
 #      AProVE09-01.cnf.gz
 
 #  sat2014_app_bench:
@@ -128,23 +129,49 @@ tools:
 #          - plingeling
 #          - glucose-4.2.1
 #          - lingeling
-          - lingelingplain
+#          - lingelingplain
 #          - MapleLCMDiscChronoBT-DL-v3
 #          - zchaff.2001
 #          - zchaff.2004.05.13
 #          - zchaff.2004.11.15
 #          - zchaff.2007.03.12_x64
-          - grasp.1996_jkf_mh
-          - grasp.2008.06.22_armin1
-          - grasp.2008.06.22_armin2
+#          - grasp.1996_jkf_mh
+#          - grasp.2008.06.22_armin1
+#          - grasp.2008.06.22_armin2
           - cryptominisat5
           - belsat
-          - minisat1
+# DOES NOT WORK YET
+#          - berkmin
+          - minisat2.0
           - rsat_2.0
           - siege_v1
           - siege_v3
           - siege_v4
-          - ubcsat2006
+#          - ubcsat2006gsat
+#          - ubcsat2006gsats
+#          - ubcsat2006gwsat
+#          - ubcsat2006gsat-tabu
+#          - ubcsat2006hsat
+#          - ubcsat2006hwsat
+#          - ubcsat2006walksat
+#          - ubcsat2006walksat-tabu
+#          - ubcsat2006novelty
+#          - ubcsat2006novelty+
+#          - ubcsat2006novelty++
+#          - ubcsat2006adaptnovelty+
+#          - ubcsat2006rnovelty
+#          - ubcsat2006rnovelty+
+#          - ubcsat2006saps
+#          - ubcsat2006rsaps
+#          - ubcsat2006sapsnr
+#          - ubcsat2006paws
+#          - ubcsat2006ddfw
+#          - ubcsat2006g2wsat
+#          - ubcsat2006rots
+#          - ubcsat2006irots
+#          - ubcsat2006samd
+#          - ubcsat2006urwalk
+#          - ubcsat2006crwalk
         t:
           - 0
 #          - 1
