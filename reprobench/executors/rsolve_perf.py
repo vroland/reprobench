@@ -94,7 +94,7 @@ class RunSolverPerfEval(Executor):
                 verdict = RunStatisticExtended.TIMEOUT
             elif stats["runsolver_MEMOUT"] == 'true':
                 verdict = RunStatisticExtended.MEMOUT
-            elif stats["verdict"] == 'RTE':
+            elif "verdict" in stats and stats["verdict"] == 'RTE':
                 verdict = RunStatisticExtended.RUNTIME_ERR
             elif ("error" in stats and stats["error"] != '') or (
                 nonzero_as_rte and nonzero_as_rte.lower() == 'true' and int(stats['return_code']) != 0):

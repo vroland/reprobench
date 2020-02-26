@@ -178,7 +178,7 @@ tools:
         p:
           - none
 #          - satelite
-          - minisat2
+#          - minisat2
 #          - glucose
   asp:
     module: experiment.thp.tool.asp.aspExecutor.ASPTool
