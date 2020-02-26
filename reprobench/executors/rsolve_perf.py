@@ -15,6 +15,12 @@ from .base import Executor
 from .db import RunStatisticExtended
 from .events import STORE_THP_RUNSTATS
 
+solver_re = {
+    "grasp_ERR": ('func_store_true', lambda x: "RESOURCES EXCEEDED." in x),
+    "grasp_UNSAT": ('func_store_true', lambda x: "UNSATISFIABLE INSTANCE" in x),
+    "grasp_SAT": ('func_store_true', lambda x: " SATISFIABLE INSTANCE." in x),
+}
+
 runsolver_re = {
     "SEGFAULT": re.compile(r"^\s*Child\s*ended\s*because\s*it\s*received\s*signal\s*11\s*\((?P<val>SIGSEGV)\)\s*"),
     "STATUS": re.compile(r"Child status: (?P<val>[0-9]+)"),
@@ -88,6 +94,8 @@ class RunSolverPerfEval(Executor):
                 verdict = RunStatisticExtended.TIMEOUT
             elif stats["runsolver_MEMOUT"] == 'true':
                 verdict = RunStatisticExtended.MEMOUT
+            elif stats["verdict"] == 'RTE':
+                verdict = RunStatisticExtended.RUNTIME_ERR
             elif ("error" in stats and stats["error"] != '') or (
                 nonzero_as_rte and nonzero_as_rte.lower() == 'true' and int(stats['return_code']) != 0):
                 verdict = RunStatisticExtended.RUNTIME_ERR
@@ -106,6 +114,11 @@ class RunSolverPerfEval(Executor):
                 stats[key] = '-1'
 
         stats['run_id'] = run_id
+
+        #Remove following keys
+        for key in list(stats.keys()):
+            if key in ["stdout_grasp_SAT", "stdout_grasp_UNSAT", "stdout_grasp_ERR"]:
+                del stats[key]
 
         logger.trace(stats)
         return stats
@@ -207,7 +220,7 @@ class RunSolverPerfEval(Executor):
             else:
                 stats['error'] = ''
 
-            stats = self.parse_logs(perflog, varfile, watcher, stats)
+            stats = self.parse_logs(perflog, varfile, watcher, stdout_p, stats)
 
             logger.trace(stats)
             logger.debug(f"Finished {directory}")
@@ -237,7 +250,7 @@ class RunSolverPerfEval(Executor):
         return payload_p, perflog, stderr_p, stdout_p, varfile, watcher, runparameters_p
 
     @staticmethod
-    def parse_logs(perflog, varfile, watcher, stats=None):
+    def parse_logs(perflog, varfile, watcher, stdout, stats=None):
         if stats is None:
             stats = {}
         try:
@@ -270,4 +283,22 @@ class RunSolverPerfEval(Executor):
                     m = reg.match(line)
                     if m:
                         stats[f'perf_{val}'] = m.group("val")
+        try:
+            # runsolver parser
+            with open(f"{stdout:s}") as f:
+                for line in f:
+                    for val, reg in solver_re.items():
+                        if reg[0] == 'func_store_true':
+                            # "grasp_UNSAT": ('func', lambda x: ),
+                            if f'stdout_{val}' not in stats and reg[1](line):
+                                stats[f'stdout_{val}'] = True
+                        else:
+                            m = reg.match(line)
+                            if m:
+                                stats[f'stdout_{val}'] = m.group("val")
+            logger.trace(stats)
+        except FileNotFoundError as e:
+            logger.error(e)
+            stats['runsolver_error'] = 'true'
+
         return stats

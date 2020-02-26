@@ -36,15 +36,17 @@ import matplotlib.pyplot as plt
 
 #
 config_re = re.compile(r"default\[s=(?P<solver>([\w\.]*))(?P<group>(,([\w=]*))*)\]")
-
-for filename in ['output_zchaff_pre.csv']:
+#output_zchaff
+#output_zchaff_pre
+for filename in ['output_grasp_nu.csv']:
     print('=' * 200)
     print(filename)
     print('=' * 200)
     df = pd.read_csv(filename)
     df.loc[df['return_code'] == 139, 'verdict'] = 'SGF'
-    # print(df['return_code'].unique())
 
+    # print(df['verdict'].unique())
+    # exit(1)
     # df.loc[df['return_code'] == 139,'verdict'] = 'SGF'
 
     df['instance'] = df['run_id'].apply(lambda row: '/'.join(row.split('/')[3:-1]))
@@ -59,7 +61,7 @@ for filename in ['output_zchaff_pre.csv']:
     # exit(1)
 
     df['instance'] = df['run_id'].apply(lambda row: '/'.join(row.split('/')[3:-1]))
-    df['hostname'] = df['hostname'].apply(lambda row: row.split('.')[0])
+    # df['hostname'] = df['hostname'].apply(lambda row: row.split('.')[0])
     #
     # print(df['solver'])
     # exit(1)
@@ -76,6 +78,7 @@ for filename in ['output_zchaff_pre.csv']:
 
     z.to_csv(f'1-outputs/{filename}_overview.csv')
     z.to_latex(f'1-outputs/{filename}_overview.tex')
+    # exit(2)
 
     # --------------------------------------------------------------------------------------------
     # memory footprint solved instances
@@ -117,8 +120,8 @@ for filename in ['output_zchaff_pre.csv']:
     print(below100M)
 
     mmem = mem.groupby(['solver', 'group', 'run']).agg({'runsolver_MAXVM': ['count', np.mean, np.median]})
-    print(mmem.reset_index())
-
+    # print(mmem.reset_index())
+    # exit(1)
     mconfigs = mem['solver_t'].unique()
 
     NUM_COLORS = len(mconfigs) + 1
@@ -133,6 +136,8 @@ for filename in ['output_zchaff_pre.csv']:
     lfont = lambda x: '$\mathtt{%s}$' % x.replace('-', '\hy')
     color_m = {'lingeling,t=1': ('lingeling(thp)', '#a6cee3', '-'),
                'lingeling,t=0': ('lingeling', '#1f78b4', '-'),
+               'lingelingplain,t=0,p=none': ('lingeling-plain (nopre)', '#1f78C4', '-'),
+               'lingelingplain,t=0,p=minisat2': ('lingeling-plain (pre/m)', '#a6761d', '-'),
                'glucose,t=0': ('glucose', '#33a02c', '-'),
                'glucose,t=1': ('glucose(thp)', '#b2df8a', '-'),
                'minisat,t=0': ('minisat', '#e31a1c', '-'),
@@ -155,6 +160,12 @@ for filename in ['output_zchaff_pre.csv']:
                'zchaff.2004.05.13,t=0,p=minisat2': ('zchaff04.05 (pre/m)', '#ff7f60', '-'),
                'zchaff.2007.03.12_x64,t=0,p=glucose': ('zchaff07 (pre/g)', '#b15968', '-'),
                'zchaff.2007.03.12_x64,t=0,p=minisat2': ('zchaff07 (pre/m)', '#b15988', '-'),
+               'grasp.2008.06.22_armin1,t=0,p=minisat2': ('grasp08a1 (pre/m)', '#1b9e77', '-'),
+               'grasp.2008.06.22_armin1,t=0,p=none': ('grasp08a1 (nopre)', '#d95f02', '-'),
+               'grasp.2008.06.22_armin2,t=0,p=minisat2': ('grasp08a2 (pre/m)', '#7570b3', '-'),
+               'grasp.2008.06.22_armin2,t=0,p=none': ('grasp08a2 (nopre)', '#e7298a', '-'),
+               'grasp.1996_jkf_mh,t=0,p=none': ('grasp96 (nopre)', '#66a61e', '-'),
+               'grasp.1996_jkf_mh,t=0,p=minisat2': ('grasp96 (pre/m)', '#e6ab02', '-'),
                #
                }
     skip = ['maplesat-glibc', 'maplesat-glibcthp',
@@ -251,7 +262,7 @@ for filename in ['output_zchaff_pre.csv']:
     myff.to_csv(f'1-outputs/{filename}_summary.csv')
     myff.to_latex(f'1-outputs/{filename}_summary.tex')
 
-    print(myff.columns)
+    # print(myff.columns)
     myff[('wall_time_x', 'sum')] = (myff[('wall_time_x', 'sum')] / 3600).round(2)
     myff[('wall_time_y', 'sum')] = (myff[('wall_time_y', 'sum')] / 3600).round(2)
 
@@ -284,8 +295,8 @@ for filename in ['output_zchaff_pre.csv']:
     output['solver'] = output['solver'].replace('glucose-4.2.1', 'glucose')
 
     output = output.sort_values(by=['solver'])
+    # print(output)
 
-    print(output)
     output.to_csv(f'1-outputs/{filename}_zz_paper.csv')
     output.to_latex(f'1-outputs/{filename}_zz_paper.tex')
 

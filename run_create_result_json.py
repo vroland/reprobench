@@ -18,7 +18,7 @@ with open('./benchmark_system_config.yml') as config_f:
         print(exc)
         exit(1)
 
-config = mconfig['config']
+config = mconfig['default_exp_config']
 config = read_config(config, resolve_files=True)
 
 # TODO: consider tasks only
@@ -35,7 +35,8 @@ folders = []
 for tool in tconfig:
     folders.append(os.path.abspath("./output/%s" % tool))
 
-overwrite = False
+# overwrite = False
+overwrite = True
 
 for folder in folders:
     for file in glob.glob('%s/**/stdout.txt' % folder, recursive=True):
@@ -44,11 +45,11 @@ for folder in folders:
             my_folder)
         if os.path.exists(payload_p) and not overwrite:
             continue
-        stats = RunSolverPerfEval.parse_logs(perflog, varfile, watcher)
+        stats = RunSolverPerfEval.parse_logs(perflog, varfile, watcher, stdout_p)
         # Save payload
         # TODO: next safe payload somehow
         # make sure that run_id is saved somewhere
-        run_id = re.sub("%s/" % os.path.abspath(""), '', file)
+        run_id = re.sub("%s/" % os.path.abspath(""), '', "/".join(file.split("/")[:-1]))
         payload = RunSolverPerfEval.compile_stats(stats=stats, run_id=run_id, nonzero_as_rte=nonzero_rte)
 
         # safe stats
