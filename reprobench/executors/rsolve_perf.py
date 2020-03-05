@@ -144,7 +144,7 @@ class RunSolverPerfEval(Executor):
                     with open(stderr, 'w+') as f:
                         f.write(str(err))
         else:
-            logger.error(f"Expected file for sysinfo at {path}, but was missing.")
+            logger.warning(f"Expected file for sysinfo at {path}, but was missing.")
         return output
 
     def prerun(self, cmdline, out_path, **kwargs):

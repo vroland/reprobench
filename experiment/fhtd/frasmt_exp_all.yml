@@ -1,0 +1,82 @@
+title: FHTD
+description: Benchmark for fhtd experiments
+
+limits:
+  time: 5 # s
+#  time: 3600
+  memory: 8048 # mb
+  scheduler_memory: 32768 #mb
+
+steps:
+  run:
+    - module: reprobench.core.sysinfo.CollectSystemInfo4Server
+#    - module: reprobench.core.setup.SetupKernel
+#      config:
+#        transparent_hugepage: madvise
+    # TODO: performance govenors / --cpu-freq srun
+    - module: reprobench.executors.RunSolverPerfEval
+    # provide non-perf runner
+    # provide configurable perf parameters
+#    - module: reprobench.executors.PsmonExecutor
+      config:
+        nonzero_rte: False
+
+observers:
+  - module: reprobench.core.sysinfo.SystemInfoObserver
+#  - module: reprobench.executors.RunStatisticObserver
+  - module: reprobench.executors.RunStatisticExtendedObserver
+
+#  analysis:
+#    - module: reprobench.statistics.tables.RunTable
+#      config:
+#        joins:
+#          - reprobench.executors.db.RunStatistic
+#          - reprobench.core.sysinfo.RunNode
+#        output: statistics/raw.csv
+#    - module: reprobench.statistics.tables.RunSummaryTable
+#      config:
+#        output: statistics/summary.csv
+#    - module: reprobench.statistics.plots.CactusPlot
+#      config:
+#        measure: wall_time
+#        output: statistics/cactus.ipynb
+
+tasks:
+  hypergraphs:
+    type: file
+#    urls:
+#      - https://github.com/daajoe/hypergraphs.git
+    path: /projects/p_gpusat/hypergraphs
+#    path: ./tasks/thp/sat/
+    extract_archives: true
+    patterns: |
+      **/Dubois-015.xml.hg
+      !**/*.tar.bz2
+      !**/*.tar.xz
+      !**/*.tar.gz
+      !**/*.tgz
+      !**/.*
+      !**.*~
+#      **/*.hg
+
+tools:
+  fhtd:
+    module: experiment.fhtd.tool.frasmt.frasmtExecutor.FhtdTool
+    parameters:
+      #name of parameter configuration: we may have multiple ones
+      default:
+        sp:
+          - lib+optimathsat+optimathsat-1.6.3
+          - lib+z3-4.8.7-x64-ubuntu-16.04+bin+z3
+
+#TODO:
+runs:
+  fhtd:
+    all:
+      - hypergraphs
+
+
+#TODO:
+#config: "./benchmark_thp_bmc_sw.yml"
+#config: "./benchmark_thp_bmc_hw.yml"
+#config: "./benchmark_thp_maxsat.yml"

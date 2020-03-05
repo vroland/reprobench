@@ -1,5 +1,6 @@
 import inspect
 import os
+from pathlib import Path
 
 from loguru import logger
 
@@ -63,15 +64,18 @@ class Tool:
 
     @classmethod
     def is_ready(cls):
-        return Path(cls.path).is_file() and os.access(self.get_path, os.X_OK)
+        return Path(cls.path).is_file() #and os.access(self.get_path, os.X_OK)
 
     @classmethod
     def teardown(cls):
         pass
 
     def get_path(self):
-        runtm_path = os.path.join(os.path.dirname(inspect.getfile(self.__class__)), self.path)
-        if os.path.islink(runtm_path):
-            os.path.abspath(runtm_path)
+        if self.path.startswith("~"):
+            return os.path.expanduser(self.path)
         else:
-            return os.path.relpath(runtm_path)
+            runtm_path = os.path.join(os.path.dirname(inspect.getfile(self.__class__)), self.path)
+            if os.path.islink(runtm_path):
+                return os.path.abspath(runtm_path)
+            else:
+                return os.path.relpath(runtm_path)
