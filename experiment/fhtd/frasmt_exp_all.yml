@@ -67,7 +67,7 @@ tools:
       default:
         sp:
           - lib+optimathsat+optimathsat-1.6.3
-          - lib+z3-4.8.7-x64-ubuntu-16.04+bin+z3
+#          - lib+z3-4.8.7-x64-ubuntu-16.04+bin+z3
 
 #TODO:
 runs:

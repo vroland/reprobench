@@ -11,7 +11,7 @@ from reprobench.tools.executable import ExecutableTool
 class FhtdTool(ExecutableTool):
     name = "SAT Tool"
     prefix = '-'
-    path = "~/src/frasmt/bin/fhtd"
+    path = "./bin/frasmt_wrapper.sh"
 
     def get_arguments(self):
         return [f"{self.prefix}{key} {value}" for key, value in self.parameters.items()]
