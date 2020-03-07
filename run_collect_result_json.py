@@ -8,8 +8,10 @@ import yaml
 import zmq
 from loguru import logger
 
+from experiment.fhtd.tool.frasmt.frasmtExecutor import FhtdTool
 from reprobench.core.bootstrap.client import bootstrap_tools
 from reprobench.executors import RunSolverPerfEval
+from reprobench.executors.db import RunStatisticExtended
 from reprobench.executors.events import STORE_THP_RUNSTATS
 from reprobench.utils import read_config, encode_message
 
@@ -54,12 +56,6 @@ if send_events:
 df = None
 
 # TODO: handling of multiple keys
-keys = ['runsolver_WCTIME', 'runsolver_CPUTIME', 'runsolver_USERTIME', 'runsolver_SYSTEMTIME', 'runsolver_CPUUSAGE',
-        'runsolver_MAXVM', 'runsolver_TIMEOUT', 'runsolver_MEMOUT', 'runsolver_STATUS', 'perf_dTLB_load_misses',
-        'perf_dTLB_loads', 'perf_dTLB_store_misses', 'perf_dTLB_stores', 'perf_iTLB_load_misses', 'perf_iTLB_loads',
-        'perf_cycles', 'perf_cache_misses', 'perf_elapsed', 'return_code', 'cpu_time', 'wall_time',
-        'max_memory', 'platform', 'hostname', 'run_id', 'verdict', 'runsolver_error']
-
 for folder in folders:
     for file in glob.glob('%s/**/result.json' % folder, recursive=True):
         my_folder = os.path.dirname(file)
@@ -68,22 +64,32 @@ for folder in folders:
             try:
                 result = json.load(result_f)
             except json.decoder.JSONDecodeError as e:
+                #TODO: refactor
                 logger.error(e)
                 logger.error(result_p)
-                exit(1)
+                stats = {'verdict': RunStatisticExtended.RUNTIME_ERR, 'run_id': result['run_id'], 'return_code': '9'}
+                for e in set(cols) - set(stats.keys()):
+                    stats[e] = 'NaN'
+                df.loc[len(df)] = stats
+                continue
             stats = RunSolverPerfEval.compile_stats(stats=result, run_id=result['run_id'], nonzero_as_rte=nonzero_rte)
+            # TODO: after updating to non-sql database move things
+            fname = os.path.join(os.path.dirname(file), 'stdout.txt')
+            problem_stats = FhtdTool.evaluator(fname)
+            stats.update(problem_stats)
+
             if df is None:
                 # TODO: handling of missing keys and default from file
                 # df = pd.DataFrame(columns=result.keys())
-                df = pd.DataFrame(columns=keys)
-            print(result.keys())
+                df = pd.DataFrame(columns=set(RunSolverPerfEval.keys()+FhtdTool.keys()))
             cols = df.columns
             try:
                 df.loc[len(df)] = stats
             except ValueError as e:
                 missing = set(cols) - set(stats.keys())
-                logger.info("Following keys where missing... adding na.")
-                logger.info(missing)
+                if missing != {'runsolver_error'} and missing != {'err', 'runsolver_error'}:
+                    logger.info("Following keys where missing... adding na.")
+                    logger.info(missing)
                 for e in missing:
                     stats[e] = 'NaN'
                 df.loc[len(df)] = stats

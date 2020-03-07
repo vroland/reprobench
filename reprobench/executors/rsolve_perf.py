@@ -70,6 +70,15 @@ class RunSolverPerfEval(Executor):
         RunStatisticExtended.create_table()
 
     @staticmethod
+    def keys():
+        return ['runsolver_WCTIME', 'runsolver_CPUTIME', 'runsolver_USERTIME', 'runsolver_SYSTEMTIME', 'runsolver_CPUUSAGE',
+        'runsolver_MAXVM', 'runsolver_TIMEOUT', 'runsolver_MEMOUT', 'runsolver_STATUS', 'perf_dTLB_load_misses',
+        'perf_dTLB_loads', 'perf_dTLB_store_misses', 'perf_dTLB_stores', 'perf_iTLB_load_misses', 'perf_iTLB_loads',
+        'perf_cycles', 'perf_cache_misses', 'perf_elapsed', 'return_code', 'cpu_time', 'wall_time',
+        'max_memory', 'platform', 'hostname', 'run_id', 'verdict', 'runsolver_error']
+
+
+    @staticmethod
     def compile_stats(stats, run_id, nonzero_as_rte):
         perf_keys = ['perf_dTLB_load_misses', 'perf_dTLB_loads', 'perf_dTLB_store_misses',
                      'perf_dTLB_stores', 'perf_iTLB_load_misses', 'perf_iTLB_loads',

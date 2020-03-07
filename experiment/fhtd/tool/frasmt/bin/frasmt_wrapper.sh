@@ -11,14 +11,14 @@ trap interrupted TERM
 trap interrupted INT
 
 #
-echo "Activating Conda environment"
+echo "c Activating Conda environment"
 
 if [ -d "$HOME/miniconda3/" ]; then
   myconda="$HOME/miniconda3"
 elif [ -d "$HOME/anaconda3/" ]; then
   myconda="$HOME/anaconda3"
 else
-  echo "REQUIRES CONDA"
+  echo "c REQUIRES CONDA"
   exit 5
 fi
 
@@ -39,22 +39,21 @@ unset __conda_setup
 conda activate rb
 
 #cd "$(dirname "$0")" || (echo "Could not change directory to $0. Exiting..."; exit 1)
-env="VOID=1"
 solver_cmd="$HOME/src/frasmt/bin/fhtd $*"
 
-echo
-echo "env $env $solver_cmd"
-echo
+echo "c "
+echo "c $myconda/envs/rb/bin/python $solver_cmd"
+echo "c "
 
 #NOTE: if you need to redirect the solver output in the future, we suggest to use stdlog.txt
 #
 # run call in background and wait for finishing
-env $env $solver_cmd &
+$myconda/envs/rb/bin/python $solver_cmd &
 
 #alternative approach
 #(export $env; $solver_cmd $filename) &
 PID=$!
 wait $PID
 exit_code=$?
-echo "Solver finished with exit code="$exit_code
+echo "c Solver finished with exit code="$exit_code
 exit $exit_code
