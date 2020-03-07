@@ -47,7 +47,7 @@ class FhtdTool(ExecutableTool):
 
     @staticmethod
     def err_dict():
-        ret = {k: "na" for k in FhtdTool.keys()}
+        ret = {k: "NaN" for k in FhtdTool.keys()}
         ret.update({"verdict": RunStatisticExtended.RUNTIME_ERR})
         return ret
 
