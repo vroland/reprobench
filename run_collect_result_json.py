@@ -74,8 +74,8 @@ for folder in folders:
                 continue
             stats = RunSolverPerfEval.compile_stats(stats=result, run_id=result['run_id'], nonzero_as_rte=nonzero_rte)
             # TODO: after updating to non-sql database move things
-            fname = os.path.join(os.path.dirname(file), 'stdout.txt')
-            problem_stats = FhtdTool.evaluator(fname)
+
+            problem_stats = FhtdTool.evaluator(os.path.dirname(file), stats)
             stats.update(problem_stats)
 
             if df is None:
