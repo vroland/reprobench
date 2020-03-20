@@ -1,4 +1,4 @@
-default_exp_config: "./experiment/mc2020/mc2020_exp_all.yml"
+default_exp_config: "./experiment/mcc2020/mcc2020_exp_all.yml"
 #default_exp_config: "./experiment/fhtd/frasmt_exp_all.yml"
 #default_exp_config: "./experiment/thp/0thp_exp_all.yml"
 #default_exp_config: "./experiment/thp/0thp_exp_mc_preprocess.yml"
