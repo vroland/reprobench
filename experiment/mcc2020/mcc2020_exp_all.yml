@@ -87,7 +87,7 @@ tasks:
 
 tools:
   number_sat:
-    module: experiment.thp.tool.wmc.wmcExecutor.WMCTool
+    module: experiment.mcc2020.tool.wmc.wmcExecutor.WMCTool
     parameters:
       default:
         s:
