@@ -65,7 +65,7 @@ cd "$(dirname "$0")" || (echo "Could not change directory to $0. Exiting..."; ex
 if [ "$solver" == "approxmc" ] ; then
   solver_cmd="./approxmc_glibc $*"
 elif [ "$solver" == "c2d" ] ; then
-  solver_cmd="./c2d $*"
+  solver_cmd="./c2d $* -in "
 elif [ "$solver" == "cachet" ] ; then
   solver_cmd="./cachet_glibc $*"
 elif [ "$solver" == "d4" ] ; then
