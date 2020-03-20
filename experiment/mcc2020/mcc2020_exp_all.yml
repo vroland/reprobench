@@ -47,7 +47,7 @@ tasks:
     path: /projects/p_mcc2020
     extract_archives: true
     patterns: |
-      **/*.mcc2020_cnf
+      **/C4D9N150_28.mcc2020_cnf
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
@@ -55,6 +55,7 @@ tasks:
       !**/.*
       !**.*~
       !**/dfremont_old_format/*
+#      **/*.mcc2020_cnf
 
   track2_wmc:
     type: file
@@ -90,13 +91,13 @@ tools:
     parameters:
       default:
         s:
-          - approxmc
-          - c2d
-          - cachet
+#          - approxmc
+#          - c2d
+#          - cachet
           - d4
-          - ganak
+#          - ganak
           - minic2d
-          - sharpsat
+#          - sharpsat
         #we are not interested in transparent huge pages here
         t:
           - 0
