@@ -1,0 +1,67 @@
+title: clasp
+description: Benchmark for different runtimes with and without glibc hack
+
+limits:
+  time: 900 # s
+  memory: 4024 # mb
+
+steps:
+  run:
+    - module: reprobench.core.sysinfo.CollectSystemInfo
+    - module: reprobench.executors.RunSolverPerfEval
+#    - module: reprobench.executors.PsmonExecutor
+      config:
+        nonzero_rte: False
+#  analysis:
+#    - module: reprobench.statistics.tables.RunTable
+#      config:
+#        joins:
+#          - reprobench.executors.db.RunStatistic
+#          - reprobench.core.sysinfo.RunNode
+#        output: statistics/raw.csv
+#    - module: reprobench.statistics.tables.RunSummaryTable
+#      config:
+#        output: statistics/summary.csv
+#    - module: reprobench.statistics.plots.CactusPlot
+#      config:
+#        measure: wall_time
+#        output: statistics/cactus.ipynb
+
+observers:
+  - module: reprobench.core.sysinfo.SystemInfoObserver
+#  - module: reprobench.executors.RunStatisticObserver
+  - module: reprobench.executors.RunStatisticExtendedObserver
+
+tasks:
+  mus_bench:
+    type: url
+    urls:
+      - http://www.cril.univ-artois.fr/SAT11/bench/SAT11-Competition-GMUS-SelectedBenchmarks.tar
+#    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark
+    path: ./tasks/thp/mus/
+    extract_archives: true
+    patterns: |
+      **/*
+      !**/*.tar.bz2
+      !**/*.tar.xz
+      !**/*.tar.gz
+      !**/*.tgz
+      !**/*.tar
+
+tools:
+  glibc:
+    module: tools.mus.musExecutor.MUSTool
+    parameters:
+      default:
+        s:
+          - muser2
+  glibc_thp:
+    module: tools.mus.musExecutor.MUSTool
+    parameters:
+      default:
+        #t = transparent huge pages
+        t: 1
+        #s = solver
+        s:
+          - muser2
+

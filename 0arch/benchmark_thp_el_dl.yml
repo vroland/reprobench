@@ -1,0 +1,62 @@
+title: asp_solvers
+description: Benchmark for different runtimes with and without glibc hack
+
+limits:
+  time: 5 # s
+  memory: 4024 # mb
+  scheduler_memory: 62000 #mb
+
+steps:
+  run:
+    - module: reprobench.core.sysinfo.CollectSystemInfo
+    - module: reprobench.executors.RunSolverPerfEval
+      config:
+        nonzero_rte: False
+#  analysis:
+#    - module: reprobench.statistics.tables.RunTable
+#      config:
+#        joins:
+#          - reprobench.executors.db.RunStatistic
+#          - reprobench.core.sysinfo.RunNode
+#        output: statistics/raw.csv
+#    - module: reprobench.statistics.tables.RunSummaryTable
+#      config:
+#        output: statistics/summary.csv
+#    - module: reprobench.statistics.plots.CactusPlot
+#      config:
+#        measure: wall_time
+#        output: statistics/cactus.ipynb
+
+observers:
+  - module: reprobench.core.sysinfo.SystemInfoObserver
+  - module: reprobench.executors.RunStatisticExtendedObserver
+
+tasks:
+  asp_bench:
+    type: url
+    urls:
+      - http://www.maxsat.udl.cat/14/benchmarks/wpms_industrial.tgz
+    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/MAXSAT/
+#    path: ./tasks/thp/ASP/
+    extract_archives: true
+    patterns: |
+      **/*
+      !**/*.tar.bz2
+      !**/*.tar.xz
+      !**/*.tar.gz
+      !**/*.tgz
+
+tools:
+  glibc:
+    module: tools.maxsat.maxsatExecutor.MAXSAT
+    parameters:
+      default:
+        s:
+          - open-wbo_static
+  glibc_thp:
+    module: tools.maxsat.maxsatExecutor.MAXSAT
+    parameters:
+      default:
+        t: 1
+        s:
+          - open-wbo_static

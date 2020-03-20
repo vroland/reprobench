@@ -1,0 +1,89 @@
+title: bmc
+description: Benchmark for different runtimes with and without glibc hack
+
+limits:
+  time: 900 # s
+  memory: 8048 # mb
+  scheduler_memory: 32768 #mb
+
+steps:
+  run:
+    - module: reprobench.core.sysinfo.CollectSystemInfo
+    - module: reprobench.core.setup.SetupKernel
+      config:
+        transparent_hugepage: madvise
+    - module: reprobench.executors.RunSolverPerfEval
+#    - module: reprobench.executors.PsmonExecutor
+      config:
+        nonzero_rte: False
+#  analysis:
+#    - module: reprobench.statistics.tables.RunTable
+#      config:
+#        joins:
+#          - reprobench.executors.db.RunStatistic
+#          - reprobench.core.sysinfo.RunNode
+#        output: statistics/raw.csv
+#    - module: reprobench.statistics.tables.RunSummaryTable
+#      config:
+#        output: statistics/summary.csv
+#    - module: reprobench.statistics.plots.CactusPlot
+#      config:
+#        measure: wall_time
+#        output: statistics/cactus.ipynb
+
+observers:
+  - module: reprobench.core.sysinfo.SystemInfoObserver
+#  - module: reprobench.executors.RunStatisticObserver
+  - module: reprobench.executors.RunStatisticExtendedObserver
+
+tasks:
+  hwmcc17_bench:
+    type: file
+    urls:
+      - http://fmv.jku.at/hwmcc17/hwmcc17-single-benchmarks.tar.xz
+    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/BMC/hwmcc17-single-benchmarks.tar/
+#    path: /scratch/p_gpusat/automated-reasoner-builds/benchmarks/AIG_hwmcc17-deep
+    #    path: ./tasks/thp/bmc/
+    extract_archives: true
+    patterns: |
+      6s0.aig
+      !**/*.tar.bz2
+      !**/*.tar.xz
+      !**/*.tar.gz
+      !**/*.tgz
+      !**/*.tar
+#      **/*
+
+#  hwmcc19_bench:
+#    type: file
+#    urls:
+#      - http://fmv.jku.at/hwmcc17/hwmcc17-single-benchmarks.tar.xz
+#    path: /scratch/p_gpusat/automated-reasoner-builds/benchmarks/HWMCC_2019-single/aig/
+#    #    path: ./tasks/thp/bmc/
+#    extract_archives: true
+#    patterns: |
+#      6s0.aig
+#      !**/*.tar.bz2
+#      !**/*.tar.xz
+#      !**/*.tar.gz
+#      !**/*.tgz
+#      !**/*.tar
+#      **/*
+
+tools:
+  glibc:
+    module: tools.bmc.bmcExecutor.BMCTool
+    parameters:
+      default:
+        s:
+          - aigbmc
+  glibc_thp:
+    module: tools.bmc.bmcExecutor.BMCTool
+    parameters:
+      default:
+        #t = transparent huge pages
+        t: 1
+        #s = solver
+        s:
+          - aigbmc
+
