@@ -14,6 +14,14 @@ class ExecutableTool(Tool):
     def is_ready(cls):
         return True
 
+    @staticmethod
+    def keys():
+        return []
+
+    @staticmethod
+    def evaluator(filename, stats):
+        return {}
+
     def get_arguments(self):
         return [f"{self.prefix}{key}={value}" for key, value in self.parameters.items()]
 

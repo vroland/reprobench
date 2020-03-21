@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import glob
+import importlib
 import json
 import os
 
@@ -8,12 +9,12 @@ import yaml
 import zmq
 from loguru import logger
 
-from experiment.fhtd.tool.frasmt.frasmtExecutor import FhtdTool
 from reprobench.core.bootstrap.client import bootstrap_tools
 from reprobench.executors import RunSolverPerfEval
 from reprobench.executors.db import RunStatisticExtended
 from reprobench.executors.events import STORE_THP_RUNSTATS
-from reprobench.utils import read_config, encode_message
+from reprobench.utils import read_config, encode_message, import_class
+
 
 mconfig = None
 with open('./benchmark_system_config.yml') as config_f:
@@ -31,9 +32,19 @@ for module in config['steps']['run']:
         continue
     nonzero_rte = module['config']['nonzero_rte']
 
+tools = {}
+i = 0
+for item in config['runs']:
+    module = import_class(config['tools'][item]['module'])
+    tools[item] = module
+    if i>0:
+        print("Supports only one tool atm. Check your config. Exiting...")
+        exit(1)
+    i+=1
+
+
+
 # TODO: make parameter
-
-
 tconfig = bootstrap_tools(config)
 folders = []
 for tool in tconfig:
@@ -75,13 +86,13 @@ for folder in folders:
             stats = RunSolverPerfEval.compile_stats(stats=result, run_id=result['run_id'], nonzero_as_rte=nonzero_rte)
             # TODO: after updating to non-sql database move things
 
-            problem_stats = FhtdTool.evaluator(os.path.dirname(file), stats)
+            problem_stats = module.evaluator(os.path.dirname(file), stats)
             stats.update(problem_stats)
 
             if df is None:
                 # TODO: handling of missing keys and default from file
                 # df = pd.DataFrame(columns=result.keys())
-                df = pd.DataFrame(columns=set(RunSolverPerfEval.keys()+FhtdTool.keys()))
+                df = pd.DataFrame(columns=set(RunSolverPerfEval.keys()+module.keys()))
             cols = df.columns
             try:
                 df.loc[len(df)] = stats
