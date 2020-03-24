@@ -62,7 +62,7 @@ class LocalManager(BaseManager):
 
     def spawn_workers(self):
         logger.error(f"Value of cluster_job_id is {self.cluster_job_id}")
-        if self.cluster_job_id is None:
+        if self.cluster_job_id is None or self.cluster_job_id == -1:
             if self.multicore and "processes" in self.multicore:
                 num_workers = self.multicore['processes']
             else:
@@ -85,7 +85,7 @@ class LocalManager(BaseManager):
             self.runner_process.start()
 
     def wait(self):
-        if self.cluster_job_id is None:
+        if self.cluster_job_id is None or self.cluster_job_id == -1:
             progress_bar = tqdm(desc="Executing runs", total=self.num_pending)
             for _ in self.pool_iterator:
                 progress_bar.update()
