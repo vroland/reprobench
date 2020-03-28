@@ -6,9 +6,10 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 # Initialize our own variables:
 #verbose=0
 thp=0
-while getopts "h?vt:s:f:i:" opt; do
+opts=""
+while getopts ":h?vt:s:f:i:" opt; do
     case "$opt" in
-    h|\?)
+    h)
         show_help
         exit 0
         ;;
@@ -22,6 +23,9 @@ while getopts "h?vt:s:f:i:" opt; do
     f)  filename=$OPTARG
         ;;
     i)  original_input=$OPTARG
+        ;;
+    *)
+        opts="${opts} -$OPTARG"
         ;;
     esac
 done
@@ -58,7 +62,7 @@ fi
 
 cd "$(dirname "$0")" || (echo "Could not change directory to $0. Exiting..."; exit 1)
 
-solver_cmd="./"$solver" $*"
+solver_cmd="./${solver} ${opts} $*"
 
 echo "Original input instance was $original_input"
 echo "env $env $solver_cmd  $filename"
@@ -71,8 +75,11 @@ echo
 # run call in background and wait for finishing
 if [ "$solver" == "tuw_cpp_glibc" ] ; then
   env $env $solver_cmd $filename &
+elif [ "$solver" == "scipjack_upstream" ] ; then
+  env $env $solver_cmd -f $filename &
 elif [ "$solver" == "hsv" ] ; then
-  env $env $solver_cmd -solve_graphic $filename &
+#<prog> -solve_graphic <instance.stp> <?time_limit (seconds)>  <?enable_prune> <?enable_future_cost>
+  env $env $solver_cmd -solve_graphic $filename 3600 1 1 &
 else
   env $env $solver_cmd < $filename &
 fi

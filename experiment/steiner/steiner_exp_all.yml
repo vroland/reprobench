@@ -197,8 +197,19 @@ tools:
 #        r:
 #        g:
 #        q: 6
-  scipjack:
+  hsv:
     module: experiment.steiner.tool.tuw_cpp.steinerExecutor.SteinerTool
+  scipjack_upstream:
+    module: experiment.steiner.tool.tuw_cpp.steinerExecutor.SteinerTool
+    parameters:
+      default:
+        q:
+  scipjack_pace:
+    module: experiment.steiner.tool.tuw_cpp.steinerExecutor.SteinerTool
+    parameters:
+      default:
+        q:
+
   wata:
     module: experiment.steiner.tool.tuw_cpp.steinerExecutor.SteinerTool
 
