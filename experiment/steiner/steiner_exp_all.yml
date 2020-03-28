@@ -139,66 +139,43 @@ tasks:
     extract_archives: true
     path: /projects/p_gpusat/steiner/rectlinear
     patterns: |
-      **/es80fst04.stp
       !**/*.tar.bz2
-#      **/*.stp
-#  vienna:
-#    type: url
-#    urls:
-#      - http://dimacs11.zib.de/instances/vienna.zip
-#    extract_archives: true
-#    path: /projects/p_gpusat/steiner/vienna
-#    patterns: |
-#      **/*.stp
-#      !**/*.tar.bz2
-#  copenhagen:
-#    type: url
-#    urls:
-#      - http://dimacs11.zib.de/instances/Copenhagen14.zip
-#    extract_archives: true
-#    path: /projects/p_gpusat/steiner/copenhagen
-#    patterns: |
-#      **/*.stp
-#      !**/*.tar.bz2
-#  group:
-#    type: url
-#    urls:
-#      - http://steinlib.zib.de/download/WRP3.tgz
-#      - http://steinlib.zib.de/download/WRP4.tgz
-#    extract_archives: true
-#    path: /projects/p_gpusat/steiner/group
-#    patterns: |
-#      **/*.stp
-#      !**/*.tar.bz2
+      **/*.stp
+#      **/es80fst04.stp
+  vienna:
+    type: url
+    urls:
+      - http://dimacs11.zib.de/instances/vienna.zip
+    extract_archives: true
+    path: /projects/p_gpusat/steiner/vienna
+    patterns: |
+      **/*.stp
+      !**/*.tar.bz2
+  copenhagen:
+    type: url
+    urls:
+      - http://dimacs11.zib.de/instances/Copenhagen14.zip
+    extract_archives: true
+    path: /projects/p_gpusat/steiner/copenhagen
+    patterns: |
+      **/*.stp
+      !**/*.tar.bz2
+  group:
+    type: url
+    urls:
+      - http://steinlib.zib.de/download/WRP3.tgz
+      - http://steinlib.zib.de/download/WRP4.tgz
+    extract_archives: true
+    path: /projects/p_gpusat/steiner/group
+    patterns: |
+      **/*.stp
+      !**/*.tar.bz2
 
 
 tools:
-#TODO:
-# hsv
-# old python tool with various options
-# old cython
-#  hsv:
-#    module: experiment.steiner.tool.tuw_cpp.steinerExecutor.SteinerTool
-#    parameters:
-#      default:
-#        d: 2
-#        b: 0
-#        a:
-#        t:
-#        r:
-#        g:
-#  hsv-da:
-#    module: experiment.steiner.tool.tuw_cpp.steinerExecutor.SteinerTool
-#    parameters:
-#      default:
-#        d: 2
-#        b: 0
-#        t:
-#        r:
-#        g:
-#        q: 6
   hsv:
     module: experiment.steiner.tool.tuw_cpp.steinerExecutor.SteinerTool
+  #TODO:
   scipjack_upstream:
     module: experiment.steiner.tool.tuw_cpp.steinerExecutor.SteinerTool
     parameters:
@@ -212,11 +189,35 @@ tools:
 
   wata:
     module: experiment.steiner.tool.tuw_cpp.steinerExecutor.SteinerTool
-
+#TODO
+#  tuw_python:
+#    module: experiment.steiner.tool.steinerExecutor.SteinerPyTool
+#    parameters:
+#      default:
 #  tuw_cython:
 #    module: experiment.steiner.tool.steinerExecutor.SteinerPyTool
 #    parameters:
 #      default:
+#  tuw_python-hsv:
+#    module: experiment.steiner.tool.tuw_cpp.steinerExecutor.SteinerTool
+#    parameters:
+#      default:
+#        d: 2
+#        b: 0
+#        a:
+#        t:
+#        r:
+#        g:
+#  tuw_python_hsv-da:
+#    module: experiment.steiner.tool.tuw_cpp.steinerExecutor.SteinerTool
+#    parameters:
+#      default:
+#        d: 2
+#        b: 0
+#        t:
+#        r:
+#        g:
+#        q: 6
   tuw_cpp_glibc:
     module: experiment.steiner.tool.tuw_cpp.steinerExecutor.SteinerTool
     parameters:
@@ -229,40 +230,41 @@ tools:
 runs:
   tuw_cpp_glibc:
     all:
-#      - group
-#      - copenhagen
-#      - vienna
+      - group
+      - copenhagen
+      - vienna
       - rectlinear
-#      - pace
-#      - vlsi
-#      - crossgrid
-#      - euclidian
-#      - artificial
-#      - random
+      - pace
+      - vlsi
+      - crossgrid
+      - euclidian
+      - artificial
+      - random
   wata:
     all:
-#      - group
-#      - copenhagen
-#      - vienna
+      - group
+      - copenhagen
+      - vienna
       - rectlinear
-#      - pace
-#      - vlsi
-#      - crossgrid
-#      - euclidian
-#      - artificial
-#      - random
+      - pace
+      - vlsi
+      - crossgrid
+      - euclidian
+      - artificial
+      - random
   scipjack_pace:
     all:
-#      - group
-#      - copenhagen
-#      - vienna
+      - group
+      - copenhagen
+      - vienna
       - rectlinear
-#      - pace
-#      - vlsi
-#      - crossgrid
-#      - euclidian
-#      - artificial
-#      - random
+      - pace
+      - vlsi
+      - crossgrid
+      - euclidian
+      - artificial
+      - random
+#TODO:
 #  scipjack_upstream:
 #    all:
 #      - group
@@ -277,13 +279,13 @@ runs:
 #      - random
   hsv:
     all:
-#      - group
-#      - copenhagen
-#      - vienna
+      - group
+      - copenhagen
+      - vienna
       - rectlinear
-#      - pace
-#      - vlsi
-#      - crossgrid
-#      - euclidian
-#      - artificial
-#      - random
+      - pace
+      - vlsi
+      - crossgrid
+      - euclidian
+      - artificial
+      - random
