@@ -72,6 +72,7 @@ class CoreObserver(Observer):
             id=run.id,
             task=str(Path(task.path) / task.instance),
             tool=run.tool.module,
+            tool_name=run.tool.name,
             parameters=pg,
             steps=list(runsteps.dicts()),
             limits=limits,

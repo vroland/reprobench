@@ -41,6 +41,7 @@ class Tool:
         self.cwd = context["run"]["id"]
         self.parameters = context["run"]["parameters"]
         self.task = context["run"]["task"]
+        self.tool_name = context["tool_name"]
 
     def prerun(self, executor):
         raise NotImplementedError

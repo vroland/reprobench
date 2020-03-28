@@ -278,7 +278,7 @@ class BenchmarkWorker:
                 ret.value = False
             return False
 
-        logger.info(f"Running {run['task']} with tool {run['tool']} and "
+        logger.info(f"Running {run['task']} with tool {run['tool']}({run['tool_name']}) and "
                     f"parameters {run['parameters']} limits: {run['limits']}")
 
         run_id = run["id"]
@@ -290,7 +290,8 @@ class BenchmarkWorker:
         if not tool.is_ready():
             tool.setup()
 
-        context = {"socket": socket, "tool": tool, "run": run, "server_address": self.server_address}
+        context = {"socket": socket, "tool": tool, "tool_name": run["tool_name"], "run": run,
+                   "server_address": self.server_address}
         logger.info(f"Processing task: {run['id']}")
 
         directory = Path(run["id"])

@@ -58,11 +58,10 @@ fi
 
 cd "$(dirname "$0")" || (echo "Could not change directory to $0. Exiting..."; exit 1)
 
-solver_cmd="./"$solver"_glibc $*"
-
+solver_cmd="./"$solver" $*"
 
 echo "Original input instance was $original_input"
-echo "env $env $solver_cmd $filename"
+echo "env $env $solver_cmd  $filename"
 echo
 echo
 
@@ -70,7 +69,11 @@ echo
 #NOTE: if you need to redirect the solver output in the future, we suggest to use stdlog.txt
 #
 # run call in background and wait for finishing
-env $env $solver_cmd $filename &
+if [ "$solver" == "tuw_cpp_glibc" ] ; then
+  env $env $solver_cmd $filename &
+else
+  env $env $solver_cmd < $filename &
+fi
 #alternative approach
 #(export $env; $solver_cmd $filename) &
 PID=$!

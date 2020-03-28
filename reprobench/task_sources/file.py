@@ -12,6 +12,11 @@ class FileSource(BaseTaskSource):
     def __init__(self, path=None, patterns="", resolve=False, **kwargs):
         super().__init__(path)
         if not os.path.exists(path):
+            try:
+                os.makedirs(path)
+            except:
+                logger.error(f"Failed to create directory at {path}")
+        if not os.path.exists(path):
             logger.error(f"Path does not exist: '{path}'")
             raise FileNotFoundError(path)
         self.patterns = patterns
