@@ -71,6 +71,8 @@ echo
 # run call in background and wait for finishing
 if [ "$solver" == "tuw_cpp_glibc" ] ; then
   env $env $solver_cmd $filename &
+elif [ "$solver" == "hsv" ] ; then
+  env $env $solver_cmd -solve_graphic $filename &
 else
   env $env $solver_cmd < $filename &
 fi
