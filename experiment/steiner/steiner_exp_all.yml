@@ -251,7 +251,31 @@ runs:
       - euclidian
       - artificial
       - random
-  scipjack:
+  scipjack_pace:
+    all:
+      - group
+      - copenhagen
+      - vienna
+      - rectlinear
+      - pace
+      - vlsi
+      - crossgrid
+      - euclidian
+      - artificial
+      - random
+  scipjack_upstream:
+    all:
+      - group
+      - copenhagen
+      - vienna
+      - rectlinear
+      - pace
+      - vlsi
+      - crossgrid
+      - euclidian
+      - artificial
+      - random
+  hsv:
     all:
       - group
       - copenhagen
