@@ -229,61 +229,61 @@ tools:
 runs:
   tuw_cpp_glibc:
     all:
-      - group
-      - copenhagen
-      - vienna
+#      - group
+#      - copenhagen
+#      - vienna
       - rectlinear
-      - pace
-      - vlsi
-      - crossgrid
-      - euclidian
-      - artificial
-      - random
+#      - pace
+#      - vlsi
+#      - crossgrid
+#      - euclidian
+#      - artificial
+#      - random
   wata:
     all:
-      - group
-      - copenhagen
-      - vienna
+#      - group
+#      - copenhagen
+#      - vienna
       - rectlinear
-      - pace
-      - vlsi
-      - crossgrid
-      - euclidian
-      - artificial
-      - random
+#      - pace
+#      - vlsi
+#      - crossgrid
+#      - euclidian
+#      - artificial
+#      - random
   scipjack_pace:
     all:
-      - group
-      - copenhagen
-      - vienna
+#      - group
+#      - copenhagen
+#      - vienna
       - rectlinear
-      - pace
-      - vlsi
-      - crossgrid
-      - euclidian
-      - artificial
-      - random
-  scipjack_upstream:
-    all:
-      - group
-      - copenhagen
-      - vienna
-      - rectlinear
-      - pace
-      - vlsi
-      - crossgrid
-      - euclidian
-      - artificial
-      - random
+#      - pace
+#      - vlsi
+#      - crossgrid
+#      - euclidian
+#      - artificial
+#      - random
+#  scipjack_upstream:
+#    all:
+#      - group
+#      - copenhagen
+#      - vienna
+#      - rectlinear
+#      - pace
+#      - vlsi
+#      - crossgrid
+#      - euclidian
+#      - artificial
+#      - random
   hsv:
     all:
-      - group
-      - copenhagen
-      - vienna
+#      - group
+#      - copenhagen
+#      - vienna
       - rectlinear
-      - pace
-      - vlsi
-      - crossgrid
-      - euclidian
-      - artificial
-      - random
+#      - pace
+#      - vlsi
+#      - crossgrid
+#      - euclidian
+#      - artificial
+#      - random
