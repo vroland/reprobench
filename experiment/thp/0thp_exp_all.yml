@@ -2,7 +2,7 @@ title: THP
 description: Benchmark for different runtimes with and without glibc hack
 
 limits:
-  time: 5 # s
+  time: 900 # s
 #  time: 3600
   memory: 8048 # mb
   scheduler_memory: 32768 #mb
@@ -46,11 +46,11 @@ tasks:
     type: file
 #    urls:
 #      - https://www.cs.uni-potsdam.de/wv/projects/sets/set-industrial-09-12-gauss.tar.xz
-    path: /projects/p_gpusat/automated-reasoner-builds/benchmarks/SAT_gauss
+    path: /files/00-DBAI/home/jfichte/projects/p_gpusat/automated-reasoner-builds/benchmarks/SAT_gauss
 #    path: ./tasks/thp/sat/
     extract_archives: true
     patterns: |
-      AProVE09-05.cnf.gz
+      **/*
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
@@ -132,21 +132,23 @@ tools:
 #          - lingelingplain
 #          - MapleLCMDiscChronoBT-DL-v3
 #          - zchaff.2001
+          - zchaff.2001.2.17_i686
+#          - zchaff.2001.2.17_32
 #          - zchaff.2004.05.13
 #          - zchaff.2004.11.15
 #          - zchaff.2007.03.12_x64
 #          - grasp.1996_jkf_mh
 #          - grasp.2008.06.22_armin1
 #          - grasp.2008.06.22_armin2
-          - cryptominisat5
-          - belsat
+#          - cryptominisat5
+#          - belsat
 # DOES NOT WORK YET
 #          - berkmin
-          - minisat2.0
-          - rsat_2.0
-          - siege_v1
-          - siege_v3
-          - siege_v4
+#          - minisat2.0
+#          - rsat_2.0
+#          - siege_v1
+#          - siege_v3
+#          - siege_v4
 #          - ubcsat2006gsat
 #          - ubcsat2006gsats
 #          - ubcsat2006gwsat

@@ -67,6 +67,8 @@ elif [ "$solver" == "lingelingplain" ] ; then
   solver_cmd="./lingeling_glibc --plain $*"
 elif [ "$solver" == "zchaff.2001" ] ; then
   solver_cmd="./zchaff.2001 $*"
+elif [ "$solver" == "zchaff.2001.2.17_i686" ] ; then
+  solver_cmd="./zchaff.2001.2.17_i686 $*"
 elif [ "$solver" == "zchaff.2004.05.13" ] ; then
   solver_cmd="./zchaff.2004.05.13 $*"
 elif [ "$solver" == "zchaff.2004.11.15" ] ; then
