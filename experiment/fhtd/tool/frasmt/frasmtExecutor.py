@@ -6,7 +6,7 @@ from loguru import logger
 from reprobench.executors.db import RunStatisticExtended
 from reprobench.tools.executable import ExecutableTool
 
-
+#TODO: Result-Parser
 class FhtdTool(ExecutableTool):
     name = "SAT Tool"
     prefix = '-'
@@ -38,7 +38,11 @@ class FhtdTool(ExecutableTool):
             input_str="-f %s" % self.task,
             out_path=self.get_out_path(),
             err_path=self.get_err_path(),
+            #TODO: refactor all
+            #TODO: toolname
+            date=self.date
         )
+
 
     @staticmethod
     def keys():

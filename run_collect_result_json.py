@@ -3,6 +3,7 @@ import glob
 import importlib
 import json
 import os
+import pathlib
 
 import pandas as pd
 import yaml
@@ -27,10 +28,15 @@ with open('./benchmark_system_config.yml') as config_f:
 config = mconfig['default_exp_config']
 config = read_config(config, resolve_files=True)
 
+nonzero_rte = None
+module = None
 for module in config['steps']['run']:
     if module['module'] != 'reprobench.executors.RunSolverPerfEval':
         continue
     nonzero_rte = module['config']['nonzero_rte']
+
+if module is None or nonzero_rte is None:
+    raise RuntimeError
 
 tools = {}
 i = 0
@@ -67,40 +73,49 @@ if send_events:
 df = None
 
 # TODO: handling of multiple keys
+add_keys = ["platform", "hostname", "run_id"]
 for folder in folders:
     for file in glob.glob('%s/**/result.json' % folder, recursive=True):
         my_folder = os.path.dirname(file)
-        result_p = "%s/result.json" % my_folder
+        result_p = f"{my_folder}/result.json"
+        cols = set(RunSolverPerfEval.keys() + module.keys() + add_keys)
+        with open(f"{my_folder}/run.json", 'r') as run_f:
+            run_info = json.load(run_f)
+        try:
+            run_id = run_info['run_id']
+        except KeyError:
+            run_id = os.path.dirname(result_f.name).replace(str(pathlib.Path(__file__).parent.absolute()) + '/', '')
+
         with open(result_p, 'r') as result_f:
+            if df is None:
+                df = pd.DataFrame(columns=set(RunSolverPerfEval.keys() + module.keys()))
             try:
                 result = json.load(result_f)
-            except json.decoder.JSONDecodeError as e:
+                if not 'run_id' in result:
+                    raise KeyError
+            except (json.decoder.JSONDecodeError, KeyError) as e:
                 #TODO: refactor
                 logger.error(e)
-                logger.error(result_p)
-                stats = {'verdict': RunStatisticExtended.RUNTIME_ERR, 'run_id': result['run_id'], 'return_code': '9'}
-                for e in set(cols) - set(stats.keys()):
+                logger.error(f"Instance {run_id} did not finish properly.")
+                stats = {'verdict': RunStatisticExtended.RUNTIME_ERR, 'run_id': run_id, 'return_code': '9'}
+                for e in set(cols) - set(stats.keys()) - {"hostname"}:
                     stats[e] = 'NaN'
+                stats['hostname'] = 'unknown'
                 df.loc[len(df)] = stats
                 continue
-            stats = RunSolverPerfEval.compile_stats(stats=result, run_id=result['run_id'], nonzero_as_rte=nonzero_rte)
+            #TODO: continue here
+            stats = RunSolverPerfEval.compile_stats(stats=result, run_id=run_id, nonzero_as_rte=nonzero_rte)
             # TODO: after updating to non-sql database move things
 
             problem_stats = module.evaluator(os.path.dirname(file), stats)
             stats.update(problem_stats)
 
-            if df is None:
-                # TODO: handling of missing keys and default from file
-                # df = pd.DataFrame(columns=result.keys())
-                df = pd.DataFrame(columns=set(RunSolverPerfEval.keys()+module.keys()))
-            cols = df.columns
             try:
                 df.loc[len(df)] = stats
             except ValueError as e:
                 missing = set(cols) - set(stats.keys())
                 if missing != {'runsolver_error'} and missing != {'err', 'runsolver_error'}:
-                    logger.info("Following keys where missing... adding na.")
-                    logger.info(missing)
+                    logger.info(f"Missing keys ({missing}) for instance {run_id} adding na.")
                 for e in missing:
                     stats[e] = 'NaN'
                 df.loc[len(df)] = stats

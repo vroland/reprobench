@@ -40,7 +40,7 @@ class BaseManager(object):
         # we have to update the initial cluster id here, simply because we know the id from the cluster scheduler....
         payload = dict(
             config=bootstrapped_config, output_dir=self.output_dir,
-            repeat=self.repeat, cluster_job_id=self.cluster_job_id
+            repeat=self.repeat, cluster_job_id=self.cluster_job_id, overwrite=True
         )
         send_event(self.socket, SUBMITTER_BOOTSTRAP, payload)
         self.num_pending = decode_message(self.socket.recv())

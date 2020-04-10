@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import re
+
 import numpy as np
 from pandas.plotting import scatter_matrix
 import pandas as pd
@@ -29,20 +31,24 @@ import matplotlib.pyplot as plt
 # output_THP_sat_t0_1-3.csv
 # output_THP_sat-2020-02-05.csv
 # output_THP_sat-2020-02-12.csv
+config_re = re.compile(r"default\[s=(?P<solver>([\w.-]+),(t=[01]))(,[\w=]*)*\]")
+
 for filename in ['output_THP_2020_04_08_cryptominisat.csv']:
     print('=' * 200)
     print(filename)
     print('=' * 200)
     df = pd.read_csv(filename)
 
+    df['solver'] = df['run_id'].apply(lambda row: re.findall(config_re, row.split('/')[2])[0][1])
+    df['group'] = df['run_id'].apply(lambda row: re.findall(config_re, row.split('/')[2])[0][2])
     df['instance'] = df['run_id'].apply(lambda row: '/'.join(row.split('/')[3:-1]))
     df['run'] = df['run_id'].apply(lambda row: int(row.split('/')[-1]))
-    df['group'] = df['run_id'].apply(lambda row: row.split('/')[2][-4:-1])
+    # df['group'] = df['run_id'].apply(lambda row: row.split('/')[2][-4:-1])
     # print(df['group'].unique())
     # print(df['run_id'])
     # exit(1)
 
-    df['solver'] = df['run_id'].apply(lambda row: row.split('/')[2][10:-5])
+
     df['instance'] = df['run_id'].apply(lambda row: '/'.join(row.split('/')[3:-1]))
     df['hostname'] = df['hostname'].apply(lambda row: row.split('.')[0])
     #
@@ -127,6 +133,8 @@ for filename in ['output_THP_2020_04_08_cryptominisat.csv']:
                'mergesat,t=1': ('mergesat(thp)', '#cab2d6', '-'),
                'plingeling,t=0': ('plingeling', '#b15928', '-'),
                'plingeling,t=1': ('plingeling(thp)', '#ffff99', '-'),
+               'cryptominisat5,t=0': ('plingeling', '#b15928', '-'),
+               'cryptominisat5,t=1': ('plingeling(thp)', '#ffff99', '-'),
                }
     skip = ['maplesat-glibc', 'maplesat-glibcthp',
             'lingeling-glibc', 'lingeling-glibcthp',
@@ -284,19 +292,6 @@ for filename in ['output_THP_2020_04_08_cryptominisat.csv']:
     plt.rcParams['text.latex.preamble'] = [r'\usepackage{amsmath}\def\hy{\hbox{-}\nobreak\hskip0pt}']
 
     lfont = lambda x: '$\mathtt{%s}$' % x.replace('-', '\hy')
-    color_m = {'lingeling,t=1': ('lingeling(thp)', '#a6cee3', '-'),
-               'lingeling,t=0': ('lingeling', '#1f78b4', '-'),
-               'glucose,t=0': ('glucose', '#33a02c', '-'),
-               'glucose,t=1': ('glucose(thp)', '#b2df8a', '-'),
-               'minisat,t=0': ('minisat', '#e31a1c', '-'),
-               'minisat,t=1': ('minisat(thp)', '#fb9a99', '-'),
-               'maplesat,t=0': ('maplesat', '#ff7f00', '-'),
-               'maplesat,t=1': ('maplesat(thp)', '#fdbf6f', '-'),
-               'mergesat,t=0': ('mergesat', '#6a3d9a', '-'),
-               'mergesat,t=1': ('mergesat(thp)', '#cab2d6', '-'),
-               'plingeling,t=0': ('plingeling', '#b15928', '-'),
-               'plingeling,t=1': ('plingeling(thp)', '#ffff99', '-'),
-               }
     skip = ['maplesat-glibc', 'maplesat-glibcthp',
             'lingeling-glibc', 'lingeling-glibcthp',
             'minisat-glibc', 'minisat-glibcthp',

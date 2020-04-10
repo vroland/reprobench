@@ -76,6 +76,7 @@ class CoreObserver(Observer):
             parameters=pg,
             steps=list(runsteps.dicts()),
             limits=limits,
+            date=run.created_at.isoformat()
         )
         logger.trace(run_dict)
         return run_dict
@@ -116,9 +117,9 @@ class CoreObserver(Observer):
             num_pending_runs = cls.get_pending_runs()
             logger.debug('Sending bootstrap "%s"' % address)
             reply.send_multipart([address, encode_message(num_pending_runs)])
-            # raise RuntimeError
         elif event_type == SUBMITTER_REPORTBACK:
             pending_runs = cls.update_cluster_id_for_runs(**payload)
+            logger.debug(f"Pending runs: {pending_runs}")
         elif event_type == WORKER_JOIN:
             run = cls.get_next_pending_run(**payload)
             reply.send_multipart([address, encode_message(run)])

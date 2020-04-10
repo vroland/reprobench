@@ -39,9 +39,7 @@ class SteinerTool(ExecutableTool):
 
     @staticmethod
     def keys():
-        return ["width", 'width_frac_numerator', 'width_frac_denominator', "err", '#vertices', '#hyperedges',
-                'ret_fhtd', 'size_largest_hyperedge', 'pre_clique_size', 'num_twins', 'hash', 'enc_wall', 'pre_wall',
-                'verdict']
+        return ["solution", 'verdict']
 
     @staticmethod
     def err_dict(verdict):

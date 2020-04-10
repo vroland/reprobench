@@ -19,7 +19,7 @@ class Observer:
         server.observers.append(cls)
 
     @classmethod
-    def handle_event(cls, event_type, payload, **kwargs):
+    def handle_event(cls, event_type, payload, unqlite, **kwargs):
         logger.debug(event_type)
         pass
 
@@ -42,6 +42,7 @@ class Tool:
         self.parameters = context["run"]["parameters"]
         self.task = context["run"]["task"]
         self.tool_name = context["tool_name"]
+        self.date = context["run"]["date"]
 
     def prerun(self, executor):
         raise NotImplementedError

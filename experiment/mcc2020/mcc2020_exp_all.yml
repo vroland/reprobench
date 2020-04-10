@@ -44,17 +44,24 @@ observers:
 tasks:
   track1_mc:
     type: file
-    path: /projects/p_mcc2020
+    path: /projects/p_mcc2020/test
     extract_archives: true
     patterns: |
-      **/C4D9N150_28.mcc2020_cnf
+      4step.cnf.gz
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
       !**/*.tgz
       !**/.*
       !**.*~
-      !**/dfremont_old_format/*
+      !**/mcc2020_pcnf
+      !**/*.txt
+      !**/*.md
+      !**/*.smt
+      !**/*.pdf
+      !**/*.processed
+#      **/*
+#      **/C4D9N150_28.mcc2020_cnf
 #      **/*.mcc2020_cnf
 
   track2_wmc:
@@ -102,11 +109,25 @@ tools:
         t:
           - 0
 
+  number_sat_gen_pre:
+    module: experiment.mcc2020.tool.mc.mcpreExecutor.MCPreprocessor
+    parameters:
+      pmc:
+        cmd: "pre/pmc -affine -orGate -equiv -vivification -litImplied -eliminateLit -addClause -rewrite {filename}"
+        output: "/home/vagrant/project_output/{filename}.pmc"
+      b+e:
+        cmd: "pre/b+e -limSolver=1000 {filename}"
+        output: "/home/vagrant/project_output/{filename}.b+e"
+#testinstances
+
 #TODO:
 runs:
-  number_sat:
+  number_sat_gen_pre:
     all:
       - track1_mc
+#  number_sat:
+#    all:
+#      - track1_mc
 
 
 #TODO:

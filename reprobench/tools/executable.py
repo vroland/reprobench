@@ -55,5 +55,6 @@ class ExecutableTool(Tool):
             directory=self.cwd,
             out_path=self.get_out_path(),
             err_path=self.get_err_path(),
-            task=self.task
+            task=self.task,
+            date=self.date
         )

@@ -22,7 +22,7 @@ tasks:
 #    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/SAT_2014app/
 ##    path: ./tasks/thp/sat/
 #    extract_archives: true
-#    patterns: |
+#    err_patterns: |
 #      **/*
 #      !**/*.tar.bz2
 #      !**/*.tar.xz

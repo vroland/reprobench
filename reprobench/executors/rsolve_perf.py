@@ -4,6 +4,7 @@ import os
 import pathlib
 import platform
 import re
+import shutil
 import tempfile
 from subprocess import Popen, PIPE
 
@@ -95,7 +96,11 @@ class RunSolverPerfEval(Executor):
                 stats['return_code'] = stats['runsolver_STATUS']
             except KeyError:
                 stats['return_code'] = '9'
-            stats['cpu_time'] = stats['runsolver_CPUTIME']
+            try:
+                stats['cpu_time'] = stats['runsolver_CPUTIME']
+            except KeyError:
+                logger.error(f"The run probably failed for instance {run_id}...")
+                return stats
             stats['wall_time'] = stats['runsolver_WCTIME']
             stats['max_memory'] = stats['runsolver_MAXVM']
 
@@ -173,21 +178,31 @@ class RunSolverPerfEval(Executor):
         err_path=None,
         input_str=None,
         directory=None,
+        date=None,
+        output_path=None,
         **kwargs,
     ):
-        stats = {'platform': platform.platform(aliased=True), 'hostname': platform.node()}
+        #TODO/NEXT
+        #TODO: add toolname
+        stats = {'date': date, 'platform': platform.platform(aliased=True), 'hostname': platform.node()}
 
         cmdline[0] = str(pathlib.Path(cmdline[0]).resolve())
 
         with tempfile.NamedTemporaryFile(prefix='rsolve_perf_tmp', dir='/dev/shm', delete=True) as f:
             logger.debug(f"Extracting instance {input_str} to {f.name}")
-            transparent_cat = f"{self.reprobench_path}/lib/tcat.sh {input_str} -o {f.name}"
+            if "-f" in input_str:
+                input_str = input_str.split(" ")[1]
+            ifilename = input_str
+
+            transparent_cat = f"{self.reprobench_path}/lib/tcat.sh -f {input_str} -o {f.name}"
 
             logger.trace(transparent_cat)
             p_tmpout = Popen(transparent_cat, stdout=PIPE, stderr=PIPE, shell=True, close_fds=True,
                              cwd=self.reprobench_path)
             output, err = p_tmpout.communicate()
+
             if err != b'':
+                logger.error(output)
                 logger.error(err)
                 stats['error'] = err
                 exit(1)
@@ -200,10 +215,14 @@ class RunSolverPerfEval(Executor):
 
             logger.debug(perflog)
 
-            ifilename = input_str
-            if "-f" in ifilename:
-                ifilename = ifilename.split(" ")[1]
-            solver_cmd = f"{' '.join(cmdline)} -f {f.name} -i {ifilename}"
+            if '{filename}' in cmdline:
+                debug_cmd=" ".join(cmdline).format(filename=ifilename)
+                logger.info(debug_cmd)
+                solver_cmd = " ".join(cmdline).format(filename=f.name)
+                logger.trace(f"Command (with zcat/... handling): was {solver_cmd}")
+            else:
+                solver_cmd = f"{' '.join(cmdline)} -f {f.name} -i {ifilename}"
+
             logger.trace(f"Solver command was: {solver_cmd}")
             # perf list
             perfcmdline = f"/usr/bin/perf stat -o {perflog} -e dTLB-load-misses,dTLB-loads,dTLB-store-misses," \
@@ -230,6 +249,20 @@ class RunSolverPerfEval(Executor):
                 stats['error'] = ''
 
             stats = self.parse_logs(perflog, varfile, watcher, stdout_p, stats)
+
+            if output_path:
+                if "{filename}" in output_path:
+                    output_path=output_path.replace("{filename}", ifilename)
+                    if output_path.endswith('gz') or output_path.endswith('bz2') or output_path.endswith('xy'):
+                        output_path=os.path.splitext(output_path)[0]
+                    logger.info(f"Writing stdout to {output_path}")
+                    odir = os.path.dirname(output_path)
+                    if not os.path.exists(odir):
+                        os.makedirs(odir)
+                    shutil.copyfile(stdout_p,output_path)
+                else:
+                    raise NotImplementedError
+
 
             logger.trace(stats)
             logger.debug(f"Finished {directory}")

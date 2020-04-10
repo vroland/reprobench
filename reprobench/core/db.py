@@ -14,7 +14,6 @@ from playhouse.apsw_ext import (
 
 db = Proxy()
 
-
 class BaseModel(Model):
     class Meta:
         database = db

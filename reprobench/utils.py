@@ -15,6 +15,7 @@ import numpy
 import requests
 import strictyaml
 import zmq
+from unqlite import UnQLite
 
 from reprobench.core.exceptions import ExecutableNotFoundError, NotSupportedError
 from reprobench.core.schema import schema
@@ -226,6 +227,18 @@ def get_db_path(output_dir):
     return str((Path(output_dir) / f"benchmark.db").resolve())
 
 
+def get_unqlitedb_path(output_dir):
+    """Get the database path from the given output directory
+
+    Args:
+        output_dir (str): path to the output directory
+
+    Returns:
+        str: database path
+    """
+    return str((Path(output_dir) / f"benchmark_results.unqlite").resolve())
+
+
 def init_db(db_path):
     """Initialize the given database
 
@@ -258,7 +271,7 @@ def resolve_files_uri(root):
 
     for k in iterator:
         if isinstance(root[k], str) and root[k].startswith(protocol):
-            root[k] = Path(root[k][len(protocol) :]).read_text()
+            root[k] = Path(root[k][len(protocol):]).read_text()
         elif isinstance(root[k], Iterable) and not isinstance(root[k], str):
             resolve_files_uri(root[k])
 
@@ -280,8 +293,8 @@ def read_config(config_path, resolve_files=False):
 
     with open(config_path, "r") as f:
         config_text = f.read()
-        #TODO: fixeme, ignore Schema for now....
-        #, schema=schema
+        # TODO: fixeme, ignore Schema for now....
+        # , schema=schema
         config = strictyaml.load(config_text).data
 
         if 'additional_config_files' in config:
@@ -411,7 +424,7 @@ def parse_pcs_parameters(lines):
 
         comment_pos = line.find("#")
         pos = line.find(parameter_range_indicator, comment_pos)
-        parameter_str = line[pos + len(parameter_range_indicator) :].strip()
+        parameter_str = line[pos + len(parameter_range_indicator):].strip()
 
         parameter_range = get_pcs_parameter_range(parameter_str, is_categorical)
 
@@ -434,4 +447,3 @@ def check_valid_config_space(config_space, parameters):
     for key, value in parameters.items():
         if key in base:
             base[key] = value
-

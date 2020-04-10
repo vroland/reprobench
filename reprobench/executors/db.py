@@ -37,6 +37,7 @@ class RunStatistic(BaseModel):
 
 
 class RunStatisticExtended(BaseModel):
+    #TODO: move everything to PerfExecutor
     TIMEOUT = "TLE"
     MEMOUT = "MEM"
     RUNTIME_ERR = "RTE"
@@ -82,7 +83,7 @@ class RunStatisticExtended(BaseModel):
     perf_context_switches = FloatField(null=True)
     return_code = IntegerField(null=True)
 
-    #think about removing; but duplicate data helps here to work faster...
+    # think about removing; but duplicate data helps here to work faster...
     platform = CharField(null=True)
     hostname = CharField(null=True)
 

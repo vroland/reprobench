@@ -67,7 +67,7 @@ tasks:
 #    path: /scratch/p_gpusat/automated-reasoner-builds/benchmark/SAT_2014app/
 ##    path: ./tasks/thp/sat/
 #    extract_archives: true
-#    patterns: |
+#    err_patterns: |
 #      **/*
 #      !**/*.tar.bz2
 #      !**/*.tar.xz
@@ -85,7 +85,7 @@ tasks:
 #    path: /scratch/p_gpusat/automated-reasoner-builds/benchmarks/ASP_gauss/
 ##    path: ./tasks/thp/ASP/
 #    extract_archives: true
-#    patterns: |
+#    err_patterns: |
 #      csp010-SocialGolfer_w3_g3_s6.dlv.dat.lp.lp
 #      !**/*.tar.bz2
 #      !**/*.tar.xz
@@ -101,7 +101,7 @@ tasks:
 # #        - https://github.com/dfremont/counting-benchmarks.git
 #     path: /projects/p_gpusat/automated-reasoner-builds/benchmarks/mc
 #     extract_archives: true
-#     patterns: |
+#     err_patterns: |
 #       *.gz
 #       !*.b+e.gz
 #       !*.pmc.gz

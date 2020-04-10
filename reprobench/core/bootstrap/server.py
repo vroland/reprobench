@@ -2,6 +2,7 @@ import itertools
 import json
 from pathlib import Path
 
+import peewee
 from loguru import logger
 from peewee import chunked
 from tqdm import tqdm
@@ -22,6 +23,7 @@ from reprobench.core.db import (
 from reprobench.utils import (
     check_valid_config_space,
     get_db_path,
+    get_unqlitedb_path,
     import_class,
     init_db,
     is_range_str,
@@ -38,6 +40,7 @@ except ImportError:
 def bootstrap_db(output_dir):
     db_path = get_db_path(output_dir)
     init_db(db_path)
+
     db.connect()
     db.create_tables(MODELS, safe=True)
 
@@ -211,7 +214,7 @@ def bootstrap_tools(config):
             create_parameter_group(tool_name, group, parameters)
 
 
-def bootstrap_runs(benchmark_name, output_dir, repeat=1, cluster_job_id=-1):
+def bootstrap_runs(benchmark_name, output_dir, repeat=1, cluster_job_id=-1, overwrite=False):
     tasks2tools = Task2Tool.select().where(Task2Tool.benchmark_name == benchmark_name)
     # collect task groups
     params = {}
@@ -241,7 +244,6 @@ def bootstrap_runs(benchmark_name, output_dir, repeat=1, cluster_job_id=-1):
                 continue
             for e in params[group]:
                 # tt_id, benchmark_name, tool, parameters
-                logger.debug(f"{path}/{instance}")
                 logger.trace(f"|path| {path}")
                 logger.trace(f"|group| {group} |e| {e}")
                 for iteration in range(repeat):
@@ -257,19 +259,32 @@ def bootstrap_runs(benchmark_name, output_dir, repeat=1, cluster_job_id=-1):
                                  task=t_id, parameter_group=e['pg_id'], status=Run.PENDING,
                                  iteration=iteration)
                     logger.trace(myrun)
-                    query = Run.insert(myrun)
-                    query.execute()
+                    if not overwrite:
+                        try:
+                            query = Run.insert(myrun)
+                            query.execute()
+                        except peewee.IntegrityError as e:
+                            logger.error("Insert failed. Likely you have already ran an experiment on those instances."
+                                         "You need to start the benchmark with force overwrite.")
+                            logger.info(f"Error message was {e}")
+                    else:
+                        logger.info("Note that the runner indicated insert overwrite on the benchmarks.")
+                        query = Run.insert(myrun).on_conflict('replace')
+                        query.execute()
     return
 
 
-def bootstrap(config=None, output_dir=None, repeat=1, server=None, cluster_job_id=-1):
+def bootstrap(config=None, output_dir=None, repeat=1, server=None, cluster_job_id=-1, overwrite=False):
     Path(output_dir).mkdir(parents=True, exist_ok=True)
+    #TODO: doublecheck, this might not work with multiple runs
     bootstrap_db(output_dir)
+    #TODO: doublecheck this might not work with multiple jobs of different requirements
     bootstrap_limits(config)
     bootstrap_steps(config)
+    #TODO: unsure whether the MVC is actually useful here; desipte the it might seem hard to debug then
     bootstrap_observers(config, server)
     register_steps(config)
     bootstrap_tasks(config)
     bootstrap_tools(config)
     bootstrap_tasks2tools(config)
-    bootstrap_runs(config['title'], output_dir, repeat, cluster_job_id)
+    bootstrap_runs(config['title'], output_dir, repeat, cluster_job_id, overwrite)
