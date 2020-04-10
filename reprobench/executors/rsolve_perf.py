@@ -258,7 +258,10 @@ class RunSolverPerfEval(Executor):
                     logger.info(f"Writing stdout to {output_path}")
                     odir = os.path.dirname(output_path)
                     if not os.path.exists(os.path.realpath(odir)):
-                        os.makedirs(odir)
+                        try:
+                            os.makedirs(odir)
+                        except FileExistsError as e:
+                            logger.warning(f"Pretended that the folder already existed. Error was: {e}")
                     shutil.copyfile(stdout_p,output_path)
                 else:
                     raise NotImplementedError
