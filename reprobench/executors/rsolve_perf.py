@@ -257,7 +257,7 @@ class RunSolverPerfEval(Executor):
                         output_path=os.path.splitext(output_path)[0]
                     logger.info(f"Writing stdout to {output_path}")
                     odir = os.path.dirname(output_path)
-                    if not os.path.exists(odir):
+                    if not os.path.exists(os.path.realpath(odir)):
                         os.makedirs(odir)
                     shutil.copyfile(stdout_p,output_path)
                 else:
