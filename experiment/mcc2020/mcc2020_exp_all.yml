@@ -114,10 +114,10 @@ tools:
     parameters:
       pmc:
         cmd: "pre/pmc -affine -orGate -equiv -vivification -litImplied -eliminateLit -addClause -rewrite {filename}"
-        output: "/home/vagrant/project_output/{filename}.pmc"
+        output: "/home/jfichte/project_output/{filename}.pmc"
       b+e:
         cmd: "pre/b+e -limSolver=1000 {filename}"
-        output: "/home/vagrant/project_output/{filename}.b+e"
+        output: "/home/jfichte/project_output/{filename}.b+e"
 #testinstances
 
 #TODO:
