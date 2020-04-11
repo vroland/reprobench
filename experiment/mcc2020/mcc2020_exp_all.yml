@@ -46,7 +46,8 @@ observers:
 tasks:
   track1_mc:
     type: file
-    path: /projects/p_mcc2020/test
+#    path: /projects/p_mcc2020/test
+    path: ./experiment/mcc2020/test_instances
     extract_archives: true
     patterns: |
       4step.cnf.gz
@@ -66,33 +67,33 @@ tasks:
 #      **/C4D9N150_28.mcc2020_cnf
 #      **/*.mcc2020_cnf
 
-  track2_wmc:
-    type: file
-    path: /projects/p_mcc2020
-    extract_archives: true
-    patterns: |
-      **/*.mcc2020_wcnf
-      !**/*.tar.bz2
-      !**/*.tar.xz
-      !**/*.tar.gz
-      !**/*.tgz
-      !**/.*
-      !**.*~
-      !**/dfremont_old_format/*
+  # track2_wmc:
+  #   type: file
+  #   path: /projects/p_mcc2020
+  #   extract_archives: true
+  #   patterns: |
+  #     **/*.mcc2020_wcnf
+  #     !**/*.tar.bz2
+  #     !**/*.tar.xz
+  #     !**/*.tar.gz
+  #     !**/*.tgz
+  #     !**/.*
+  #     !**.*~
+  #     !**/dfremont_old_format/*
 
-  track3_pmc:
-    type: file
-    path: /projects/p_mcc2020
-    extract_archives: true
-    patterns: |
-      **/*.mcc2020_pcnf
-      !**/*.tar.bz2
-      !**/*.tar.xz
-      !**/*.tar.gz
-      !**/*.tgz
-      !**/.*
-      !**.*~
-      !**/dfremont_old_format/*
+  # track3_pmc:
+  #   type: file
+  #   path: /projects/p_mcc2020
+  #   extract_archives: true
+  #   patterns: |
+  #     **/*.mcc2020_pcnf
+  #     !**/*.tar.bz2
+  #     !**/*.tar.xz
+  #     !**/*.tar.gz
+  #     !**/*.tgz
+  #     !**/.*
+  #     !**.*~
+  #     !**/dfremont_old_format/*
 
 tools:
   number_sat:
