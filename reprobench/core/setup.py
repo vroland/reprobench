@@ -23,7 +23,7 @@ class SetupKernel(Step):
         KernelParameters.create_table()
 
     @classmethod
-    def _set_thp(cls,config):
+    def _set_thp(cls, config):
         info = {}
 
         info["platform"] = platform.platform(aliased=True)
@@ -41,7 +41,21 @@ class SetupKernel(Step):
             with open('/sys/kernel/mm/transparent_hugepage/enabled', 'r') as thp:
                 value = thp.readlines()
                 logger.info(f"THP value is now: {value}")
-                info['transparent_hugepage']=value
+                info['transparent_hugepage'] = value
+
+        # see: Hackenberg, Schoene, Ilsche, Molka, Schuchart, Geyer: An Energy Efficiency Feature Survey of the Intel Haswell Processor (IPDPSW'2015)
+        if 'governors' in config:
+            driver = ''
+            try:
+                governor_path = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_driver"
+                with open(governor_path, 'r') as driver_fh:
+                    driver = driver_fh.read()
+                    logger.info(f"Driver was {driver}")
+                logger.error(driver)
+                exit(1)
+            except FileNotFoundError as e:
+                logger.error(f"Was unable to set performance governor (file {governor_path} does not exist.")
+            pass
 
         return info
 
