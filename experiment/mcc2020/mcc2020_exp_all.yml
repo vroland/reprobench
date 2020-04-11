@@ -9,6 +9,7 @@ limits:
 
 steps:
   run:
+# move to step that runs once on a node, but not every time; there is no point in collecting the data every time
     - module: reprobench.core.sysinfo.CollectSystemInfo4Server
     - module: reprobench.core.setup.SetupKernel
       config:
