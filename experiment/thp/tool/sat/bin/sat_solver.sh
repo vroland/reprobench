@@ -63,6 +63,10 @@ cd "$(dirname "$0")" || (echo "Could not change directory to $0. Exiting..."; ex
 
 if [ "$solver" == "plingeling" ] ; then
   solver_cmd="./"$solver"_glibc -t 1 -g 8 $*"
+elif [ "$solver" == "satz_x86_64" ] ; then
+	  solver_cmd="./satz_x86_64 $*"
+elif [ "$solver" == "sato3.2" ] ; then
+  solver_cmd="./sato3.2 $*"
 elif [ "$solver" == "lingelingplain" ] ; then
   solver_cmd="./lingeling_glibc --plain $*"
 elif [ "$solver" == "zchaff.2001" ] ; then

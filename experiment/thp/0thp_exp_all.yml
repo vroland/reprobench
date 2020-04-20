@@ -132,14 +132,16 @@ tools:
 #          - lingelingplain
 #          - MapleLCMDiscChronoBT-DL-v3
 #          - zchaff.2001
-          - zchaff.2001.2.17_i686
+#          - sato3.2 
+          - satz_x86_64 #TODO
+#          - zchaff.2001.2.17_i686
 #          - zchaff.2001.2.17_32
 #          - zchaff.2004.05.13
 #          - zchaff.2004.11.15
 #          - zchaff.2007.03.12_x64
-#          - grasp.1996_jkf_mh
-#          - grasp.2008.06.22_armin1
-#          - grasp.2008.06.22_armin2
+          - grasp.1996_jkf_mh
+          - grasp.2008.06.22_armin1
+          - grasp.2008.06.22_armin2
 #          - cryptominisat5
 #          - belsat
 # DOES NOT WORK YET
