@@ -1,4 +1,4 @@
-#!/home/jfichte/anaconda3/envs/rb/bin/python
+#!/home/jfichte/miniconda3/envs/rb/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

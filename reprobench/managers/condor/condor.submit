@@ -29,7 +29,7 @@ initialdir = {{initialdir}}
 # ENVIRONMENT
 #=========================================================================
 getenv=True
-environment = "PATH=/home/jfichte/miniconda3/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
+environment = "PATH=/home/jfichte/miniconda3/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin SLURM_ARRAY_JOB_ID=$(Cluster)"
 #LD_LIBRARY_PATH=:/home/jfichte/.local/lib"
 
 #=========================================================================
@@ -43,7 +43,8 @@ should_transfer_files = NO
 # JOBS
 #=========================================================================
 {% for host in hosts %}
-Executable = {{rbdir}}/run_worker.py
+Executable = {{cmd}}
+Arguments  = {{args}}
 #reprobench-bin
 output = /home/decodyn/reprobench/output/condor_{{host}}.txt
 error = /home/decodyn/reprobench/output/condor_{{host}}.err

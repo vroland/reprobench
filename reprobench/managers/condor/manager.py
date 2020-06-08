@@ -14,7 +14,7 @@ from reprobench.managers.base import BaseManager
 from reprobench.utils import send_event
 
 from jinja2 import Template
-
+import re
 
 class CondorManager(BaseManager):
     def __init__(self, config, server_address, tunneling, **kwargs):
@@ -69,42 +69,15 @@ class CondorManager(BaseManager):
         subprocess.run(["condor_rm", f"jfichte"])
 
     def spawn_workers(self):
-        logger.info("Spawning workers...")
+        logger.info("Generating worker templates...")
 
-        address_args = f"--address={self.server_address}"
-        if self.tunneling is not None:
-            address_args = f"-h {self.tunneling['host']} -p {self.tunneling['port']} -K {self.tunneling['key_file']}"
-
-
-        hosts=list(range(int(f"{self.reserve_hosts}")))
-        with open(f"{self.rbdir}/output/conda_job_{self.config['title']}", "w") as condorsubmitfile:
-            with open(Path(__file__).parent / "condor.submit") as template:
-                t = Template(template.read())
-                condorsubmitfile.write(
-                    t.render(hosts=hosts, timeout=self.time_limit,rbdir=self.rbdir,
-                             memout=self.mem_limit, initialdir=f"{self.rbdir}/output/"))
-
-        exit(2)
-        
         target_path = f"{sys.exec_prefix}/bin/reprobench"
         if len(self.rbdir) > 0:
             target_path = f"{self.rbdir}/reprobench-bin"
-
-        worker_submit_cmd = [
-            "./sbatch",
-            "--parsable",
-            f"--array=1-{self.reserve_hosts}",
-            f"--time={self.time_limit}",
-            f"--mem={self.mem_limit}",
-            f"--cpus-per-task={self.cpus_per_task}",
-            f"--job-name={self.config['title']}-benchmark-worker",
-            f"--output={self.output_dir}/slurm-worker_%a.out",
-            f"--mail-user={self.email}",
-            f"--mail-type=end"
-        ]
-
-        if self.exclusive:
-            worker_submit_cmd.append("--exclusive")
+        
+        address_args = f"--address={self.server_address}"
+        if self.tunneling is not None:
+            address_args = f"-h {self.tunneling['host']} -p {self.tunneling['port']} -K {self.tunneling['key_file']}"
 
         # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         # PREPARE PARAMETERS FOR WORKER
@@ -112,10 +85,11 @@ class CondorManager(BaseManager):
         multicore_str = urllib.parse.quote(json.dumps(self.multicore))
         # TODO: change to human readable
 
-        worker_cmd = f"{target_path} worker {address_args} --multicore={multicore_str}"  # {self.multicore}
+        worker_cmd = f"worker {address_args} --multicore={multicore_str}"  # {self.multicore}
         if self.debug:
             worker_cmd += " -vv"
 
+        worker_submit_cmd = []
         # Additional args may contain args that are required by the scheduler
         if len(self.additional) > 0:
             additional_args = self.additional.split(" ")
@@ -129,14 +103,39 @@ class CondorManager(BaseManager):
                     if i + 1 < len(additional_args):
                         worker_submit_cmd.append(additional_args[i + 1])
 
-        # Finaly add command
-        worker_submit_cmd.append(f"--wrap=\"srun {worker_cmd}\"")
-        logger.error(worker_submit_cmd)
-        logger.trace(worker_submit_cmd)
+
+        logger.info(f"{worker_cmd}")
+        
+        # Construct Condor Job Script File
+        hosts=list(range(int(f"{self.reserve_hosts}")))
+        with open(f"{self.rbdir}/output/condor_job_{self.config['title']}", "w") as condorsubmitfile:
+            with open(Path(__file__).parent / "condor.submit") as template:
+                t = Template(template.read())
+                condorsubmitfile.write(
+                    t.render(cmd=f"{target_path}", hosts=hosts, timeout=self.time_limit,rbdir=self.rbdir,args=f"{worker_cmd}",
+                             memout=self.mem_limit, initialdir=f"{self.rbdir}/"))
+        worker_submit_cmd = [
+            f"/usr/bin/condor_submit",
+            f"{self.rbdir}/output/condor_job_{self.config['title']}"
+        ]
+
+        logger.info(f"Submit command: {worker_submit_cmd}")
 
         #Submit to cluster scheduler and report back the JobID
-        self.slurm_job_id = subprocess.check_output(" ".join(worker_submit_cmd), shell=True).decode().strip()
-        logger.info(f"Worker SLURM_ARRAY_JOB_ID/SLURM_JOB_ID: {self.slurm_job_id}")
+        res = subprocess.check_output(" ".join(worker_submit_cmd), shell=True).decode()
+        regex_str = "1\sjob\(s\)\ssubmitted\sto\scluster\s(?P<jobid>[0-9]+)\."
+        regex = re.compile(regex_str)
+        self.slurm_job_id = None
+        for line in res.split('\n'):
+            if line.startswith("Submitting job(s)."):
+                continue
+            find = regex.findall(line)
+            if len(find)>0:
+                self.slurm_job_id = find[0]
+                break
+        if self.slurm_job_id is None:
+            raise RuntimeError("An Error occured while submitting the job with condor")
+        logger.info(f"Worker CONDOR_JOB_ID: {self.slurm_job_id}")
 
     def get_initial_cluster_id(self):
         self.cluster_job_id = random.randint(0, 65536)

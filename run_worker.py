@@ -1,4 +1,4 @@
-#!/home/decodyn/reprobench/run_worker_env.sh
+#!/home/jfichte/miniconda3/envs/rb/bin/python
 #/home/jfichte/anaconda3/condabin/
 import argparse
 
