@@ -1,0 +1,52 @@
+universe = vanilla
+requirements = machine == "cobra-submit.kr.tuwien.ac.at"
+request_memory = +10G
+
+#requirements = machine != "cobra-submit.kr.tuwien.ac.at"
+#request_memory = +250G
+
+#TODO: check cluster timeout and memlimit
+#periodic_remove = (CurrentTime - JobCurrentStartDate) >= {{timeout}}
+#RemoteWallClockTime
+#(CurrentTime - EnteredCurrentStatus) >= 7200
+#max_run_time
+#remove_kill_sig   = SIGTERM
+remove_kill_sig = 15
+kill_sig = 15
+nice_user = True
+priority = 20
+job_max_vacate_time = 60
+
+#=========================================================================
+# PATHS
+#=========================================================================
+#initialdir required due to host misconfiguration on the cobra cluster
+initialdir = {{initialdir}}
+#remote_initialdir = $ENV(HOME)/benchmark
+
+
+#=========================================================================
+# ENVIRONMENT
+#=========================================================================
+getenv=True
+environment = "PATH=/home/jfichte/miniconda3/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
+#LD_LIBRARY_PATH=:/home/jfichte/.local/lib"
+
+#=========================================================================
+# NOTIFICATION
+#=========================================================================
+Notification = Never
+#Complete
+should_transfer_files = NO
+
+#=========================================================================
+# JOBS
+#=========================================================================
+{% for host in hosts %}
+Executable = {{rbdir}}/run_worker.py
+#reprobench-bin
+output = /home/decodyn/reprobench/output/condor_{{host}}.txt
+error = /home/decodyn/reprobench/output/condor_{{host}}.err
+log = /home/decodyn/reprobench/output/condor_{{host}}.log
+Queue 1
+{% endfor %}

@@ -141,7 +141,8 @@ class BenchmarkWorker:
                 logger.error(f"Failed to set affinity for control thread {ee}")
 
             # Get number of physical CPUs, not cores
-            val = subprocess.check_output('numactl --hardware', shell=True, text=True)
+            logger.error('FIXME: I AM JUST A FUCKING MOCK HERE')
+            val = subprocess.check_output('/home/jfichte/bin/numactl --hardware', shell=True, text=True)
             regex_p = re.compile(r"\s*available:\s*(?P<pcore>[0-9]+)\s*nodes\s*\((?P<nodes>([0-9]+-[0-9]+|[0-9]+))\)")
             rcores = regex_p.match(val.split("\n")[0])
             if rcores:

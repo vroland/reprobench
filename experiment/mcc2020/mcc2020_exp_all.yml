@@ -48,10 +48,10 @@ tasks:
   track1_mc:
     type: file
 #    path: /projects/p_mcc2020/test
-    path: ./experiment/mcc2020/test_instances
+    path: /mnt/vg01/lv01/home/decodyn/benchmarks/suites/MCC2020/x_ana_mcc2020/instances/test
     extract_archives: true
     patterns: |
-      4step.cnf.gz
+      **/*cnf
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz

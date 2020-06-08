@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/home/decodyn/reprobench/run_worker_env.sh
+#/home/jfichte/anaconda3/condabin/
 import argparse
 
 import yaml

@@ -2,6 +2,7 @@ name: rb
 channels:
   - defaults
 dependencies:
+  - jinja2
   - _libgcc_mutex=0.1=main
   - blas=1.0=mkl
   - ca-certificates=2019.10.16=0

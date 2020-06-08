@@ -4,6 +4,8 @@ from .local import LocalManager
 from .local import cli as local_cli
 from .slurm import SlurmManager
 from .slurm import cli as slurm_cli
+from .condor import CondorManager
+from .condor import cli as condor_cli
 from .sge import SgeManager
 from .sge import cli as sge_cli
 
