@@ -1,5 +1,5 @@
 universe = vanilla
-requirements = machine == "cobra-submit.kr.tuwien.ac.at"
+requirements = machine == "cobra-node11.kr.tuwien.ac.at"
 request_memory = +10G
 
 #requirements = machine != "cobra-submit.kr.tuwien.ac.at"

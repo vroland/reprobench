@@ -11,9 +11,11 @@ from reprobench.tools.executable import ExecutableTool
 class SATTool(ExecutableTool):
     name = "SAT Tool"
     prefix = '-'
-    path = "./bin/sat_solver.sh"
+    path = "./bins/mc_solver.sh"
 
     def get_arguments(self):
+        self.reprobench_path = os.path.abspath(os.path.join(os.path.dirname(reprobench.__file__), '..'))
+        self.parameters['d'] = f"{self.reprobench_path}/{self.cwd}"
         return [f"{self.prefix}{key} {value}" for key, value in self.parameters.items()]
 
     def get_cmdline(self):

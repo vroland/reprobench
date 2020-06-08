@@ -48,7 +48,7 @@ tasks:
   track1_mc:
     type: file
 #    path: /projects/p_mcc2020/test
-    path: /mnt/vg01/lv01/home/decodyn/benchmarks/suites/MCC2020/x_ana_mcc2020/instances/test
+    path: /mnt/vg01/lv01/home/decodyn/benchmarks/suites/MCC2020/x_ana_mcc2020/instances/track1_public
     extract_archives: true
     patterns: |
       **/*.mcc2020_cnf
@@ -56,6 +56,7 @@ tasks:
       !**/*.tar.xz
       !**/*.tar.gz
       !**/*.tgz
+      !**/*.bz2
       !**/.*
       !**.*~
       !**/mcc2020_pcnf
@@ -98,14 +99,29 @@ tasks:
 
 tools:
   number_sat:
-    module: experiment.mcc2020.tool.wmc.wmcExecutor.WMCTool
+    module: experiment.mcc2020.tool.mc.mcExecutor.SATTool
     parameters:
       default:
         s:
+         - addmc
+         - art-ai
+         - compile
+         - count_bareganak
+         - ispence
+         - msoos
+         - nus-narasimha
+         - nus-onlyapprox
+         - swats
+         - ucla-c2d
+         - ucla-c2d-bpe
+         - ucla-c2d-bpe2
+         - ucla-minic2d
+         - ucla-minic2d-bpe
+         - ucla-sdd-bpe
 #          - approxmc
 #          - c2d
 #          - cachet
-          - d4
+#          - d4
 #          - ganak
 #          - minic2d
 #          - sharpsat
@@ -138,12 +154,12 @@ tools:
 
 #TODO:
 runs:
-  number_sat_gen_pre:
-    all:
-      - track1_mc
-#  number_sat:
+#  number_sat_gen_pre:
 #    all:
 #      - track1_mc
+  number_sat:
+    all:
+      - track1_mc
 
 
 #TODO:
