@@ -1,18 +1,21 @@
+import inspect
 import os
+from pathlib import Path
 
 from loguru import logger
 
+import reprobench
 from reprobench.tools.executable import ExecutableTool
 
 
-class WMCTool(ExecutableTool):
-    name = "(W)MC Tool"
+class SATTool(ExecutableTool):
+    name = "SAT Tool"
     prefix = '-'
-    path = "./bin/wmc_solver.sh"
-    pre_path = "./pre/wmc_pre.sh"
-    #TODO: run preprocessor first and report preprocessing time separatley
+    path = "./bins/wmc_solver.sh"
 
     def get_arguments(self):
+        self.reprobench_path = os.path.abspath(os.path.join(os.path.dirname(reprobench.__file__), '..'))
+        self.parameters['d'] = f"{self.reprobench_path}/{self.cwd}"
         return [f"{self.prefix}{key} {value}" for key, value in self.parameters.items()]
 
     def get_cmdline(self):

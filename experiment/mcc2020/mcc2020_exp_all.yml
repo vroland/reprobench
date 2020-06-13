@@ -2,7 +2,8 @@ title: MCC2020
 description: Benchmark for fhtd experiments
 
 limits:
-  time: 1800 # s
+  time: 10 #s
+#  time: 1800 # s
 #  time: 3600
   memory: 16096 # mb
   scheduler_memory: 32768 #mb
@@ -69,19 +70,26 @@ tasks:
 #      **/C4D9N150_28.mcc2020_cnf
 #      **/*.mcc2020_cnf
 
-  # track2_wmc:
-  #   type: file
-  #   path: /projects/p_mcc2020
-  #   extract_archives: true
-  #   patterns: |
-  #     **/*.mcc2020_wcnf
-  #     !**/*.tar.bz2
-  #     !**/*.tar.xz
-  #     !**/*.tar.gz
-  #     !**/*.tgz
-  #     !**/.*
-  #     !**.*~
-  #     !**/dfremont_old_format/*
+  track2_wmc:
+    type: file
+    path: /mnt/vg01/lv01/home/decodyn/benchmarks/suites/MCC2020/x_ana_mcc2020/instances/track2_public
+    extract_archives: true
+    patterns: |
+      **/track2_000.mcc2020_wcnf
+      !**/*.tar.bz2
+      !**/*.tar.xz
+      !**/*.tar.gz
+      !**/*.tgz
+      !**/*.bz2
+      !**/.*
+      !**.*~
+      !**/mcc2020_pcnf
+      !**/*.txt
+      !**/*.md
+      !**/*.smt
+      !**/*.pdf
+      !**/*.processed
+#      **/*.mcc2020_wcnf
 
   # track3_pmc:
   #   type: file
@@ -129,6 +137,26 @@ tools:
         t:
           - 0
 
+  wmc:
+    #FIXME
+    module: experiment.mcc2020.tool.wmc.wmcExecutor.SATTool
+    parameters:
+      default:
+        s:
+         - addmc
+         - art-ai
+         - compile
+##         - ispence
+         - msoos
+         - nus-onlyapprox
+         - smsharma1
+         - ucla-c2d
+         - ucla-minic2d
+        #we are not interested in transparent huge pages here
+        t:
+          - 0
+
+
   number_sat_gen_pre:
     module: experiment.mcc2020.tool.mc.mcpreExecutor.MCPreprocessor
     parameters:
@@ -154,13 +182,13 @@ tools:
 
 #TODO:
 runs:
-#  number_sat_gen_pre:
+#  number_sat:
 #    all:
 #      - track1_mc
-  number_sat:
-    all:
-      - track1_mc
 
+  wmc:
+    all:
+      - track2_wmc
 
 #TODO:
 #config: "./benchmark_thp_bmc_sw.yml"
