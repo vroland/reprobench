@@ -26,7 +26,8 @@ multicore:
       2: 7..11
       3: 14..18
       4: 19..23
-server_url: "tcp://10.0.0.11:31318"
+#server_url: "tcp://10.0.0.11:31318"
+server_url: "tcp://127.0.0.1:31313"
 email: "johannes.fichte@tu-dresden.de"
 reserve_time: "18:00:00"
 
