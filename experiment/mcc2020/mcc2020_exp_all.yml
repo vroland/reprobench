@@ -70,12 +70,33 @@ tasks:
 #      **/C4D9N150_28.mcc2020_cnf
 #      **/*.mcc2020_cnf
 
-  track2_wmc:
+#  track2_wmc:
+#    type: file
+#    path: /mnt/vg01/lv01/home/decodyn/benchmarks/suites/MCC2020/x_ana_mcc2020/instances/track2_public
+#    extract_archives: true
+#    patterns: |
+#      **/*.mcc2020_wcnf
+#      !**/*.tar.bz2
+#      !**/*.tar.xz
+#      !**/*.tar.gz
+#      !**/*.tgz
+#      !**/*.bz2
+#      !**/.*
+#      !**.*~
+#      !**/mcc2020_pcnf
+#      !**/*.txt
+#      !**/*.md
+#      !**/*.smt
+#      !**/*.pdf
+#      !**/*.processed
+#      **/track2_000.mcc2020_wcnf
+
+  track3_pmc:
     type: file
-    path: /mnt/vg01/lv01/home/decodyn/benchmarks/suites/MCC2020/x_ana_mcc2020/instances/track2_public
+    path: /mnt/vg01/lv01/home/decodyn/benchmarks/suites/MCC2020/x_ana_mcc2020/instances/track3_public
     extract_archives: true
     patterns: |
-      **/track2_000.mcc2020_wcnf
+      **/track3_000.mcc2020_pcnf
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
@@ -89,21 +110,7 @@ tasks:
       !**/*.smt
       !**/*.pdf
       !**/*.processed
-#      **/*.mcc2020_wcnf
 
-  # track3_pmc:
-  #   type: file
-  #   path: /projects/p_mcc2020
-  #   extract_archives: true
-  #   patterns: |
-  #     **/*.mcc2020_pcnf
-  #     !**/*.tar.bz2
-  #     !**/*.tar.xz
-  #     !**/*.tar.gz
-  #     !**/*.tgz
-  #     !**/.*
-  #     !**.*~
-  #     !**/dfremont_old_format/*
 
 tools:
   number_sat:
@@ -156,6 +163,22 @@ tools:
         t:
           - 0
 
+  pmc:
+    #FIXME
+    module: experiment.mcc2020.tool.pmc.pmcExecutor.SATTool
+    parameters:
+      default:
+        s:
+         - compile
+         - count_bareganak
+         - k-hasimt
+         - nus-narasimha
+         - smsharma1
+         - nus-onlyapprox
+        #we are not interested in transparent huge pages here
+        t:
+          - 0
+
 
   number_sat_gen_pre:
     module: experiment.mcc2020.tool.mc.mcpreExecutor.MCPreprocessor
@@ -185,10 +208,12 @@ runs:
 #  number_sat:
 #    all:
 #      - track1_mc
-
-  wmc:
+#  wmc:
+#    all:
+#      - track2_wmc
+  pmc:
     all:
-      - track2_wmc
+      - track3_pmc
 
 #TODO:
 #config: "./benchmark_thp_bmc_sw.yml"
