@@ -2,9 +2,9 @@ title: MCC2020
 description: Benchmark for fhtd experiments
 
 limits:
-  time: 5 # s
+  time: 1800 # s
 #  time: 3600
-  memory: 8048 # mb
+  memory: 16096 # mb
   scheduler_memory: 32768 #mb
 
 steps:

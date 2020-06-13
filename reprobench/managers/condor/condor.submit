@@ -1,9 +1,9 @@
 universe = vanilla
 requirements = machine == "cobra-node11.kr.tuwien.ac.at"
-request_memory = +10G
+#request_memory = +10G
+request_memory = +250G
 
 #requirements = machine != "cobra-submit.kr.tuwien.ac.at"
-#request_memory = +250G
 
 #TODO: check cluster timeout and memlimit
 #periodic_remove = (CurrentTime - JobCurrentStartDate) >= {{timeout}}
