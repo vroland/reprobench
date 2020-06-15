@@ -123,7 +123,7 @@ class CondorManager(BaseManager):
 
         #Submit to cluster scheduler and report back the JobID
         res = subprocess.check_output(" ".join(worker_submit_cmd), shell=True).decode()
-        regex_str = "1\sjob\(s\)\ssubmitted\sto\scluster\s(?P<jobid>[0-9]+)\."
+        regex_str = "[0-9]+\sjob\(s\)\ssubmitted\sto\scluster\s(?P<jobid>[0-9]+)\."
         regex = re.compile(regex_str)
         self.slurm_job_id = None
         for line in res.split('\n'):

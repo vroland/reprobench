@@ -7,7 +7,7 @@ default_exp_config: "./experiment/mcc2020/mcc2020_exp_all.yml"
 repeat: 1
 #TODO: add_loglevel
 output: "output"
-reserve_hosts: 1
+reserve_hosts: 6
 reserve_cores: 24
 #https://doc.zih.tu-dresden.de/hpc-wiki/pub/Compendium/HardwareTaurus/i4000.png
 billing: p_gpusat
@@ -26,8 +26,8 @@ multicore:
       2: 7..11
       3: 14..18
       4: 19..23
-#server_url: "tcp://10.0.0.11:31318"
-server_url: "tcp://127.0.0.1:31313"
+server_url: "tcp://10.0.0.11:31318"
+#server_url: "tcp://127.0.0.1:31313"
 email: "johannes.fichte@tu-dresden.de"
 reserve_time: "18:00:00"
 
