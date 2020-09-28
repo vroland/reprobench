@@ -1,0 +1,256 @@
+c WARNING: for repeatability, setting FPU to use double precision
+c Problem Statistics:
+c
+c [33mBenchmark Information[0m
+c Number of variables: 924
+c Number of clauses: 97
+c Number of literals: 287
+c Parse time: 0.00
+c
+c
+c Backbone simplification
+c The number of unit literal found is: 0
+c Time to realize the backbone simplification: 0.024000
+c
+c [33mCollect Bi-Partition Procedure[0m
+c Time to sort the selector: 0.000000
+c Number of input variables computed: 730
+c Time to compute the bi-partition: 0.068000
+c
+c Number of variables forgotten: 19
+c Number of iterations: 2
+c
+c Vivification, total time: 0.000000
+c Vivification, number of clauses removed: 0
+c Vivification, number of literals removed: 0
+c
+c Occurrence Elimination, total time: 0.000000
+c Occurrence Elimination, number of literals removed: 7
+c Time used for the preprocessing step: 0.000000
+c
+p cnf 924 222
+-804 -136 163 -848 0
+-749 -136 163 -848 0
+-802 847 -163 0
+-748 -163 136 847 0
+-136 -847 -163 802 749 0
+106 -7 -1 209 0
+804 -136 163 848 749 0
+847 -749 -163 -136 0
+-208 1 7 0
+-731 161 0
+444 161 1 0
+-207 7 -1 0
+-748 136 163 848 0
+240 1 64 0
+795 -163 -161 0
+208 -7 1 0
+161 -793 163 0
+207 -7 -1 0
+210 64 7 0
+-795 163 -161 0
+-210 7 -1 106 0
+161 793 -163 0
+64 106 0
+-444 1 -161 731 0
+802 -848 163 136 748 0
+-209 64 -7 0
+-7 209 -240 1 106 0
+-163 748 136 -847 802 0
+163 848 -802 136 0
+7 -240 1 106 -210 0
+-161 731 -1 0
+196 0
+-17 0
+31 0
+44 0
+45 0
+49 0
+-51 0
+54 0
+-68 0
+-69 0
+56 0
+-70 0
+-84 0
+98 0
+112 0
+60 0
+61 0
+-74 0
+62 0
+-75 0
+76 0
+79 0
+-93 0
+80 0
+-94 0
+100 0
+101 0
+-103 0
+117 0
+-104 0
+118 0
+107 0
+-108 0
+-109 0
+-122 0
+123 0
+-111 0
+-120 0
+121 0
+-135 0
+125 0
+-139 0
+126 0
+128 0
+142 0
+-143 0
+-144 0
+158 0
+-159 0
+-134 0
+149 0
+153 0
+167 0
+-168 0
+-182 0
+-195 0
+181 0
+-180 0
+-170 0
+184 0
+171 0
+185 0
+172 0
+-186 0
+-173 0
+-187 0
+-188 0
+176 0
+-190 0
+-191 0
+-2 0
+-15 0
+-16 0
+-3 0
+-29 0
+-30 0
+-4 0
+-43 0
+-5 0
+-18 0
+-57 0
+-6 0
+-32 0
+-58 0
+-71 0
+-33 0
+-46 0
+-59 0
+-85 0
+-47 0
+-86 0
+-99 0
+-113 0
+-127 0
+-114 0
+-141 0
+-115 0
+-155 0
+-129 0
+-156 0
+-169 0
+-157 0
+-183 0
+-9 0
+-10 0
+-11 0
+-24 0
+-25 0
+-12 0
+-26 0
+-13 0
+-14 0
+-34 0
+-48 0
+-35 0
+-50 0
+-52 0
+-40 0
+-55 0
+-407 0
+-77 0
+-91 0
+-105 0
+-119 0
+-65 0
+-78 0
+-92 0
+-81 0
+-95 0
+-82 0
+-83 0
+-73 0
+-88 0
+-89 0
+-102 0
+-90 0
+-97 0
+-110 0
+-124 0
+-138 0
+-131 0
+-132 0
+-145 0
+-133 0
+-146 0
+-160 0
+-174 0
+-137 0
+-692 0
+-150 0
+-707 0
+-148 0
+-152 0
+-162 0
+-179 0
+-178 0
+-193 0
+-192 0
+-87 0
+-22 0
+-23 0
+-28 0
+-37 0
+-39 0
+-63 0
+-66 0
+-116 0
+-175 0
+-53 0
+-67 0
+-177 0
+-41 0
+c The variables forgot
+194 0
+154 0
+96 0
+42 0
+27 0
+38 0
+189 0
+147 0
+130 0
+72 0
+19 0
+21 0
+36 0
+20 0
+166 0
+8 0
+165 0
+164 0
+151 0
+c The number of literals is: 112
+c The number of variables is: 733

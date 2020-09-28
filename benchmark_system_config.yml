@@ -1,14 +1,16 @@
 #default_exp_config: "./experiment/steiner/steiner_exp_all.yml"
-default_exp_config: "./experiment/mcc2020/mcc2020_exp_all.yml"
+default_exp_config: "./experiment/gpusat/gpusat_exp_all.yml"
 #default_exp_config: "./experiment/fhtd/frasmt_exp_all.yml"
 #default_exp_config: "./experiment/thp/0thp_exp_all.yml"
 #default_exp_config: "./experiment/thp/0thp_exp_mc_preprocess.yml"
+#default_exp_config: "./experiment/gpusat/gpusat_exp_all.yml"
+#default_exp_config: "./experiment/gpusat/gpusat_exp_all.yml"
 #TODO: move to benchmark file
 repeat: 1
 #TODO: add_loglevel
 output: "output"
 reserve_hosts: 1
-reserve_cores: 24
+reserve_cores: 8
 #https://doc.zih.tu-dresden.de/hpc-wiki/pub/Compendium/HardwareTaurus/i4000.png
 billing: p_gpusat
 multicore:
@@ -27,7 +29,7 @@ multicore:
       3: 14..18
       4: 19..23
 server_url: "tcp://127.0.0.1:31313"
-email: "johannes.fichte@tu-dresden.de"
+email: "valentin.roland@tu-dresden.de"
 reserve_time: "18:00:00"
 
 
