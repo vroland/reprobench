@@ -86,9 +86,10 @@ for folder in folders:
         except KeyError:
             run_id = os.path.dirname(result_f.name).replace(str(pathlib.Path(__file__).parent.absolute()) + '/', '')
 
+        df_keys = set(RunSolverPerfEval.keys() + module.keys());
         with open(result_p, 'r') as result_f:
             if df is None:
-                df = pd.DataFrame(columns=set(RunSolverPerfEval.keys() + module.keys()))
+                df = pd.DataFrame(df_keys)
             try:
                 result = json.load(result_f)
                 if not 'run_id' in result:
@@ -110,15 +111,13 @@ for folder in folders:
             problem_stats = module.evaluator(os.path.dirname(file), stats)
             stats.update(problem_stats)
 
-            try:
-                df.loc[len(df)] = stats
-            except ValueError as e:
-                missing = set(cols) - set(stats.keys())
-                if missing != {'runsolver_error'} and missing != {'err', 'runsolver_error'}:
-                    logger.info(f"Missing keys ({missing}) for instance {run_id} adding na.")
-                for e in missing:
-                    stats[e] = 'NaN'
-                df.loc[len(df)] = stats
+            # project to used keys only
+            stats =  {k : v for k,v in stats.items() if k in df_keys}
+            missing = df_keys - set(stats.keys())
+            if missing:
+                logger.info(f"Missing keys ({missing}) for instance {run_id} adding na.")
+            df.append(stats, ignore_index=True)
+
         # logger.info(result)
         if send_events:
             logger.error('Send Event...')

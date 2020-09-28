@@ -1,4 +1,4 @@
-#!/home/jfichte/anaconda3/envs/rb/bin/python
+#!env python
 # -*- coding: utf-8 -*-
 import re
 import sys
