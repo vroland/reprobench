@@ -89,7 +89,7 @@ for folder in folders:
         df_keys = set(RunSolverPerfEval.keys() + module.keys());
         with open(result_p, 'r') as result_f:
             if df is None:
-                df = pd.DataFrame(df_keys)
+                df = pd.DataFrame(columns=df_keys)
             try:
                 result = json.load(result_f)
                 if not 'run_id' in result:
@@ -102,7 +102,7 @@ for folder in folders:
                 for e in set(cols) - set(stats.keys()) - {"hostname"}:
                     stats[e] = 'NaN'
                 stats['hostname'] = 'unknown'
-                df.loc[len(df)] = stats
+                df = df.append(stats, ignore_index=True)
                 continue
             #TODO: continue here
             stats = RunSolverPerfEval.compile_stats(stats=result, run_id=run_id, nonzero_as_rte=nonzero_rte)
@@ -111,12 +111,10 @@ for folder in folders:
             problem_stats = module.evaluator(os.path.dirname(file), stats)
             stats.update(problem_stats)
 
-            # project to used keys only
-            stats =  {k : v for k,v in stats.items() if k in df_keys}
             missing = df_keys - set(stats.keys())
             if missing:
                 logger.info(f"Missing keys ({missing}) for instance {run_id} adding na.")
-            df.append(stats, ignore_index=True)
+            df = df.append(stats, ignore_index=True)
 
         # logger.info(result)
         if send_events:
@@ -126,4 +124,5 @@ for folder in folders:
             socket.send_multipart([STORE_THP_RUNSTATS, encode_message(result)])
             logger.error('Done...')
 
+logger.info(df.info())
 df.to_csv('output_%s.csv' % config['title'])

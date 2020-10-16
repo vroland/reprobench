@@ -84,6 +84,10 @@ elif [ "$solver" == "gpusat_cuda_array" ] ; then
   solver_cmd="./gpusat_cuda --dataStructure array -f $*"
 elif [ "$solver" == "gpusat_cuda_tree" ] ; then
   solver_cmd="./gpusat_cuda --dataStructure tree -f $*"
+elif [ "$solver" == "gpusat_any" ] ; then
+  solver_cmd="./gpusat -f $*"
+elif [ "$solver" == "gpusat_cuda_any" ] ; then
+  solver_cmd="./gpusat_cuda -f $*"
 else
   solver_cmd="./"$solver"_glibc $*"
 fi

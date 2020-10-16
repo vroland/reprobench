@@ -4,7 +4,7 @@ description: Benchmark for gpusat experiments
 limits:
   time: 30 # s
 #  time: 3600
-  memory: 8048 # mb
+  memory: 12000 # mb
   scheduler_memory: 32768 #mb
 
 steps:
@@ -63,37 +63,25 @@ tasks:
       !**/*.smt
       !**/*.pdf
       !**/*.processed
-#      **/*
-#      **/C4D9N150_28.mcc2020_cnf
-#      **/*.mcc2020_cnf
 
-  # track2_wmc:
-  #   type: file
-  #   path: /projects/p_mcc2020
-  #   extract_archives: true
-  #   patterns: |
-  #     **/*.mcc2020_wcnf
-  #     !**/*.tar.bz2
-  #     !**/*.tar.xz
-  #     !**/*.tar.gz
-  #     !**/*.tgz
-  #     !**/.*
-  #     !**.*~
-  #     !**/dfremont_old_format/*
-
-  # track3_pmc:
-  #   type: file
-  #   path: /projects/p_mcc2020
-  #   extract_archives: true
-  #   patterns: |
-  #     **/*.mcc2020_pcnf
-  #     !**/*.tar.bz2
-  #     !**/*.tar.xz
-  #     !**/*.tar.gz
-  #     !**/*.tgz
-  #     !**/.*
-  #     !**.*~
-  #     !**/dfremont_old_format/*
+  gpusat_no_pp:
+    type: file
+    path: ./experiment/gpusat/all_Count
+    extract_archives: true
+    patterns: |
+      **/*.cnf
+      !**/*.tar.bz2
+      !**/*.tar.xz
+      !**/*.tar.gz
+      !**/*.tgz
+      !**/.*
+      !**.*~
+      !**/mcc2020_pcnf
+      !**/*.txt
+      !**/*.md
+      !**/*.smt
+      !**/*.pdf
+      !**/*.processed
 
 tools:
   number_sat:
@@ -112,6 +100,8 @@ tools:
           - sharpsat
           - gpusat_tree
           - gpusat_array
+#          - gpusat_any
+#          - gpusat_cuda_any
         #we are not interested in transparent huge pages here
         t:
           - 0
@@ -146,7 +136,8 @@ runs:
 #      - track1_mc
   number_sat:
     all:
-      - gpusatbench
+      - gpusat_no_pp
+#      - gpusatbench
 
 
 #TODO:

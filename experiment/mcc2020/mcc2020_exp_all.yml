@@ -2,7 +2,7 @@ title: MCC2020
 description: Benchmark for fhtd experiments
 
 limits:
-  time: 5 # s
+  time: 30 # s
 #  time: 3600
   memory: 8048 # mb
   scheduler_memory: 32768 #mb
@@ -51,7 +51,7 @@ tasks:
     path: ./experiment/mcc2020/test_instances
     extract_archives: true
     patterns: |
-      4step.cnf.gz
+      **/*.cnf.gz
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
@@ -141,9 +141,9 @@ runs:
   number_sat_gen_pre:
     all:
       - track1_mc
-#  number_sat:
-#    all:
-#      - track1_mc
+  number_sat:
+    all:
+      - track1_mc
 
 
 #TODO:
