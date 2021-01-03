@@ -2,9 +2,9 @@ title: GPUSAT
 description: Benchmark for gpusat experiments
 
 limits:
-  time: 30 # s
+  time: 600 # s
 #  time: 3600
-  memory: 12000 # mb
+  memory: 120000 # mb
   scheduler_memory: 32768 #mb
 
 steps:
@@ -64,6 +64,25 @@ tasks:
       !**/*.pdf
       !**/*.processed
 
+  mcc2020:
+    type: file
+    path: ./experiment/gpusat/track1_all
+    extract_archives: true
+    patterns: |
+      **/*.bz2
+      !**/*.tar.bz2
+      !**/*.tar.xz
+      !**/*.tar.gz
+      !**/*.tgz
+      !**/.*
+      !**.*~
+      !**/mcc2020_pcnf
+      !**/*.txt
+      !**/*.md
+      !**/*.smt
+      !**/*.pdf
+      !**/*.processed
+  
   gpusat_no_pp:
     type: file
     path: ./experiment/gpusat/all_Count
@@ -92,16 +111,16 @@ tools:
 #          - approxmc
 #          - c2d
 #          - cachet
-          - gpusat_cuda_tree
-          - gpusat_cuda_array
-          - d4
+#          - gpusat_cuda_tree
+#          - gpusat_cuda_array
+#          - d4
 #          - ganak
 #          - minic2d
           - sharpsat
-          - gpusat_tree
-          - gpusat_array
-#          - gpusat_any
-#          - gpusat_cuda_any
+#          - gpusat_tree
+#          - gpusat_array
+          - gpusat_any
+          - gpusat_cuda_any
         #we are not interested in transparent huge pages here
         t:
           - 0
@@ -138,6 +157,7 @@ runs:
     all:
       - gpusat_no_pp
 #      - gpusatbench
+#      - mcc2020
 
 
 #TODO:

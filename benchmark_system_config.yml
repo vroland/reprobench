@@ -10,9 +10,11 @@ repeat: 1
 #TODO: add_loglevel
 output: "output"
 reserve_hosts: 1
-reserve_cores: 8
+reserve_cores: 24
 #https://doc.zih.tu-dresden.de/hpc-wiki/pub/Compendium/HardwareTaurus/i4000.png
 billing: p_gpusat
+#billing: p_mcc2020
+#billing: p_mcc2020
 multicore:
 #  processes: 6
 #  cores_per_process: 2
@@ -23,13 +25,14 @@ multicore:
       - 14
       - 15
     # Ideally the processes should be distributed among NUMA regions.
+    # FIXME: only one worker
     worker:
       1: 2..6
       2: 7..11
       3: 14..18
       4: 19..23
-server_url: "tcp://127.0.0.1:31313"
+server_url: "tcp://172.26.62.61:31320"
 email: "valentin.roland@tu-dresden.de"
-reserve_time: "18:00:00"
+reserve_time: "12:00:00"
 
 

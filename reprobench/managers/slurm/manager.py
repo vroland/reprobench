@@ -78,7 +78,8 @@ class SlurmManager(BaseManager):
             target_path = f"{self.rbdir}/reprobench-bin"
 
         worker_submit_cmd = [
-            "./sbatch",
+            "sbatch",
+            "--gres=gpu:1",
             "--parsable",
             f"--array=1-{self.reserve_hosts}",
             f"--time={self.time_limit}",
@@ -99,7 +100,7 @@ class SlurmManager(BaseManager):
         multicore_str = urllib.parse.quote(json.dumps(self.multicore))
         # TODO: change to human readable
 
-        worker_cmd = f"{target_path} worker {address_args} --multicore={multicore_str}"  # {self.multicore}
+        worker_cmd = f"{self.rbdir}/reprobench-launch.sh {target_path} worker {address_args} --multicore={multicore_str}"  # {self.multicore}
         if self.debug:
             worker_cmd += " -vv"
 
