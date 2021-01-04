@@ -4,7 +4,9 @@ description: Benchmark for gpusat experiments
 limits:
   time: 600 # s
 #  time: 3600
-  memory: 120000 # mb
+#  CUDA allocates virtual memory which is as big as all physical ram + gpu ram.
+#  On the cluster, this is a LOT.
+  memory: 500000 # mb
   scheduler_memory: 32768 #mb
 
 steps:
@@ -116,11 +118,12 @@ tools:
 #          - d4
 #          - ganak
 #          - minic2d
-          - sharpsat
+#          - sharpsat
 #          - gpusat_tree
 #          - gpusat_array
-          - gpusat_any
-          - gpusat_cuda_any
+#          - gpusat_any
+          - gpusat_cuda_array
+          - gpusat_cuda_tree
         #we are not interested in transparent huge pages here
         t:
           - 0
@@ -155,8 +158,8 @@ runs:
 #      - track1_mc
   number_sat:
     all:
-      - gpusat_no_pp
-#      - gpusatbench
+#      - gpusat_no_pp
+      - gpusatbench
 #      - mcc2020
 
 
