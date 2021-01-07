@@ -124,6 +124,8 @@ tools:
 #          - gpusat_any
           - gpusat_cuda_array
           - gpusat_cuda_tree
+          - gpusat_cuda_array_unpinned
+          - gpusat_cuda_tree_unpinned
         #we are not interested in transparent huge pages here
         t:
           - 0
@@ -159,8 +161,8 @@ runs:
   number_sat:
     all:
 #      - gpusat_no_pp
-      - gpusatbench
-#      - mcc2020
+#      - gpusatbench
+      - mcc2020
 
 
 #TODO:

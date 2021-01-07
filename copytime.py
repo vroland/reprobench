@@ -6,7 +6,7 @@ from collections import defaultdict
 out = defaultdict(dict)
 
 for path in sys.stdin.readlines():
-	solver, instance = re.match("^./number_sat/default\[s=([A-Za-z_]*),t=0\]/gpusatbench/(.*)/0/stderr.txt$", path.strip(), flags=re.MULTILINE).groups()
+	solver, instance = re.match("^./number_sat/default\[s=([A-Za-z_]*),t=0\]/mcc2020/(.*)/0/stderr.txt$", path.strip(), flags=re.MULTILINE).groups()
 	with open(path.strip()) as f:
 		content = f.read()
 		times = {}

@@ -84,6 +84,10 @@ elif [ "$solver" == "gpusat_cuda_array" ] ; then
   solver_cmd="nvprof ./gpusat_cuda --dataStructure array -f $*"
 elif [ "$solver" == "gpusat_cuda_tree" ] ; then
   solver_cmd="nvprof ./gpusat_cuda --dataStructure tree -f $*"
+elif [ "$solver" == "gpusat_cuda_array_unpinned" ] ; then
+  solver_cmd="nvprof ./gpusat_cuda --unpinned --dataStructure array -f $*"
+elif [ "$solver" == "gpusat_cuda_tree_unpinned" ] ; then
+  solver_cmd="nvprof ./gpusat_cuda --unpinned --dataStructure tree -f $*"
 elif [ "$solver" == "gpusat_any" ] ; then
   solver_cmd="nvprof ./gpusat -f $*"
 elif [ "$solver" == "gpusat_cuda_any" ] ; then
