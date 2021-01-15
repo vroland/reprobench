@@ -76,22 +76,24 @@ elif [ "$solver" == "minic2d" ] ; then
   solver_cmd="./minic2d_glibc -C $* -c"
 elif [ "$solver" == "sharpsat" ] ; then
   solver_cmd="./sharpsat_glibc $*"
+elif [ "$solver" == "sharpsat_gpu" ] ; then
+  solver_cmd="./sharpsat_gpu -gpu $*"
 elif [ "$solver" == "gpusat_array" ] ; then
-  solver_cmd="nvprof ./gpusat --dataStructure array -f $*"
+  solver_cmd="./gpusat --dataStructure array -f $*"
 elif [ "$solver" == "gpusat_tree" ] ; then
-  solver_cmd="nvprof ./gpusat --dataStructure tree -f $*"
+  solver_cmd="./gpusat --dataStructure tree -f $*"
 elif [ "$solver" == "gpusat_cuda_array" ] ; then
-  solver_cmd="nvprof ./gpusat_cuda --dataStructure array -f $*"
+  solver_cmd="./gpusat_cuda --dataStructure array -f $*"
 elif [ "$solver" == "gpusat_cuda_tree" ] ; then
-  solver_cmd="nvprof ./gpusat_cuda --dataStructure tree -f $*"
+  solver_cmd="./gpusat_cuda --dataStructure tree -f $*"
 elif [ "$solver" == "gpusat_cuda_array_unpinned" ] ; then
-  solver_cmd="nvprof ./gpusat_cuda --unpinned --dataStructure array -f $*"
+  solver_cmd="./gpusat_cuda --unpinned --dataStructure array -f $*"
 elif [ "$solver" == "gpusat_cuda_tree_unpinned" ] ; then
-  solver_cmd="nvprof ./gpusat_cuda --unpinned --dataStructure tree -f $*"
+  solver_cmd="./gpusat_cuda --unpinned --dataStructure tree -f $*"
 elif [ "$solver" == "gpusat_any" ] ; then
-  solver_cmd="nvprof ./gpusat -f $*"
+  solver_cmd="./gpusat -f $*"
 elif [ "$solver" == "gpusat_cuda_any" ] ; then
-  solver_cmd="nvprof ./gpusat_cuda -f $*"
+  solver_cmd="./gpusat_cuda -f $*"
 else
   solver_cmd="./"$solver"_glibc $*"
 fi
