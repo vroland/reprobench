@@ -94,6 +94,8 @@ elif [ "$solver" == "gpusat_any" ] ; then
   solver_cmd="./gpusat -f $*"
 elif [ "$solver" == "gpusat_cuda_any" ] ; then
   solver_cmd="./gpusat_cuda -f $*"
+elif [ "$solver" == "gpusat_dp_any" ] ; then
+  solver_cmd="./cuda_port -f $*"
 else
   solver_cmd="./"$solver"_glibc $*"
 fi
