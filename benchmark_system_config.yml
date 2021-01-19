@@ -31,7 +31,7 @@ multicore:
       2: 7..11
       3: 14..18
       4: 19..23
-server_url: "tcp://172.26.62.61:31320"
+server_url: "tcp://127.0.0.1:31313"
 email: "valentin.roland@tu-dresden.de"
 reserve_time: "12:00:00"
 

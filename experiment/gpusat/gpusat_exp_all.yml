@@ -72,6 +72,7 @@ tasks:
     extract_archives: true
     patterns: |
       **/*.bz2
+      **/*.cnf
       !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
@@ -118,14 +119,15 @@ tools:
 #          - d4
 #          - ganak
 #          - minic2d
-#          - sharpsat
+          - sharpsat
+          - sharpsat_gpu
 #          - gpusat_tree
 #          - gpusat_array
 #          - gpusat_any
-          - gpusat_cuda_array
-          - gpusat_cuda_tree
-          - gpusat_cuda_array_unpinned
-          - gpusat_cuda_tree_unpinned
+#          - gpusat_cuda_array
+#          - gpusat_cuda_tree
+#          - gpusat_cuda_array_unpinned
+#          - gpusat_cuda_tree_unpinned
         #we are not interested in transparent huge pages here
         t:
           - 0
