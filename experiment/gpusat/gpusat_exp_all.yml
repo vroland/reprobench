@@ -123,9 +123,12 @@ tools:
 #          - sharpsat_gpu
 #          - gpusat_tree
 #          - gpusat_array
-          - gpusat_any
-          - gpusat_dp_any
-          - gpusat_cuda_any
+#          - gpusat_any
+#          - gpusat_dp_any
+#          - gpusat_cuda_any
+          - tw_flowcutter
+          - tw_tamaki
+          - tw_htd
 #          - gpusat_cuda_array
 #          - gpusat_cuda_tree
 #          - gpusat_cuda_array_unpinned

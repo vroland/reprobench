@@ -96,6 +96,13 @@ elif [ "$solver" == "gpusat_cuda_any" ] ; then
   solver_cmd="./gpusat_cuda -f $*"
 elif [ "$solver" == "gpusat_dp_any" ] ; then
   solver_cmd="./cuda_port -f $*"
+
+elif [ "$solver" == "tw_flowcutter" ] ; then
+  solver_cmd="bash ./twgen.sh ./flow_cutter_pace17 "
+elif [ "$solver" == "tw_tamaki" ] ; then
+  solver_cmd="bash ./twgen.sh ./tw-heuristic "
+elif [ "$solver" == "tw_htd" ] ; then
+  solver_cmd="bash ./twgen.sh ./htd_main --opt width --output td --print-progress --iterations 0 "
 else
   solver_cmd="./"$solver"_glibc $*"
 fi
@@ -105,7 +112,6 @@ echo "Original input instance was $original_input"
 echo "env $env $solver_cmd $filename"
 echo
 echo
-
 
 #NOTE: if you need to redirect the solver output in the future, we suggest to use stdlog.txt
 #

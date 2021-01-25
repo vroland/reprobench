@@ -38,11 +38,60 @@ for tool in tconfig:
 # overwrite = False
 overwrite = True
 
+tw_runs = {}
 for folder in folders:
     for file in glob.glob('%s/**/stdout.txt' % folder, recursive=True):
         my_folder = os.path.dirname(file)
         payload_p, perflog, stderr_p, stdout_p, varfile, watcher, runparameters_p = RunSolverPerfEval.log_paths(
             my_folder)
+        with open(file) as f:
+            # tamaki
+            results = []
+            f.readline()
+            sl = f.readline()
+            print(file)
+            if "tw-heuristic" in sl:
+                while True:
+                    line = f.readline()
+                    if "width = " in line:
+                        w = int(line.split("=")[1])
+                        line = f.readline()
+                        t = int(line.split("=")[1].strip().split(" ")[0]) / 1000.0
+                        results.append((w, t))
+                    if line.startswith("s td") or not line:
+                        break
+            elif "flow_cutter_pace17" in sl:
+                init_time = 0
+                while True:
+                    line = f.readline()
+                    if line.startswith("c init_time"):
+                        init_time = int(line.split(" ")[2])
+                    elif line.startswith("c status"):
+                        tw, t = map(int, line.split(" ")[2:])
+                        t = (t - init_time) / 1000.0
+                        results.append((tw, t))
+                    if line.startswith("s td") or not line:
+                        break
+
+            elif "htd_main" in sl:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith("Duration:"):
+                        t = float(line.split(" ")[-2])
+                        f.readline()
+                        twline = f.readline().strip()
+                        tw = 0
+                        if not twline.startswith("Improved Maximum Bag Size:"):
+                            continue
+                        else:
+                            tw = int(twline.split(" ")[-1])
+                        results.append((tw, t))
+                    if line.startswith("Solver finished"):
+                        break
+
+            if len(results) >= 2 and results[-1][0] == results[-2][0]:
+                results.pop()
+            tw_runs[file] = results;
         if os.path.exists(payload_p) and not overwrite:
             continue
         stats = RunSolverPerfEval.parse_logs(perflog, varfile, watcher, stdout_p)
@@ -55,3 +104,6 @@ for folder in folders:
         # safe stats
         with open(payload_p, 'w') as payload_f:
             payload_f.write(json.dumps(payload))
+
+with open("tw_runs.json", 'w') as payload_f:
+    json.dump(tw_runs, payload_f)
