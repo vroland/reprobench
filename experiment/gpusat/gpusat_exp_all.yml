@@ -6,7 +6,7 @@ limits:
 #  time: 3600
 #  CUDA allocates virtual memory which is as big as all physical ram + gpu ram.
 #  On the cluster, this is a LOT.
-  memory: 500000 # mb
+  memory: 32000 # mb
   scheduler_memory: 32768 #mb
 
 steps:
@@ -123,13 +123,13 @@ tools:
 #          - sharpsat_gpu
 #          - gpusat_tree
 #          - gpusat_array
-          - gpusat_any
-          - gpusat_dp_any
-          - gpusat_cuda_any
-#          - gpusat_cuda_array
-#          - gpusat_cuda_tree
-#          - gpusat_cuda_array_unpinned
-#          - gpusat_cuda_tree_unpinned
+#          - gpusat_any
+#          - gpusat_dp_any
+#          - gpusat_cuda_any
+          - gpusat_cuda_array
+          - gpusat_cuda_tree
+          - gpusat_cuda_array_unpinned
+          - gpusat_cuda_tree_unpinned
         #we are not interested in transparent huge pages here
         t:
           - 0
