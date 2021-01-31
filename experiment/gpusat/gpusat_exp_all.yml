@@ -165,8 +165,8 @@ runs:
   number_sat:
     all:
 #      - gpusat_no_pp
-#      - gpusatbench
-      - mcc2020
+      - gpusatbench
+#      - mcc2020
 
 
 #TODO:
