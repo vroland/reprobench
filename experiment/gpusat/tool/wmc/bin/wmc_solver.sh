@@ -76,8 +76,6 @@ elif [ "$solver" == "minic2d" ] ; then
   solver_cmd="./minic2d_glibc -C $* -c"
 elif [ "$solver" == "sharpsat" ] ; then
   solver_cmd="./sharpsat_glibc $*"
-elif [ "$solver" == "sharpsat_gpu" ] ; then
-  solver_cmd="./sharpsat_gpu -gpu $*"
 elif [ "$solver" == "gpusat_array" ] ; then
   solver_cmd="./gpusat --dataStructure array -f $*"
 elif [ "$solver" == "gpusat_tree" ] ; then
@@ -96,6 +94,28 @@ elif [ "$solver" == "gpusat_cuda_any" ] ; then
   solver_cmd="./gpusat_cuda -f $*"
 elif [ "$solver" == "gpusat_dp_any" ] ; then
   solver_cmd="./cuda_port -f $*"
+
+elif [ "$solver" == "tw_flowcutter" ] ; then
+  solver_cmd="bash ./twgen.sh ./flow_cutter_pace17 "
+elif [ "$solver" == "tw_tamaki" ] ; then
+  solver_cmd="bash ./twgen.sh ./tw-heuristic "
+elif [ "$solver" == "tw_htd" ] ; then
+  solver_cmd="bash ./twgen.sh ./htd_main --opt width --output width --print-progress --iterations 0 "
+
+elif [ "$solver" == "sharpsat_gpu" ] ; then
+  solver_cmd="./sharpsat_gpu -gpu $*"
+elif [ "$solver" == "sharpsat_gpu_prof" ] ; then
+  solver_cmd="./sharpsat_gpu_prof -gpu $*"
+elif [ "$solver" == "sharpsat_gpu_prof_nogpu" ] ; then
+  solver_cmd="./sharpsat_gpu_prof $*"
+elif [ "$solver" == "sharpsat_gpusat" ] ; then
+  solver_cmd="./sharpsat_gpusat -gpu $*"
+elif [ "$solver" == "sharpsat_gpusat_nogpu" ] ; then
+  solver_cmd="./sharpsat_gpusat $*"
+elif [ "$solver" == "sharpsat_gpusat_prof" ] ; then
+  solver_cmd="./sharpsat_gpusat_prof -gpu $*"
+elif [ "$solver" == "sharpsat_gpusat_prof_nogpu" ] ; then
+  solver_cmd="./sharpsat_gpusat_prof $*"
 else
   solver_cmd="./"$solver"_glibc $*"
 fi
@@ -105,7 +125,6 @@ echo "Original input instance was $original_input"
 echo "env $env $solver_cmd $filename"
 echo
 echo
-
 
 #NOTE: if you need to redirect the solver output in the future, we suggest to use stdlog.txt
 #
