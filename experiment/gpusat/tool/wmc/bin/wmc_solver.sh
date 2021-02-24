@@ -95,6 +95,23 @@ elif [ "$solver" == "gpusat_cuda_any" ] ; then
 elif [ "$solver" == "gpusat_dp_any" ] ; then
   solver_cmd="./cuda_port -f $*"
 
+elif [ "$solver" == "gsc_prof_tree_pin_cache" ] ; then
+  solver_cmd="nvprof ./gpusat_cuda --dataStructure tree -f $*"
+elif [ "$solver" == "gsc_prof_tree_pin_nocache" ] ; then
+  solver_cmd="nvprof ./gpusat_cuda --dataStructure tree --no-cache -f $*"
+elif [ "$solver" == "gsc_prof_tree_nopin_cache" ] ; then
+  solver_cmd="nvprof ./gpusat_cuda --dataStructure tree --unpinned -f $*"
+elif [ "$solver" == "gsc_prof_tree_nopin_nocache" ] ; then
+  solver_cmd="nvprof ./gpusat_cuda --dataStructure tree --no-cache --unpinned -f $*"
+elif [ "$solver" == "gsc_prof_array_pin_cache" ] ; then
+  solver_cmd="nvprof ./gpusat_cuda --dataStructure array -f $*"
+elif [ "$solver" == "gsc_prof_array_pin_nocache" ] ; then
+  solver_cmd="nvprof ./gpusat_cuda --dataStructure array --no-cache -f $*"
+elif [ "$solver" == "gsc_prof_array_nopin_cache" ] ; then
+  solver_cmd="nvprof ./gpusat_cuda --dataStructure array --unpinned -f $*"
+elif [ "$solver" == "gsc_prof_array_nopin_nocache" ] ; then
+  solver_cmd="nvprof ./gpusat_cuda --dataStructure array --no-cache --unpinned -f $*"
+
 elif [ "$solver" == "tw_flowcutter" ] ; then
   solver_cmd="bash ./twgen.sh ./flow_cutter_pace17 "
 elif [ "$solver" == "tw_tamaki" ] ; then

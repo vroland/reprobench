@@ -85,6 +85,26 @@ tasks:
       !**/*.smt
       !**/*.pdf
       !**/*.processed
+
+  sharpsat_sample:
+    type: file
+    path: ./experiment/gpusat/sharpsat_sample
+    extract_archives: true
+    patterns: |
+      **/*.bz2
+      **/*.cnf
+      !**/*.tar.bz2
+      !**/*.tar.xz
+      !**/*.tar.gz
+      !**/*.tgz
+      !**/.*
+      !**.*~
+      !**/mcc2020_pcnf
+      !**/*.txt
+      !**/*.md
+      !**/*.smt
+      !**/*.pdf
+      !**/*.processed
   
   gpusat_no_pp:
     type: file
@@ -121,15 +141,29 @@ tools:
 #          - minic2d
 #          - sharpsat
 #          - sharpsat_gpu
+#          - sharpsat_gpu_prof
+#          - sharpsat_gpu_prof_nogpu
 #          - gpusat_tree
 #          - gpusat_array
-          - gpusat_any
-          - gpusat_dp_any
-          - gpusat_cuda_any
+#          - gpusat_any
+#          - gpusat_dp_any
+#          - gpusat_cuda_any
 #          - gpusat_cuda_array
 #          - gpusat_cuda_tree
 #          - gpusat_cuda_array_unpinned
 #          - gpusat_cuda_tree_unpinned
+#          - gsc_prof_tree_pin_cache
+#          - gsc_prof_tree_pin_nocache
+#          - gsc_prof_tree_nopin_cache
+#          - gsc_prof_tree_nopin_nocache
+#          - gsc_prof_array_pin_cache
+#          - gsc_prof_array_pin_nocache
+#          - gsc_prof_array_nopin_cache
+#          - gsc_prof_array_nopin_nocache
+          - tw_flowcutter
+          - tw_tamaki
+          - tw_htd
+
         #we are not interested in transparent huge pages here
         t:
           - 0
@@ -167,6 +201,7 @@ runs:
 #      - gpusat_no_pp
 #      - gpusatbench
       - mcc2020
+#      - sharpsat_sample
 
 
 #TODO:
