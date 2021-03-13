@@ -225,7 +225,7 @@ class RunSolverPerfEval(Executor):
 
             logger.trace(f"Solver command was: {solver_cmd}")
             # perf list
-            perfcmdline = f"/usr/bin/perf stat -o {perflog} -e dTLB-load-misses,dTLB-loads,dTLB-store-misses," \
+            perfcmdline = f"perf stat -o {perflog} -e dTLB-load-misses,dTLB-loads,dTLB-store-misses," \
                           f"dTLB-stores,iTLB-load-misses,iTLB-loads,cycles,stalled-cycles-backend,cache-misses " \
                           f"{solver_cmd}"
             runsolver = os.path.expanduser("~/bin/runsolver")
@@ -238,6 +238,7 @@ class RunSolverPerfEval(Executor):
                 runparameters_f.write(json.dumps(run_details))
 
             logger.trace(run_cmd)
+            logger.debug(os.environ['PATH'])
             logger.info(f"Running {directory}")
             p_solver = Popen(run_cmd, stdout=PIPE, stderr=PIPE, shell=True, close_fds=True, cwd=outdir)
             output, err = p_solver.communicate()

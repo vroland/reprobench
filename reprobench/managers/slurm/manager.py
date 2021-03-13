@@ -79,7 +79,7 @@ class SlurmManager(BaseManager):
 
         worker_submit_cmd = [
             "sbatch",
-            "--gres=gpu:1",
+#            "--gres=gpu:1",
             "--parsable",
             f"--array=1-{self.reserve_hosts}",
             f"--time={self.time_limit}",

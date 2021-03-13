@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 # A POSIX variable
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
@@ -28,6 +28,8 @@ while getopts "h?vt:s:f:i:p:" opt; do
         ;;
     esac
 done
+
+echo "path: $PATH"
 
 shift $((OPTIND-1))
 
@@ -106,7 +108,6 @@ elif [ "$solver" == "tw_htd" ] ; then
 else
   solver_cmd="./"$solver"_glibc $*"
 fi
-
 
 echo "Original input instance was $original_input"
 echo "env $env $solver_cmd $filename"
