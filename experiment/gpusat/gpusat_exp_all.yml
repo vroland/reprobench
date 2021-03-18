@@ -7,7 +7,7 @@ limits:
 #  CUDA allocates virtual memory which is as big as all physical ram + gpu ram.
 #  On the cluster, this is a LOT.
   memory: 32000 # mb
-  scheduler_memory: 32768 #mb
+  scheduler_memory: 250000 #mb
 
 steps:
   run:

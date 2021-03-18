@@ -13,7 +13,7 @@ with open('./benchmark_system_config.yml') as config_f:
 m = SlurmManager(server_address=mconfig['server_url'], output_dir=mconfig['output'],
                  config=mconfig['default_exp_config'], tunneling=None, repeat=mconfig['repeat'],
                  rbdir="/home/s7300481/reprobench", reserve_cores=mconfig['reserve_cores'], reserve_memory=0,
-                 additional_args=f"--partition=haswell64 -A {mconfig['billing']} --exclusive",
+                 additional_args=f"--partition=haswell256 -A {mconfig['billing']} --exclusive",
                  reserve_time=mconfig['reserve_time'],
                  reserve_hosts=mconfig['reserve_hosts'], email=mconfig['email'],
                  multicore=mconfig['multicore']

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-JFLAGS="-Xmx16g -Xms16g -Xss1g"
+JFLAGS="-Xmx10g -Xms10g -Xss1g"
 
 tmp="/tmp/tmp_input"_"$$"
 trap 'rm -f $tmp' EXIT
