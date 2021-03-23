@@ -119,18 +119,26 @@ tools:
 #          - d4
 #          - ganak
 #          - minic2d
-          - sharpsat
-          - sharpsat_gpu
+#          - sharpsat
+#          - sharpsat_gpu
           - sharpsat_gpusat
 #          - gpusat_tree
 #          - gpusat_array
 #          - gpusat_any
 #          - gpusat_dp_any
-#          - gpusat_cuda_any
+          - gpusat_cuda_any
 #          - gpusat_cuda_array
 #          - gpusat_cuda_tree
 #          - gpusat_cuda_array_unpinned
 #          - gpusat_cuda_tree_unpinned
+#          - gsc_prof_tree_pin_cache
+#          - gsc_prof_tree_pin_nocache
+#          - gsc_prof_tree_nopin_cache
+#          - gsc_prof_tree_nopin_nocache
+#          - gsc_prof_array_pin_cache
+#          - gsc_prof_array_pin_nocache
+#          - gsc_prof_array_nopin_cache
+#          - gsc_prof_array_nopin_nocache
         #we are not interested in transparent huge pages here
         t:
           - 0
