@@ -3,6 +3,7 @@ import glob
 import json
 import os
 import re
+import sys
 
 import yaml
 
@@ -43,8 +44,22 @@ for folder in folders:
         my_folder = os.path.dirname(file)
         payload_p, perflog, stderr_p, stdout_p, varfile, watcher, runparameters_p = RunSolverPerfEval.log_paths(
             my_folder)
-        if os.path.exists(payload_p) and not overwrite:
-            continue
+
+        solve_time = 0
+        with open(file) as f:
+            text = f.read()
+            m = re.findall("^\s*,\"Solving\":\s([0-9.]*)$", text, flags=re.MULTILINE)
+            # multiple matches?
+            if len(m) > 1:
+                print("invalid stdout file.")
+                sys.exit(1)
+ 
+            if m:
+                solve_time = float(m[0])
+
+        #if os.path.exists(payload_p) and not overwrite:
+        #    continue
+
         stats = RunSolverPerfEval.parse_logs(perflog, varfile, watcher, stdout_p)
         # Save payload
         # TODO: next safe payload somehow
@@ -52,6 +67,7 @@ for folder in folders:
         run_id = re.sub("%s/" % os.path.abspath(""), '', "/".join(file.split("/")[:-1]))
         payload = RunSolverPerfEval.compile_stats(stats=stats, run_id=run_id, nonzero_as_rte=nonzero_rte)
 
+        payload["solve_time_reported"] = solve_time
         # safe stats
         with open(payload_p, 'w') as payload_f:
             payload_f.write(json.dumps(payload))

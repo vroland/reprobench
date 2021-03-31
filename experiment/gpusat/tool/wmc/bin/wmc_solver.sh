@@ -121,6 +121,17 @@ elif [ "$solver" == "tw_tamaki" ] ; then
 elif [ "$solver" == "tw_htd" ] ; then
   solver_cmd="bash ./twgen.sh ./htd_main --opt width --output width --print-progress --iterations 0 "
 
+elif [ "$solver" == "gpusat_cuda_td" ] ; then
+  instfile=$(sed '1q;d' ~/reprobench/$original_input);
+  decomposition=$(sed '2q;d' ~/reprobench/$original_input);  
+  filename=""
+
+  newfile="/tmp/$(basename $original_input).cnf"
+  echo "using instfile: $instfile decomposition: $decomposition"
+
+  bzcat $instfile > $newfile 
+  solver_cmd="./gpusat_cuda -f $newfile -d $decomposition"
+
 elif [ "$solver" == "sharpsat_gpu" ] ; then
   solver_cmd="./sharpsat_gpu -gpu $*"
 elif [ "$solver" == "sharpsat_gpu_prof" ] ; then

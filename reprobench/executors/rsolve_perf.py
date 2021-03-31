@@ -194,7 +194,8 @@ class RunSolverPerfEval(Executor):
                 input_str = input_str.split(" ")[1]
             ifilename = input_str
 
-            transparent_cat = f"{self.reprobench_path}/lib/tcat.sh -f {input_str} -o {f.name}"
+            transparent_cat = f"{self.reprobench_path}/lib/tcat.sh -f '{input_str}' -o {f.name}"
+            print ("command:", transparent_cat)
 
             logger.trace(transparent_cat)
             p_tmpout = Popen(transparent_cat, stdout=PIPE, stderr=PIPE, shell=True, close_fds=True,

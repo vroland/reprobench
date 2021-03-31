@@ -47,63 +47,31 @@ observers:
 #        output: statistics/cactus.ipynb
 
 tasks:
-  gpusatbench:
-    type: file
-    path: ./experiment/gpusat/test_instances
-    extract_archives: true
-    patterns: |
-      **/*.cnf
-      !**/*.tar.bz2
-      !**/*.tar.xz
-      !**/*.tar.gz
-      !**/*.tgz
-      !**/.*
-      !**.*~
-      !**/mcc2020_pcnf
-      !**/*.txt
-      !**/*.md
-      !**/*.smt
-      !**/*.pdf
-      !**/*.processed
-
+        #  gpusatbench:
+        #    type: file
+        #    path: ./experiment/gpusat/test_instances
+        #    extract_archives: true
+        #    patterns: |
+        #      **/*.cnf
+        #      !**/*.tar.bz2
+        #      !**/*.tar.xz
+        #      !**/*.tar.gz
+        #      !**/*.tgz
+        #      !**/.*
+        #      !**.*~
+        #      !**/mcc2020_pcnf
+        #      !**/*.txt
+        #      !**/*.md
+        #      !**/*.smt
+        #      !**/*.pdf
+        #      !**/*.processed
+        #
   mcc2020:
     type: file
-    path: ./experiment/gpusat/track1_all
-    extract_archives: true
+    path: ./experiment/gpusat/decomp_runs
+    extract_archives: false
     patterns: |
-      **/*.bz2
-      **/*.cnf
-      !**/*.tar.bz2
-      !**/*.tar.xz
-      !**/*.tar.gz
-      !**/*.tgz
-      !**/.*
-      !**.*~
-      !**/mcc2020_pcnf
-      !**/*.txt
-      !**/*.md
-      !**/*.smt
-      !**/*.pdf
-      !**/*.processed
-  
-  gpusat_no_pp:
-    type: file
-    path: ./experiment/gpusat/all_Count
-    extract_archives: true
-    patterns: |
-      **/*.cnf
-      !**/*.tar.bz2
-      !**/*.tar.xz
-      !**/*.tar.gz
-      !**/*.tgz
-      !**/.*
-      !**.*~
-      !**/mcc2020_pcnf
-      !**/*.txt
-      !**/*.md
-      !**/*.smt
-      !**/*.pdf
-      !**/*.processed
+        **/*.params
 
 tools:
   number_sat:
@@ -111,6 +79,7 @@ tools:
     parameters:
       default:
         s:
+          - gpusat_cuda_td
 #          - approxmc
 #          - c2d
 #          - cachet
@@ -121,12 +90,12 @@ tools:
 #          - minic2d
 #          - sharpsat
 #          - sharpsat_gpu
-          - sharpsat_gpusat
+#          - sharpsat_gpusat
 #          - gpusat_tree
 #          - gpusat_array
 #          - gpusat_any
 #          - gpusat_dp_any
-          - gpusat_cuda_any
+#          - gpusat_cuda_any
 #          - gpusat_cuda_array
 #          - gpusat_cuda_tree
 #          - gpusat_cuda_array_unpinned
