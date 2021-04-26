@@ -14,6 +14,9 @@ for l in sys.stdin.readlines():
     with open(l.strip(), "rb") as f:
         h = hashlib.sha256(f.read()).hexdigest()
         hashes.add(h)
+    #if not instance in ["track1_131.mcc2020_cnf.bz2", "track1_134.mcc2020_cnf.bz2"]:
+    #    continue
+
     with open(paramfile, "w") as f:
         f.write(os.path.join(path_prefix, f"track1_all/{instance}\n"))
         f.write(os.path.join(path_prefix, l))
