@@ -2,11 +2,11 @@ title: GPUSAT
 description: Benchmark for gpusat experiments
 
 limits:
-  time: 600 # s
+  time: 1800 # s
 #  time: 3600
 #  CUDA allocates virtual memory which is as big as all physical ram + gpu ram.
 #  On the cluster, this is a LOT.
-  memory: 32000 # mb
+  memory: 100000 # mb
   scheduler_memory: 32768 #mb
 
 steps:
@@ -47,31 +47,31 @@ observers:
 #        output: statistics/cactus.ipynb
 
 tasks:
-        #  gpusatbench:
-        #    type: file
-        #    path: ./experiment/gpusat/test_instances
-        #    extract_archives: true
-        #    patterns: |
-        #      **/*.cnf
-        #      !**/*.tar.bz2
-        #      !**/*.tar.xz
-        #      !**/*.tar.gz
-        #      !**/*.tgz
-        #      !**/.*
-        #      !**.*~
-        #      !**/mcc2020_pcnf
-        #      !**/*.txt
-        #      !**/*.md
-        #      !**/*.smt
-        #      !**/*.pdf
-        #      !**/*.processed
-        #
-  mcc2020:
+  mccmixed:
     type: file
-    path: ./experiment/gpusat/decomp_runs
-    extract_archives: false
+    path: ./experiment/gpusat/track12
+    extract_archives: true
     patterns: |
-        **/*.params
+      **/*.cnf
+      **/*.bz2
+      !**/*.tar.xz
+      !**/*.tar.gz
+      !**/*.tgz
+      !**/.*
+      !**.*~
+      !**/mcc2020_pcnf
+      !**/*.txt
+      !**/*.md
+      !**/*.smt
+      !**/*.pdf
+      !**/*.processed
+        
+        #  mcc2020:
+        #    type: file
+        #    path: ./experiment/gpusat/decomp_runs
+        #    extract_archives: false
+        #    patterns: |
+        #        **/*.params
 
 tools:
   number_sat:
@@ -79,7 +79,7 @@ tools:
     parameters:
       default:
         s:
-          - gpusat_cuda_td
+#          - gpusat_cuda_td
 #          - approxmc
 #          - c2d
 #          - cachet
@@ -93,9 +93,9 @@ tools:
 #          - sharpsat_gpusat
 #          - gpusat_tree
 #          - gpusat_array
-#          - gpusat_any
+          - gpusat_any
 #          - gpusat_dp_any
-#          - gpusat_cuda_any
+          - gpusat_cuda_any
 #          - gpusat_cuda_array
 #          - gpusat_cuda_tree
 #          - gpusat_cuda_array_unpinned
@@ -144,7 +144,7 @@ runs:
     all:
 #      - gpusat_no_pp
 #      - gpusatbench
-      - mcc2020
+      - mccmixed
 
 
 #TODO:
