@@ -85,7 +85,7 @@ tools:
 #          - cachet
 #          - gpusat_cuda_tree
 #          - gpusat_cuda_array
-#          - d4
+          - d4
 #          - ganak
 #          - minic2d
 #          - sharpsat
@@ -93,9 +93,9 @@ tools:
 #          - sharpsat_gpusat
 #          - gpusat_tree
 #          - gpusat_array
-          - gpusat_any
+#          - gpusat_any
 #          - gpusat_dp_any
-          - gpusat_cuda_any
+#          - gpusat_cuda_any
 #          - gpusat_cuda_array
 #          - gpusat_cuda_tree
 #          - gpusat_cuda_array_unpinned

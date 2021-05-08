@@ -69,7 +69,7 @@ elif [ "$solver" == "c2d" ] ; then
 elif [ "$solver" == "cachet" ] ; then
   solver_cmd="./cachet_glibc $*"
 elif [ "$solver" == "d4" ] ; then
-  solver_cmd="./d4 $*"
+  solver_cmd="./d4 -mc $*"
 elif [ "$solver" == "ganak" ] ; then
   solver_cmd="./ganak_glibc -p $*"
 elif [ "$solver" == "minic2d" ] ; then
