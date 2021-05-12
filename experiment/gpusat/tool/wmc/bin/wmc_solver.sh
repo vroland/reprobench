@@ -132,6 +132,11 @@ elif [ "$solver" == "gpusat_cuda_td" ] ; then
   bzcat $instfile > $newfile 
   solver_cmd="./gpusat_cuda -f $newfile -d $decomposition"
 
+elif [ "$solver" == "gpusat_cuda_td2" ] ; then
+  solver_cmd="./gpusat_cuda -d $HOME/reprobench/$original_input.td -f $*"
+elif [ "$solver" == "gpusat_td2" ] ; then
+  solver_cmd="./gpusat -d $HOME/reprobench/$original_input.td -f $*"
+
 elif [ "$solver" == "sharpsat_gpu" ] ; then
   solver_cmd="./sharpsat_gpu -gpu $*"
 elif [ "$solver" == "sharpsat_gpu_prof" ] ; then
