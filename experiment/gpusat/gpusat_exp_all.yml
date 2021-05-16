@@ -49,7 +49,7 @@ observers:
 tasks:
   mccmixed:
     type: file
-    path: ./experiment/gpusat/track12_decomp
+    path: ./experiment/gpusat/track12
     extract_archives: true
     patterns: |
       **/*.cnf
@@ -79,8 +79,8 @@ tools:
     parameters:
       default:
         s:
-          - gpusat_cuda_td2
-          - gpusat_td2
+#          - gpusat_cuda_td2
+#          - gpusat_td2
 #          - approxmc
 #          - c2d
 #          - cachet
@@ -95,7 +95,7 @@ tools:
 #          - gpusat_tree
 #          - gpusat_array
 #          - gpusat_any
-#          - gpusat_dp_any
+          - gpusat_dp_any
 #          - gpusat_cuda_any
 #          - gpusat_cuda_array
 #          - gpusat_cuda_tree
