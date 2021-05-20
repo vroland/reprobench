@@ -6,7 +6,7 @@ limits:
 #  time: 3600
 #  CUDA allocates virtual memory which is as big as all physical ram + gpu ram.
 #  On the cluster, this is a LOT.
-  memory: 500000 # mb
+  memory: 100000 # mb
   scheduler_memory: 32768 #mb
 
 steps:
@@ -47,13 +47,13 @@ observers:
 #        output: statistics/cactus.ipynb
 
 tasks:
-  gpusatbench:
+  mccmixed:
     type: file
-    path: ./experiment/gpusat/test_instances
+    path: ./experiment/gpusat/track12
     extract_archives: true
     patterns: |
       **/*.cnf
-      !**/*.tar.bz2
+      **/*.bz2
       !**/*.tar.xz
       !**/*.tar.gz
       !**/*.tgz
@@ -71,9 +71,8 @@ tasks:
     path: ./experiment/gpusat/track1_all
     extract_archives: true
     patterns: |
+      **/*.cnf
       **/*.bz2
-      **/*.cnf
-      !**/*.tar.bz2
       !**/*.tar.xz
       !**/*.tar.gz
       !**/*.tgz
@@ -85,45 +84,13 @@ tasks:
       !**/*.smt
       !**/*.pdf
       !**/*.processed
-
-  sharpsat_sample:
-    type: file
-    path: ./experiment/gpusat/sharpsat_sample
-    extract_archives: true
-    patterns: |
-      **/*.bz2
-      **/*.cnf
-      !**/*.tar.bz2
-      !**/*.tar.xz
-      !**/*.tar.gz
-      !**/*.tgz
-      !**/.*
-      !**.*~
-      !**/mcc2020_pcnf
-      !**/*.txt
-      !**/*.md
-      !**/*.smt
-      !**/*.pdf
-      !**/*.processed
-  
-  gpusat_no_pp:
-    type: file
-    path: ./experiment/gpusat/all_Count
-    extract_archives: true
-    patterns: |
-      **/*.cnf
-      !**/*.tar.bz2
-      !**/*.tar.xz
-      !**/*.tar.gz
-      !**/*.tgz
-      !**/.*
-      !**.*~
-      !**/mcc2020_pcnf
-      !**/*.txt
-      !**/*.md
-      !**/*.smt
-      !**/*.pdf
-      !**/*.processed
+        
+        #  mcc2020:
+        #    type: file
+        #    path: ./experiment/gpusat/decomp_runs
+        #    extract_archives: false
+        #    patterns: |
+        #        **/*.params
 
 tools:
   number_sat:
@@ -131,6 +98,8 @@ tools:
     parameters:
       default:
         s:
+#          - gpusat_cuda_td2
+#          - gpusat_td2
 #          - approxmc
 #          - c2d
 #          - cachet
@@ -141,12 +110,6 @@ tools:
 #          - minic2d
 #          - sharpsat
 #          - sharpsat_gpu
-#          - sharpsat_gpu_prof
-#          - sharpsat_gpu_prof_nogpu
-#          - gpusat_tree
-#          - gpusat_array
-#          - gpusat_any
-#          - gpusat_dp_any
 #          - gpusat_cuda_any
 #          - gpusat_cuda_array
 #          - gpusat_cuda_tree
@@ -160,9 +123,6 @@ tools:
 #          - gsc_prof_array_pin_nocache
 #          - gsc_prof_array_nopin_cache
 #          - gsc_prof_array_nopin_nocache
-          - tw_flowcutter
-          - tw_tamaki
-          - tw_htd
 
         #we are not interested in transparent huge pages here
         t:
