@@ -2,7 +2,7 @@ title: GPUSAT
 description: Benchmark for gpusat experiments
 
 limits:
-  time: 1800 # s
+  time: 600 # s
 #  time: 3600
 #  CUDA allocates virtual memory which is as big as all physical ram + gpu ram.
 #  On the cluster, this is a LOT.
@@ -65,6 +65,25 @@ tasks:
       !**/*.smt
       !**/*.pdf
       !**/*.processed
+
+  mcc2020:
+    type: file
+    path: ./experiment/gpusat/track1_all
+    extract_archives: true
+    patterns: |
+      **/*.cnf
+      **/*.bz2
+      !**/*.tar.xz
+      !**/*.tar.gz
+      !**/*.tgz
+      !**/.*
+      !**.*~
+      !**/mcc2020_pcnf
+      !**/*.txt
+      !**/*.md
+      !**/*.smt
+      !**/*.pdf
+      !**/*.processed
         
         #  mcc2020:
         #    type: file
@@ -95,7 +114,11 @@ tools:
 #          - gpusat_tree
 #          - gpusat_array
 #          - gpusat_any
-          - gpusat_dp_any
+#          - gpusat_dp_any
+          - gpusat_cuda_array
+          - gpusat_cuda_tree
+          - gpusat_cuda_array_unpinned
+          - gpusat_cuda_tree_unpinned
 #          - gpusat_cuda_any
 #          - gpusat_cuda_array
 #          - gpusat_cuda_tree
@@ -145,7 +168,7 @@ runs:
     all:
 #      - gpusat_no_pp
 #      - gpusatbench
-      - mccmixed
+      - mcc2020
 
 
 #TODO:
