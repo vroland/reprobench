@@ -1,0 +1,147 @@
+title: sharptrace
+description: Benchmark for sharptrace experiments
+
+limits:
+  time: 180 # s
+#  time: 3600
+  memory: 2000 # mb
+  scheduler_memory: 32768 #mb
+
+steps:
+  run:
+# move to step that runs once on a node, but not every time; there is no point in collecting the data every time
+    - module: reprobench.core.sysinfo.CollectSystemInfo4Server
+    - module: reprobench.core.setup.SetupKernel
+      config:
+#        transparent_hugepage: madvise
+        # see: https://www.kernel.org/doc/html/v4.12/admin-guide/pm/intel_pstate.html
+        governors: 2.8Ghz
+    # TODO: performance govenors / --cpu-freq srun
+    - module: reprobench.executors.RunSolverPerfEval
+    # provide non-perf runner
+    # provide configurable perf parameters
+#    - module: reprobench.executors.PsmonExecutor
+      config:
+        nonzero_rte: False
+
+observers:
+  - module: reprobench.core.sysinfo.SystemInfoObserver
+#  - module: reprobench.executors.RunStatisticObserver
+  - module: reprobench.executors.RunStatisticExtendedObserver
+
+#  analysis:
+#    - module: reprobench.statistics.tables.RunTable
+#      config:
+#        joins:
+#          - reprobench.executors.db.RunStatistic
+#          - reprobench.core.sysinfo.RunNode
+#        output: statistics/raw.csv
+#    - module: reprobench.statistics.tables.RunSummaryTable
+#      config:
+#        output: statistics/summary.csv
+#    - module: reprobench.statistics.plots.CactusPlot
+#      config:
+#        measure: wall_time
+#        output: statistics/cactus.ipynb
+
+tasks:
+  mccmixed:
+    type: file
+    path: ./experiment/gpusat/track12
+    extract_archives: true
+    patterns: |
+      **/*.cnf
+      **/*.bz2
+      !**/*.tar.xz
+      !**/*.tar.gz
+      !**/*.tgz
+      !**/.*
+      !**.*~
+      !**/mcc2020_pcnf
+      !**/*.txt
+      !**/*.md
+      !**/*.smt
+      !**/*.pdf
+      !**/*.processed
+
+  mcc2020:
+    type: file
+    path: ./experiment/sharptrace/track2_all
+    extract_archives: true
+    patterns: |
+      **/*cnf
+      **/*.cnf
+      **/*.bz2
+      !**/*.tar.xz
+      !**/*.tar.gz
+      !**/*.tgz
+      !**/.*
+      !**.*~
+      !**/mcc2020_pcnf
+      !**/*.txt
+      !**/*.md
+      !**/*.smt
+      !**/*.pdf
+      !**/*.processed
+        
+        #  mcc2020:
+        #    type: file
+        #    path: ./experiment/gpusat/decomp_runs
+        #    extract_archives: false
+        #    patterns: |
+        #        **/*.params
+
+tools:
+  number_sat:
+    module: experiment.sharptrace.tool.wmc.wmcExecutor.WMCTool
+    parameters:
+      default:
+        s:
+            #          - sharpsat
+          - sharpsat_trace
+
+
+        #we are not interested in transparent huge pages here
+        t:
+          - 0
+
+#   number_sat_gen_pre:
+#     module: experiment.mcc2020.tool.mc.mcpreExecutor.MCPreprocessor
+#     parameters:
+#       pmc:
+#         cmd: "pre/pmc -affine -orGate -equiv -vivification -litImplied -eliminateLit -addClause -rewrite {filename}"
+#         output: "~/project_output/{filename}.pmc"
+# #      b+e:
+# #        cmd: "pre/b+e -limSolver=1000 {filename}"
+# #        output: "~/project_output/{filename}.b+e"
+#     test_instances:
+#       - experiment/mcc2020/test_instances/4step.cnf.gz
+#       - experiment/mcc2020/test_instances/5step.cnf.gz
+#       - experiment/mcc2020/test_instances/log-1.cnf.gz
+#       - experiment/mcc2020/test_instances/log-2.cnf.gz
+#       - experiment/mcc2020/test_instances/log-3.cnf.gz
+#       - experiment/mcc2020/test_instances/log-4.cnf.gz
+#       - experiment/mcc2020/test_instances/log-5.cnf.gz
+#       - experiment/mcc2020/test_instances/tire-1.cnf.gz
+#       - experiment/mcc2020/test_instances/tire-2.cnf.gz
+#       - experiment/mcc2020/test_instances/tire-3.cnf.gz
+#       - experiment/mcc2020/test_instances/tire-4.cnf.gz
+#testinstances
+
+#TODO:
+runs:
+#  number_sat_gen_pre:
+#    all:
+#      - track1_mc
+  number_sat:
+    all:
+#      - gpusat_no_pp
+#      - gpusatbench
+      - mcc2020
+#      - sharpsat_sample
+
+
+#TODO:
+#config: "./benchmark_thp_bmc_sw.yml"
+#config: "./benchmark_thp_bmc_hw.yml"
+#config: "./benchmark_thp_maxsat.yml"

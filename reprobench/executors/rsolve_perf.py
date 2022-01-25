@@ -329,22 +329,24 @@ class RunSolverPerfEval(Executor):
                     m = reg.match(line)
                     if m:
                         stats[f'perf_{val}'] = m.group("val")
-        try:
-            # runsolver parser
-            with open(f"{stdout:s}") as f:
-                for line in f:
-                    for val, reg in solver_re.items():
-                        if reg[0] == 'func_store_true':
-                            # "grasp_UNSAT": ('func', lambda x: ),
-                            if f'stdout_{val}' not in stats and reg[1](line):
-                                stats[f'stdout_{val}'] = True
-                        else:
-                            m = reg.match(line)
-                            if m:
-                                stats[f'stdout_{val}'] = m.group("val")
-            logger.trace(stats)
-        except FileNotFoundError as e:
-            logger.error(e)
-            stats['runsolver_error'] = 'true'
+
+        # FIXME: do not do this for sharpsat, we output a compressed (binary) trace
+        ## try:
+        ##     # runsolver parser
+        ##     with open(f"{stdout:s}") as f:
+        ##         for line in f:
+        ##             for val, reg in solver_re.items():
+        ##                 if reg[0] == 'func_store_true':
+        ##                     # "grasp_UNSAT": ('func', lambda x: ),
+        ##                     if f'stdout_{val}' not in stats and reg[1](line):
+        ##                         stats[f'stdout_{val}'] = True
+        ##                 else:
+        ##                     m = reg.match(line)
+        ##                     if m:
+        ##                         stats[f'stdout_{val}'] = m.group("val")
+        ##     logger.trace(stats)
+        ## except FileNotFoundError as e:
+        ##     logger.error(e)
+        ##     stats['runsolver_error'] = 'true'
 
         return stats
