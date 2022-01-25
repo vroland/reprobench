@@ -10,13 +10,13 @@ repeat: 1
 #TODO: add_loglevel
 output: "output"
 reserve_hosts: 1
-reserve_cores: 8
+reserve_cores: 16
 #https://doc.zih.tu-dresden.de/hpc-wiki/pub/Compendium/HardwareTaurus/i4000.png
 billing: p_gpusat
 #billing: p_mcc2020
 #billing: p_mcc2020
 multicore:
-  processes: 2
+  processes: 4
   cores_per_process: 4
   #pinning:
   #  controller:

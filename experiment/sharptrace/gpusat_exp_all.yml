@@ -2,9 +2,9 @@ title: sharptrace
 description: Benchmark for sharptrace experiments
 
 limits:
-  time: 180 # s
+  time: 600 # s
 #  time: 3600
-  memory: 2000 # mb
+  memory: 16000 # mb
   scheduler_memory: 32768 #mb
 
 steps:
